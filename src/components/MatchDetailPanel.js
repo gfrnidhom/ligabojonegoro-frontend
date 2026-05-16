@@ -1,24 +1,20 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Clock, MapPin, Users, Trophy, CalendarDays, CloudSun, Target, Activity, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, Clock, MapPin, Users, Trophy, CalendarDays, CloudSun, Target, Activity, Star, ChevronLeft, ChevronRight, FileText, BarChart2, Zap, List, Maximize2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import api from '../api';
+import api, { getImageUrl } from '../api';
 import { calculateCoordinates } from '../utils/formationCoords';
 
 const TABS = [
-  { id: 'rincian', label: 'Rincian' },
-  { id: 'lineup', label: 'Lineup' },
-  { id: 'statistik', label: 'Statistik' },
-  { id: 'h2h', label: 'H2H' },
-  { id: 'klasemen', label: 'Klasemen' },
+  { id: 'rincian', label: 'Rincian', icon: FileText },
+  { id: 'lineup', label: 'Lineup', icon: Users },
+  { id: 'statistik', label: 'Statistik', icon: BarChart2 },
+  { id: 'h2h', label: 'H2H', icon: Zap },
+  { id: 'klasemen', label: 'Klasemen', icon: List },
 ];
 
-export const getImageUrl = (path) => {
-  if (!path) return null;
-  if (path.startsWith('http')) return path;
-  return `http://127.0.0.1:8000/storage/${path}`;
-};
+
 
 export const formatGameMinute = (minute) => {
   if (minute === null || minute === undefined) return '';
@@ -64,10 +60,10 @@ export default function MatchDetailPanel({ matchId, onClose }) {
         if (res.data.success && isMounted) {
           setMatch(res.data.data);
           // Fetch standings — on failure, keep existing data (don't clear)
-          const tournamentId = res.data.data.tournament?.id;
-          if (tournamentId) {
+          const tournamentSlug = res.data.data.tournament?.uuid || res.data.data.tournament?.id;
+          if (tournamentSlug) {
             try {
-              const sRes = await api.get(`/standings/${tournamentId}`);
+              const sRes = await api.get(`/standings/${tournamentSlug}`);
               if (sRes.data.success && isMounted) {
                 setStandings(sRes.data.data);
               }
@@ -265,21 +261,22 @@ export default function MatchDetailPanel({ matchId, onClose }) {
               >
                 {TABS.map(tab => {
                   const isActive = activeTab === tab.id;
-                  const Icon = tab.id === 'rincian' ? Activity : tab.id === 'lineup' ? Users : tab.id === 'statistik' ? Target : tab.id === 'h2h' ? Clock : Trophy;
+                  const Icon = tab.icon;
                   return (
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
                       style={{
                         display: 'flex', alignItems: 'center', gap: 6,
-                        background: isActive ? '#1e293b' : 'transparent',
-                        border: `1px solid ${isActive ? '#334155' : 'rgba(255,255,255,0.05)'}`,
-                        color: isActive ? '#f8fafc' : '#94a3b8',
-                        borderRadius: 20, padding: '6px 12px', fontSize: 11, fontWeight: 600,
+                        background: isActive ? 'rgba(59, 130, 246, 0.15)' : 'transparent',
+                        border: `1px solid ${isActive ? 'rgba(59, 130, 246, 0.4)' : 'rgba(255,255,255,0.05)'}`,
+                        color: isActive ? '#60a5fa' : '#94a3b8',
+                        borderRadius: 20, padding: '6px 14px', fontSize: 12, fontWeight: 700,
                         whiteSpace: 'nowrap', transition: 'all 0.2s ease', cursor: 'pointer',
+                        boxShadow: isActive ? '0 4px 12px rgba(59, 130, 246, 0.2)' : 'none'
                       }}
                     >
-                      <Icon size={13} /> {tab.label}
+                      <Icon size={14} /> {tab.label}
                     </button>
                   )
                 })}

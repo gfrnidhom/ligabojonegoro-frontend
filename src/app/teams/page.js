@@ -54,7 +54,7 @@ export default function TeamsPage() {
         ) : teams.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {teams.map((team) => (
-              <Link href={`/teams/${team.id}`} key={team.id} className="group">
+              <Link href={`/teams/${team.uuid || team.id}`} key={team.id} className="group">
                 <div className="glass rounded-2xl p-6 h-full flex flex-col items-center text-center hover:border-[var(--primary-color)] transition-all duration-300 transform hover:-translate-y-2 relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-b from-[var(--primary-color)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   

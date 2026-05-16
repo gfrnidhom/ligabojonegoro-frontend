@@ -83,7 +83,7 @@ export default function TournamentsSection() {
                 </div>
                 
                 <Link 
-                  href={`/tournaments/${tournament.id}`} 
+                  href={`/tournaments/${tournament.uuid || tournament.id}`} 
                   className="w-full py-3 rounded-xl bg-[rgba(0,0,0,0.03)] hover:bg-[var(--primary-color)] hover:text-white border border-[var(--border-color)] hover:border-transparent text-center font-semibold transition-all"
                 >
                   Lihat Detail

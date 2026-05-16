@@ -35,7 +35,7 @@ export default function TeamDetailPage({ params }) {
         // Fetch team details
         const tRes = await api.get('/teams');
         if (tRes.data.success) {
-          const matched = tRes.data.data.find(t => String(t.id) === String(teamId));
+          const matched = tRes.data.data.find(t => String(t.uuid) === String(teamId) || String(t.id) === String(teamId));
           if (matched) {
             setTeam(matched);
           }
@@ -45,7 +45,8 @@ export default function TeamDetailPage({ params }) {
         const mRes = await api.get('/matches', { params: { per_page: 100 } });
         if (mRes.data.success) {
           const teamMatches = mRes.data.data.filter(
-            m => String(m.home_team_id) === String(teamId) || String(m.away_team_id) === String(teamId)
+            m => String(m.home_team_id) === String(teamId) || String(m.away_team_id) === String(teamId) ||
+                 String(m.home_team?.uuid) === String(teamId) || String(m.away_team?.uuid) === String(teamId)
           );
           setMatches(teamMatches);
         }
@@ -207,7 +208,7 @@ export default function TeamDetailPage({ params }) {
                     <div 
                       key={m.id} 
                       className="card"
-                      onClick={() => router.push(`/matches/${m.id}`)}
+                      onClick={() => router.push(`/matches/${m.uuid || m.id}`)}
                       style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, cursor: 'pointer' }}
                     >
                       <div style={{ flex: 1, minWidth: 150 }}>

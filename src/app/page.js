@@ -4,8 +4,8 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Trophy, Calendar, Star, Zap, CircleDot, Volleyball, Footprints, BadgeCheck, X, Home as HomeIcon, Flame, CheckCircle, Award, Maximize2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import MatchDetailPanel, { getImageUrl } from '../components/MatchDetailPanel';
-import api from '../api';
+import MatchDetailPanel from '../components/MatchDetailPanel';
+import api, { getImageUrl } from '../api';
 
 // SVG Icons for sports
 const FootballSvg = ({ size = 16, color = "currentColor" }) => (
@@ -230,7 +230,7 @@ export default function Home() {
     if (filteredMatches.length === 0) return;
     
     // If the currently selected match is still visible in the current view, keep it selected.
-    if (selectedMatchId && filteredMatches.some(m => m.id === selectedMatchId)) {
+    if (selectedMatchId && filteredMatches.some(m => (m.uuid || m.id) === selectedMatchId)) {
       return;
     }
 
@@ -239,7 +239,7 @@ export default function Home() {
     // 1. Live Match
     const live = filteredMatches.find(m => ['live', 'first_half', 'half_time', 'second_half', 'extra_time_1', 'extra_time_ht', 'extra_time_2', 'penalty_shootout', 'ongoing'].includes(m.status));
     if (live) {
-      setSelectedMatchId(live.id);
+      setSelectedMatchId(live.uuid || live.id);
       return;
     }
     
@@ -248,7 +248,7 @@ export default function Home() {
       .filter(m => m.status === 'scheduled' && new Date(m.scheduled_at) >= now)
       .sort((a, b) => new Date(a.scheduled_at) - new Date(b.scheduled_at));
     if (upcoming.length > 0) {
-      setSelectedMatchId(upcoming[0].id);
+      setSelectedMatchId(upcoming[0].uuid || upcoming[0].id);
       return;
     }
     
@@ -257,12 +257,12 @@ export default function Home() {
       .filter(m => m.status === 'finished')
       .sort((a, b) => new Date(b.scheduled_at) - new Date(a.scheduled_at));
     if (finished.length > 0) {
-      setSelectedMatchId(finished[0].id);
+      setSelectedMatchId(finished[0].uuid || finished[0].id);
       return;
     }
 
     // 4. Fallback
-    setSelectedMatchId(filteredMatches[0].id);
+    setSelectedMatchId(filteredMatches[0].uuid || filteredMatches[0].id);
   }, [filteredMatches, selectedMatchId]);
 
   // Fetch top scorers / player stats
@@ -602,7 +602,7 @@ export default function Home() {
               padding: '16px 20px', cursor: featuredLive ? 'pointer' : 'default',
               transition: 'all 0.25s ease',
             }}
-              onClick={() => featuredLive && handleMatchClick(featuredLive.id)}
+              onClick={() => featuredLive && handleMatchClick(featuredLive.uuid || featuredLive.id)}
             >
               {featuredLive ? (
                 <>
@@ -934,8 +934,8 @@ export default function Home() {
               <div key={name} className="card">
                 <div 
                   className="card-header" 
-                  onClick={() => group.tournament?.id && router.push(`/tournaments/${group.tournament.id}`)}
-                  style={{ cursor: group.tournament?.id ? 'pointer' : 'default', display: 'flex', alignItems: 'center', gap: 10 }}
+                  onClick={() => (group.tournament?.uuid || group.tournament?.id) && router.push(`/tournaments/${group.tournament.uuid || group.tournament.id}`)}
+                  style={{ cursor: (group.tournament?.uuid || group.tournament?.id) ? 'pointer' : 'default', display: 'flex', alignItems: 'center', gap: 10 }}
                 >
                   <img
                     src={getImageUrl(group.tournament?.logo_path || group.tournament?.logo) || avatar(name, '3b82f6')}
@@ -955,98 +955,99 @@ export default function Home() {
                         const time = match.scheduled_at
                           ? new Date(match.scheduled_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
                           : '-';
-                        const isSelected = selectedMatchId === match.id;
+                        const isSelected = selectedMatchId === (match.uuid || match.id);
                         
                         return (
                           <div
                             key={match.id}
-                            onClick={() => handleMatchClick(match.id)}
+                            onClick={() => handleMatchClick(match.uuid || match.id)}
                             style={{
-                              background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%)',
-                              border: `1px solid ${isSelected ? 'rgba(59,130,246,0.5)' : 'rgba(255,255,255,0.05)'}`,
-                              borderRadius: 16,
-                              padding: '24px 16px',
+                              background: 'rgba(255, 255, 255, 0.02)',
+                              backdropFilter: 'blur(10px)',
+                              border: `1px solid ${isSelected ? 'rgba(59, 130, 246, 0.4)' : 'rgba(255, 255, 255, 0.05)'}`,
+                              borderRadius: 20,
+                              padding: '20px 16px',
                               position: 'relative',
                               cursor: 'pointer',
-                              transition: 'all 0.2s ease',
-                              boxShadow: isSelected ? '0 0 0 1px #3b82f6, 0 8px 24px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.2)',
+                              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                              boxShadow: isSelected ? '0 8px 32px rgba(59, 130, 246, 0.25), inset 0 0 0 1px rgba(59, 130, 246, 0.2)' : '0 4px 16px rgba(0,0,0,0.2)',
+                              transform: isSelected ? 'scale(1.02)' : 'scale(1)',
                             }}
                           >
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, width: '100%' }}>
-                              <div style={{ width: 32 }} /> {/* balance spacing */}
+                              <div style={{ width: 32 }} /> 
                               {isLive ? (
-                                <div style={{ background: 'linear-gradient(135deg, #3b82f6, #2563eb)', color: '#fff', fontSize: 11, fontWeight: 800, padding: '4px 14px', borderRadius: 24, display: 'flex', alignItems: 'center', gap: 5, boxShadow: '0 4px 12px rgba(59, 130, 246, 0.4)', letterSpacing: '0.05em' }}>
-                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                                <div style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', fontSize: 10, fontWeight: 800, padding: '4px 12px', borderRadius: 20, display: 'flex', alignItems: 'center', gap: 6, letterSpacing: '0.05em', animation: 'pulseGlow 2s infinite' }}>
+                                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444' }}></span>
                                   LIVE
                                 </div>
                               ) : isFinished ? (
-                                <div style={{ background: 'rgba(255,255,255,0.1)', color: '#94a3b8', fontSize: 11, fontWeight: 800, padding: '4px 14px', borderRadius: 24, letterSpacing: '0.05em' }}>
+                                <div style={{ background: 'rgba(255,255,255,0.05)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.1)', fontSize: 10, fontWeight: 800, padding: '4px 12px', borderRadius: 20, letterSpacing: '0.05em' }}>
                                   SELESAI
                                 </div>
                               ) : (
-                                <div style={{ background: 'rgba(59,130,246,0.1)', color: '#60a5fa', fontSize: 12, fontWeight: 800, padding: '4px 14px', borderRadius: 24, letterSpacing: '0.05em' }}>
+                                <div style={{ background: 'rgba(59, 130, 246, 0.08)', color: '#60a5fa', border: '1px solid rgba(59, 130, 246, 0.15)', fontSize: 11, fontWeight: 800, padding: '4px 12px', borderRadius: 20, letterSpacing: '0.05em' }}>
                                   {time}
                                 </div>
                               )}
                               <button
-                                onClick={(e) => { e.stopPropagation(); router.push(`/matches/${match.id}`); }}
+                                onClick={(e) => { e.stopPropagation(); router.push(`/matches/${match.uuid || match.id}`); }}
                                 style={{
-                                  width: 32, height: 32, borderRadius: 8,
-                                  background: 'rgba(59, 130, 246, 0.12)', color: '#3b82f6',
-                                  border: '1px solid rgba(59, 130, 246, 0.25)',
+                                  width: 32, height: 32, borderRadius: 10,
+                                  background: 'rgba(255, 255, 255, 0.05)', color: '#94a3b8',
+                                  border: '1px solid rgba(255, 255, 255, 0.1)',
                                   cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                                   transition: 'all 0.2s', flexShrink: 0
                                 }}
-                                title="Detail Pertandingan"
+                                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)'; e.currentTarget.style.color = '#3b82f6'; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'; e.currentTarget.style.color = '#94a3b8'; }}
                               >
                                 <Maximize2 size={14} />
                               </button>
                             </div>
 
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
-                                <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name)} style={{ width: 64, height: 64, objectFit: 'contain', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.4))' }} alt="" />
-                                <span style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc', marginTop: 14, textAlign: 'center', lineHeight: 1.2 }}>{match.home_team?.name}</span>
-                                {/* Home Scorers */}
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 10, gap: 5 }}>
-                                  {match.events?.filter(e => e.team_id === match.home_team?.id && e.event_type === 'goal').map((g, idx) => (
-                                    <div key={idx} style={{ fontSize: 11, color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: 5 }}>
-                                      <span style={{ maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{g.player?.name?.split(' ').pop()}</span> <span style={{ color: '#8b92a5' }}>{formatGameMinute(g.minute)}&apos;</span> <svg width="10" height="10" viewBox="0 0 24 24" fill="#e8eaed" stroke="#111" strokeWidth="1"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
-                                    </div>
-                                  ))}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <div style={{ width: 56, height: 56, position: 'relative', marginBottom: 12 }}>
+                                  <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name)} style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }} alt="" />
                                 </div>
+                                <span style={{ fontSize: 13, fontWeight: 800, color: '#f8fafc', textAlign: 'center', lineHeight: 1.3 }}>{match.home_team?.name}</span>
                               </div>
 
-                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 12px' }}>
-                                <div style={{ background: '#0b0c10', border: '1px solid rgba(255,255,255,0.04)', borderRadius: 14, padding: '10px 20px', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.5)' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <div style={{ 
+                                  background: 'rgba(15, 23, 42, 0.6)', 
+                                  border: '1px solid rgba(255,255,255,0.05)', 
+                                  borderRadius: 16, 
+                                  padding: '8px 16px', 
+                                  display: 'flex', 
+                                  alignItems: 'center', 
+                                  gap: 12,
+                                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+                                }}>
                                   {hasScore ? (
                                     <>
-                                      <span style={{ fontSize: 24, fontWeight: 900, color: '#eab308', lineHeight: 1 }}>{match.home_score}</span>
-                                      <span style={{ fontSize: 14, fontWeight: 800, color: '#475569' }}>-</span>
-                                      <span style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', lineHeight: 1 }}>{match.away_score}</span>
+                                      <span style={{ fontSize: 28, fontWeight: 900, color: '#f8fafc', lineHeight: 1 }}>{match.home_score}</span>
+                                      <span style={{ fontSize: 16, fontWeight: 800, color: '#475569' }}>-</span>
+                                      <span style={{ fontSize: 28, fontWeight: 900, color: '#f8fafc', lineHeight: 1 }}>{match.away_score}</span>
                                     </>
                                   ) : (
-                                    <span style={{ fontSize: 16, fontWeight: 800, color: '#8b92a5' }}>VS</span>
+                                    <span style={{ fontSize: 14, fontWeight: 800, color: '#64748b', letterSpacing: '0.1em' }}>VS</span>
                                   )}
                                 </div>
                                 {isLive && match.minute && (
-                                  <div style={{ background: 'rgba(34, 197, 94, 0.2)', color: '#22c55e', fontSize: 13, fontWeight: 800, padding: '2px 8px', borderRadius: 6, marginTop: 10 }}>
-                                    {formatGameMinute(match.minute)}{match.minute !== 'HT' && match.minute !== 'FT' ? "'" : ""}
+                                  <div style={{ color: '#22c55e', fontSize: 12, fontWeight: 800, marginTop: 8, display: 'flex', alignItems: 'center', gap: 4 }}>
+                                    <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#22c55e', animation: 'pulseGlow 1s infinite' }}></span>
+                                    {formatGameMinute(match.minute)}&apos;
                                   </div>
                                 )}
                               </div>
 
-                              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
-                                <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name, 'ef4444')} style={{ width: 64, height: 64, objectFit: 'contain', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.4))' }} alt="" />
-                                <span style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc', marginTop: 14, textAlign: 'center', lineHeight: 1.2 }}>{match.away_team?.name}</span>
-                                {/* Away Scorers */}
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 10, gap: 5 }}>
-                                  {match.events?.filter(e => e.team_id === match.away_team?.id && e.event_type === 'goal').map((g, idx) => (
-                                    <div key={idx} style={{ fontSize: 11, color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: 5 }}>
-                                      <svg width="10" height="10" viewBox="0 0 24 24" fill="#e8eaed" stroke="#111" strokeWidth="1"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg> <span style={{ color: '#8b92a5' }}>{formatGameMinute(g.minute)}&apos;</span> <span style={{ maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{g.player?.name?.split(' ').pop()}</span>
-                                    </div>
-                                  ))}
+                              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <div style={{ width: 56, height: 56, position: 'relative', marginBottom: 12 }}>
+                                  <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name, 'ef4444')} style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }} alt="" />
                                 </div>
+                                <span style={{ fontSize: 13, fontWeight: 800, color: '#f8fafc', textAlign: 'center', lineHeight: 1.3 }}>{match.away_team?.name}</span>
                               </div>
                             </div>
                           </div>
@@ -1062,7 +1063,7 @@ export default function Home() {
                         const time = match.scheduled_at
                           ? new Date(match.scheduled_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
                           : '-';
-                        const isSelected = selectedMatchId === match.id;
+                        const isSelected = selectedMatchId === (match.uuid || match.id);
                         const homeWin = hasScore && match.home_score > match.away_score;
                         const awayWin = hasScore && match.away_score > match.home_score;
 
@@ -1071,7 +1072,7 @@ export default function Home() {
                           return (
                             <div
                               key={match.id}
-                              onClick={() => handleMatchClick(match.id)}
+                              onClick={() => handleMatchClick(match.uuid || match.id)}
                               className={`match-row ${isSelected ? 'active' : ''}`}
                             >
                               {/* Time */}
@@ -1116,7 +1117,7 @@ export default function Home() {
                                   <Star size={14} />
                                 </button>
                                 <button
-                                  onClick={(e) => { e.stopPropagation(); router.push(`/matches/${match.id}`); }}
+                                  onClick={(e) => { e.stopPropagation(); router.push(`/matches/${match.uuid || match.id}`); }}
                                   style={{
                                     width: 32, height: 32, borderRadius: 8,
                                     background: 'rgba(59, 130, 246, 0.12)', color: '#3b82f6',
@@ -1136,7 +1137,7 @@ export default function Home() {
                         return (
                           <div
                             key={match.id}
-                            onClick={() => handleMatchClick(match.id)}
+                            onClick={() => handleMatchClick(match.uuid || match.id)}
                             style={{
                               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                               padding: '14px 16px', marginBottom: 12,

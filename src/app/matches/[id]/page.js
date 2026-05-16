@@ -3,16 +3,15 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Trophy, ChevronRight, Star, ArrowLeft } from 'lucide-react';
+import { Trophy, ChevronRight, Star, ArrowLeft, FileText, Users, BarChart2, List, Activity, Zap, Clock } from 'lucide-react';
 import api, { getImageUrl } from '../../../api';
 import { calculateCoordinates } from '../../../utils/formationCoords';
 
-
 const TABS = [
-  { id: 'rincian', label: 'Rincian' },
-  { id: 'lineup', label: 'Lineup' },
-  { id: 'statistik', label: 'Statistik' },
-  { id: 'klasemen', label: 'Klasemen' }
+  { id: 'rincian', label: 'Rincian', icon: FileText },
+  { id: 'lineup', label: 'Lineup', icon: Users },
+  { id: 'statistik', label: 'Statistik', icon: BarChart2 },
+  { id: 'klasemen', label: 'Klasemen', icon: List }
 ];
 
 export const formatGameMinute = (minute) => {
@@ -50,10 +49,10 @@ export default function MatchDetailPage({ params }) {
         const res = await api.get(`/matches/${matchId}`);
         if (res.data.success && isMounted) {
           setMatch(res.data.data);
-          const tournamentId = res.data.data.tournament?.id;
-          if (tournamentId) {
+          const tournamentSlug = res.data.data.tournament?.uuid || res.data.data.tournament?.id;
+          if (tournamentSlug) {
             try {
-              const sRes = await api.get(`/standings/${tournamentId}`);
+              const sRes = await api.get(`/standings/${tournamentSlug}`);
               if (sRes.data.success && isMounted) {
                 setStandings(sRes.data.data);
               }
@@ -185,7 +184,7 @@ export default function MatchDetailPage({ params }) {
 
       {/* Breadcrumbs Navigation */}
       <div className="breadcrumb-nav" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#64748b', marginBottom: 16 }}>
-        <Link href="/tournaments" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 500 }}>
+        <Link href={`/tournaments/${match.tournament?.uuid || match.tournament?.id}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 500 }}>
           {match.tournament?.name || 'Turnamen'}
         </Link>
         {match.round && (
@@ -368,6 +367,7 @@ export default function MatchDetailPage({ params }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, overflowX: 'auto', paddingBottom: 4 }}>
           {TABS.map(tab => {
             const isActive = activeTab === tab.id;
+            const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
@@ -375,11 +375,13 @@ export default function MatchDetailPage({ params }) {
                 style={{
                   padding: '8px 16px', fontSize: 12, fontWeight: 700, borderRadius: 24, border: '1px solid',
                   cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.2s ease',
-                  background: isActive ? 'rgba(204, 162, 107, 0.15)' : 'rgba(255, 255, 255, 0.03)',
-                  color: isActive ? '#cca26b' : '#94a3b8',
-                  borderColor: isActive ? '#cca26b' : 'rgba(255, 255, 255, 0.08)',
+                  background: isActive ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+                  color: isActive ? '#3b82f6' : '#94a3b8',
+                  borderColor: isActive ? '#3b82f6' : 'rgba(255, 255, 255, 0.08)',
+                  display: 'flex', alignItems: 'center', gap: 6
                 }}
               >
+                <Icon size={14} />
                 {tab.label}
               </button>
             );

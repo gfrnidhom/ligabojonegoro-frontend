@@ -33,27 +33,26 @@ export default function TournamentDetailPage({ params }) {
         // Fetch tournament details
         const tRes = await api.get('/tournaments');
         if (tRes.data.success) {
-          const matched = tRes.data.data.find(t => String(t.id) === String(tournamentId));
+          const matched = tRes.data.data.find(t => String(t.uuid) === String(tournamentId) || String(t.id) === String(tournamentId));
           if (matched) {
             setTournament(matched);
+            // Fetch standings for this tournament using UUID if possible
+            try {
+              const sRes = await api.get(`/standings/${matched.uuid || matched.id}`);
+              if (sRes.data.success) {
+                setStandings(sRes.data.data);
+              }
+            } catch (err) {
+              console.log('No standings endpoint for this tournament or returned 404/500');
+            }
           }
         }
 
         // Fetch matches for this tournament
         const mRes = await api.get('/matches', { params: { per_page: 100 } });
         if (mRes.data.success) {
-          const tMatches = mRes.data.data.filter(m => String(m.tournament_id) === String(tournamentId));
+          const tMatches = mRes.data.data.filter(m => String(m.tournament_id) === String(tournamentId) || String(m.tournament?.uuid) === String(tournamentId));
           setMatches(tMatches);
-        }
-
-        // Fetch standings for this tournament
-        try {
-          const sRes = await api.get(`/standings/${tournamentId}`);
-          if (sRes.data.success) {
-            setStandings(sRes.data.data);
-          }
-        } catch (err) {
-          console.log('No standings endpoint for this tournament or returned 404/500');
         }
 
       } catch (err) {
@@ -261,11 +260,13 @@ export default function TournamentDetailPage({ params }) {
             style={{
               padding: '8px 16px', fontSize: 12, fontWeight: 700, borderRadius: 24, border: '1px solid',
               cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.2s ease',
-              background: activeTab === 'info' ? 'rgba(204, 162, 107, 0.15)' : 'rgba(255, 255, 255, 0.03)',
-              color: activeTab === 'info' ? '#cca26b' : '#94a3b8',
-              borderColor: activeTab === 'info' ? '#cca26b' : 'rgba(255, 255, 255, 0.08)',
+              background: activeTab === 'info' ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+              color: activeTab === 'info' ? '#3b82f6' : '#94a3b8',
+              borderColor: activeTab === 'info' ? '#3b82f6' : 'rgba(255, 255, 255, 0.08)',
+              display: 'flex', alignItems: 'center', gap: 6
             }}
           >
+            <Shield size={14} />
             Gambaran Umum
           </button>
 
@@ -274,11 +275,13 @@ export default function TournamentDetailPage({ params }) {
             style={{
               padding: '8px 16px', fontSize: 12, fontWeight: 700, borderRadius: 24, border: '1px solid',
               cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.2s ease',
-              background: activeTab === 'matches' ? 'rgba(204, 162, 107, 0.15)' : 'rgba(255, 255, 255, 0.03)',
-              color: activeTab === 'matches' ? '#cca26b' : '#94a3b8',
-              borderColor: activeTab === 'matches' ? '#cca26b' : 'rgba(255, 255, 255, 0.08)',
+              background: activeTab === 'matches' ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+              color: activeTab === 'matches' ? '#3b82f6' : '#94a3b8',
+              borderColor: activeTab === 'matches' ? '#3b82f6' : 'rgba(255, 255, 255, 0.08)',
+              display: 'flex', alignItems: 'center', gap: 6
             }}
           >
+            <Calendar size={14} />
             Daftar Pertandingan
           </button>
 
@@ -288,11 +291,13 @@ export default function TournamentDetailPage({ params }) {
               style={{
                 padding: '8px 16px', fontSize: 12, fontWeight: 700, borderRadius: 24, border: '1px solid',
                 cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.2s ease',
-                background: activeTab === 'standings' ? 'rgba(204, 162, 107, 0.15)' : 'rgba(255, 255, 255, 0.03)',
-                color: activeTab === 'standings' ? '#cca26b' : '#94a3b8',
-                borderColor: activeTab === 'standings' ? '#cca26b' : 'rgba(255, 255, 255, 0.08)',
+                background: activeTab === 'standings' ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+                color: activeTab === 'standings' ? '#3b82f6' : '#94a3b8',
+                borderColor: activeTab === 'standings' ? '#3b82f6' : 'rgba(255, 255, 255, 0.08)',
+                display: 'flex', alignItems: 'center', gap: 6
               }}
             >
+              <Trophy size={14} />
               Klasemen
             </button>
           )}
@@ -300,9 +305,11 @@ export default function TournamentDetailPage({ params }) {
           <button
             style={{
               padding: '8px 16px', fontSize: 12, fontWeight: 700, borderRadius: 24, border: '1px solid rgba(255, 255, 255, 0.04)',
-              background: 'rgba(255, 255, 255, 0.02)', color: '#475569', cursor: 'default', whiteSpace: 'nowrap'
+              background: 'rgba(255, 255, 255, 0.02)', color: '#475569', cursor: 'default', whiteSpace: 'nowrap',
+              display: 'flex', alignItems: 'center', gap: 6
             }}
           >
+            <Award size={14} />
             Pemain Terbaik
           </button>
 
@@ -382,7 +389,7 @@ export default function TournamentDetailPage({ params }) {
                   return (
                     <div 
                       key={m.id} 
-                      onClick={() => router.push(`/matches/${m.id}`)}
+                      onClick={() => router.push(`/matches/${m.uuid || m.id}`)}
                       style={{
                         background: 'rgba(255, 255, 255, 0.01)',
                         border: '1px solid rgba(255, 255, 255, 0.02)',

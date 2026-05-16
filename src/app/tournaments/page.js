@@ -86,7 +86,7 @@ export default function TournamentsPage() {
                   </div>
                   
                   <Link 
-                    href={`/tournaments/${tournament.id}`} 
+                    href={`/tournaments/${tournament.uuid || tournament.id}`} 
                     className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[rgba(0,0,0,0.03)] to-[rgba(0,0,0,0.01)] hover:from-[var(--primary-color)] hover:to-[var(--secondary-color)] hover:text-white border border-[var(--border-color)] hover:border-transparent text-center font-bold transition-all shadow-[var(--shadow-card)]"
                   >
                     Lihat Detail Turnamen
