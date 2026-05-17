@@ -1,7 +1,9 @@
 import { Inter, Outfit } from 'next/font/google';
 import './globals.css';
+import { Suspense } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import BottomNav from '../components/BottomNav';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -29,6 +31,9 @@ export default function RootLayout({ children }) {
           <main className="main-content">
             {children}
           </main>
+          <Suspense fallback={null}>
+            <BottomNav />
+          </Suspense>
           <Footer />
         </div>
       </body>

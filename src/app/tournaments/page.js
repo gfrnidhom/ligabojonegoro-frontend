@@ -1,13 +1,81 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
-import { Trophy, MapPin, Users, Search } from 'lucide-react';
+import { 
+  Trophy, 
+  MapPin, 
+  Calendar, 
+  Search, 
+  ChevronRight, 
+  ArrowUpRight,
+  Filter,
+  Users,
+  Zap
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../api';
+
+// Premium Modern Design Tokens
+const COLORS = {
+  bg: '#020617',
+  card: 'rgba(15, 23, 42, 0.4)',
+  border: 'rgba(255, 255, 255, 0.08)',
+  primary: '#3b82f6',
+  textMain: '#f8fafc',
+  textSecondary: '#94a3b8',
+};
+
+const getImageUrl = (path) => path ? (path.startsWith('http') ? path : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/storage/${path}`) : null;
+
+// Spotlight Card Component (Optimized for Mobile)
+const SpotlightCard = ({ children, className = "", style = {}, isFeatured = false }) => {
+  const divRef = useRef(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [opacity, setOpacity] = useState(0);
+
+  const handleMouseMove = (e) => {
+    if (!divRef.current) return;
+    const div = divRef.current;
+    const rect = div.getBoundingClientRect();
+    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
+
+  return (
+    <div
+      ref={divRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setOpacity(1)}
+      onMouseLeave={() => setOpacity(0)}
+      style={{
+        ...style,
+        background: 'rgba(15, 23, 42, 0.4)',
+        backdropFilter: 'blur(12px)',
+        position: 'relative',
+        overflow: 'hidden',
+        borderRadius: 24,
+        border: `1px solid ${COLORS.border}`,
+        transition: 'all 0.3s ease'
+      }}
+      className={`tournament-card-container ${className}`}
+    >
+      <div
+        className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 md:block hidden"
+        style={{
+          opacity,
+          background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, rgba(59, 130, 246, 0.15), transparent 40%)`,
+        }}
+      />
+      {children}
+    </div>
+  );
+};
 
 export default function TournamentsPage() {
   const [tournaments, setTournaments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState('all');
 
   useEffect(() => {
     const fetchTournaments = async () => {
@@ -22,86 +90,235 @@ export default function TournamentsPage() {
         setLoading(false);
       }
     };
-
     fetchTournaments();
   }, []);
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'ongoing': return 'text-green-400 bg-green-400/10 border-green-400/20';
-      case 'upcoming': return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
-      case 'completed': return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
-      default: return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
-    }
+  const filteredTournaments = useMemo(() => {
+    return tournaments.filter(t => {
+      const matchesSearch = t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           (t.location && t.location.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesFilter = activeFilter === 'all' || t.status === activeFilter;
+      return matchesSearch && matchesFilter;
+    });
+  }, [tournaments, searchQuery, activeFilter]);
+
+  const getStatusBadge = (status) => {
+    const configs = {
+      ongoing: { label: 'LIVE', color: '#ef4444' },
+      upcoming: { label: 'COMING', color: '#3b82f6' },
+      completed: { label: 'ENDED', color: '#94a3b8' }
+    };
+    const config = configs[status] || { label: status.toUpperCase(), color: '#64748b' };
+    
+    return (
+      <div style={{ 
+        display: 'flex', alignItems: 'center', gap: 6, 
+        padding: '4px 10px', borderRadius: 8, background: 'rgba(0,0,0,0.4)',
+        border: `1px solid ${config.color}40`, backdropFilter: 'blur(4px)'
+      }}>
+        {status === 'ongoing' && <div style={{ width: 6, height: 6, borderRadius: '50%', background: config.color }} className="animate-pulse" />}
+        <span style={{ fontSize: 10, fontWeight: 800, color: config.color, letterSpacing: '0.05em' }}>{config.label}</span>
+      </div>
+    );
   };
 
   return (
-    <div className="space-y-12 pb-12 animate-fade-in">
-      {/* Header */}
-      <section className="relative glass rounded-3xl overflow-hidden mt-8 p-12 text-center border border-[var(--glass-border)]">
-        <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent-color)]/10 to-[var(--primary-color)]/10 blur-3xl -z-10" />
-        <Trophy size={48} className="mx-auto mb-6 text-[var(--accent-color)]" />
-        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gradient">Turnamen Resmi</h1>
-        <p className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto">
-          Jelajahi seluruh turnamen yang sedang berjalan, akan datang, dan yang telah selesai di Liga Bojonegoro.
-        </p>
-      </section>
-
-      {/* Content */}
-      <section>
-        {loading ? (
-          <div className="loading-container">
-            <div className="loader"></div>
-            <p className="mt-4">Memuat data turnamen...</p>
+    <div style={{ background: COLORS.bg, minHeight: '100vh', color: COLORS.textMain, paddingBottom: 120 }}>
+      
+      {/* ── Header ── */}
+      <header className="page-header" style={{ padding: '60px 24px 40px', maxWidth: 1200, margin: '0 auto', textAlign: 'center' }}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 100, background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', marginBottom: 20 }}>
+            <Zap size={12} color={COLORS.primary} />
+            <span style={{ fontSize: 10, fontWeight: 700, color: COLORS.primary, letterSpacing: '0.1em' }}>KOMPETISI RESMI 2026</span>
           </div>
-        ) : tournaments.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {tournaments.map((tournament) => (
-              <div key={tournament.id} className="glass rounded-2xl p-8 relative overflow-hidden group hover:border-[var(--primary-color)] transition-all transform hover:-translate-y-2">
-                <div className="absolute top-0 right-0 w-48 h-48 bg-[var(--primary-color)]/5 rounded-full blur-3xl group-hover:bg-[var(--primary-color)]/15 transition-colors duration-500"></div>
-                
-                <div className="relative z-10 flex flex-col h-full">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="p-4 rounded-2xl bg-[rgba(0,0,0,0.03)] border border-[var(--border-color)]">
-                      <Trophy size={28} className="text-[var(--primary-color)]" />
-                    </div>
-                    <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border ${getStatusColor(tournament.status)} shadow-lg`}>
-                      {tournament.status || 'Unknown'}
-                    </span>
-                  </div>
-                  
-                  <h3 className="text-2xl font-bold mb-3 group-hover:text-[var(--primary-color)] transition-colors leading-tight text-[var(--text-primary)]">
-                    {tournament.name}
-                  </h3>
-                  
-                  <div className="flex flex-col gap-3 mb-8 mt-auto">
-                    <div className="flex items-center gap-3 text-sm text-[var(--text-secondary)]">
-                      <MapPin size={16} className="text-[var(--primary-color)]" />
-                      <span className="font-medium">{tournament.location || 'Multiple Venues'}</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm text-[var(--text-secondary)]">
-                      <Users size={16} className="text-[var(--accent-color)]" />
-                      <span className="font-medium">{tournament.sport?.name || 'Multi-Sport'}</span>
-                    </div>
-                  </div>
-                  
-                  <Link 
-                    href={`/tournaments/${tournament.uuid || tournament.id}`} 
-                    className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[rgba(0,0,0,0.03)] to-[rgba(0,0,0,0.01)] hover:from-[var(--primary-color)] hover:to-[var(--secondary-color)] hover:text-white border border-[var(--border-color)] hover:border-transparent text-center font-bold transition-all shadow-[var(--shadow-card)]"
-                  >
-                    Lihat Detail Turnamen
-                  </Link>
-                </div>
-              </div>
+          <h1 className="main-title" style={{ fontWeight: 900, marginBottom: 16, letterSpacing: '-0.02em' }}>Jelajah Turnamen</h1>
+          <p className="sub-title" style={{ maxWidth: 600, margin: '0 auto', color: COLORS.textSecondary, lineHeight: 1.6 }}>Temukan panggung kompetisi terbaik di Kabupaten Bojonegoro.</p>
+        </motion.div>
+      </header>
+
+      {/* ── Search & Filter (Mobile Sticky) ── */}
+      <div className="filter-sticky" style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(2, 6, 23, 0.8)', backdropFilter: 'blur(20px)', borderBottom: `1px solid ${COLORS.border}`, padding: '12px 24px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', gap: 12, flexDirection: 'column' }}>
+          {/* Search */}
+          <div style={{ position: 'relative' }}>
+            <Search size={16} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: COLORS.textSecondary }} />
+            <input 
+              type="text" 
+              placeholder="Cari turnamen..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%', height: 44, background: 'rgba(255,255,255,0.03)', 
+                border: `1px solid ${COLORS.border}`, borderRadius: 14,
+                padding: '0 48px', color: '#fff', fontSize: 14, outline: 'none'
+              }}
+            />
+          </div>
+          {/* Horizontal Scrollable Filters */}
+          <div className="filter-scroll hide-scrollbar" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+            {['all', 'ongoing', 'upcoming', 'completed'].map(f => (
+              <button
+                key={f}
+                onClick={() => setActiveFilter(f)}
+                style={{
+                  padding: '8px 16px', borderRadius: 12, fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap',
+                  background: activeFilter === f ? COLORS.primary : 'rgba(255,255,255,0.02)',
+                  color: activeFilter === f ? '#fff' : COLORS.textSecondary,
+                  border: `1px solid ${activeFilter === f ? COLORS.primary : COLORS.border}`,
+                  transition: 'all 0.2s'
+                }}
+              >
+                {f === 'all' ? 'Semua' : f === 'ongoing' ? 'Live' : f === 'upcoming' ? 'Mendatang' : 'Selesai'}
+              </button>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* ── Tournament Grid ── */}
+      <main style={{ maxWidth: 1200, margin: '32px auto', padding: '0 16px' }}>
+        {loading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '100px 0' }}>
+            <div className="loader" />
+          </div>
         ) : (
-          <div className="glass rounded-2xl p-16 text-center text-[var(--text-secondary)] border-dashed border-[var(--border-color)] flex flex-col items-center">
-            <Search size={48} className="mb-4 opacity-20" />
-            <p className="text-xl">Belum ada turnamen yang tersedia.</p>
+          <div className="tournament-grid">
+            <AnimatePresence mode="popLayout">
+              {filteredTournaments.map((t, idx) => {
+                const isFeatured = idx === 0 && !searchQuery && activeFilter === 'all';
+                return (
+                  <motion.div
+                    key={t.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.4 }}
+                    className={isFeatured ? 'featured-item' : ''}
+                  >
+                    <Link href={`/tournaments/${t.uuid || t.id}`} style={{ textDecoration: 'none' }}>
+                      <SpotlightCard className={`tournament-card ${isFeatured ? 'featured-card' : ''}`}>
+                        <div className="card-image-wrapper">
+                          <img 
+                            src={getImageUrl(t.banner_path) || 'https://images.unsplash.com/photo-1518091044184-21f449261c6c?q=80&w=1000&auto=format&fit=crop'} 
+                            alt={t.name}
+                            className="card-image"
+                          />
+                          <div className="card-overlay" />
+                          <div className="card-status-badge">{getStatusBadge(t.status)}</div>
+                        </div>
+
+                        <div className="card-content">
+                          <div className="card-meta">
+                            <span className="sport-tag">{t.sport?.name || 'MULTI'}</span>
+                            <span className="teams-count"><Users size={12} /> {t.teams?.length || 0} Tim</span>
+                          </div>
+                          
+                          <h3 className="card-title">{t.name}</h3>
+                          
+                          <div className="card-details">
+                            <div className="detail-item">
+                              <MapPin size={14} color={COLORS.primary} />
+                              <span>{t.location || 'Bojonegoro'}</span>
+                            </div>
+                            <div className="detail-item">
+                              <Calendar size={14} color={COLORS.primary} />
+                              <span>{t.start_date ? new Date(t.start_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : 'Segera'}</span>
+                            </div>
+                          </div>
+
+                          <div className="card-footer">
+                            <div className="organizer">
+                              <img src={getImageUrl(t.logo_path) || `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=1e293b&color=94a3b8&bold=true`} alt="Logo" />
+                              <span>Lihat Detail</span>
+                            </div>
+                            <div className="arrow-icon"><ArrowUpRight size={18} /></div>
+                          </div>
+                        </div>
+                      </SpotlightCard>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           </div>
         )}
-      </section>
+
+        {!loading && filteredTournaments.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '80px 24px', border: `1px dashed ${COLORS.border}`, borderRadius: 24 }}>
+            <Trophy size={48} style={{ color: COLORS.textSecondary, marginBottom: 16, opacity: 0.3 }} />
+            <p style={{ color: COLORS.textSecondary }}>Tidak ada turnamen ditemukan.</p>
+          </div>
+        )}
+      </main>
+
+      <style jsx global>{`
+        /* Global Responsive Variables */
+        .main-title { font-size: clamp(2rem, 5vw, 3.5rem); }
+        .sub-title { font-size: clamp(0.9rem, 2vw, 1.1rem); }
+
+        /* Grid System */
+        .tournament-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+          gap: 20px;
+        }
+
+        /* Card Styles */
+        .tournament-card {
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+        }
+        .card-image-wrapper {
+          position: relative;
+          height: 200px;
+          overflow: hidden;
+        }
+        .card-image { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+        .card-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(2,6,23,0.8) 0%, transparent 60%); }
+        .card-status-badge { position: absolute; top: 16px; left: 16px; }
+        .card-content { padding: 24px; flex: 1; display: flex; flex-direction: column; }
+        .card-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .sport-tag { background: rgba(59,130,246,0.1); color: ${COLORS.primary}; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; }
+        .teams-count { font-size: 11px; font-weight: 600; color: ${COLORS.textSecondary}; display: flex; align-items: center; gap: 4px; }
+        .card-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 16px; line-height: 1.3; }
+        .card-details { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+        .detail-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: ${COLORS.textSecondary}; }
+        .card-footer { margin-top: auto; display: flex; align-items: center; justify-content: space-between; padding-top: 16px; border-top: 1px solid ${COLORS.border}; }
+        .organizer { display: flex; align-items: center; gap: 10px; }
+        .organizer img { width: 28px; height: 28px; border-radius: 8px; }
+        .organizer span { font-size: 12px; font-weight: 700; color: #fff; }
+        .arrow-icon { width: 36px; height: 36px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid ${COLORS.border}; display: flex; align-items: center; justify-content: center; color: ${COLORS.primary}; transition: all 0.3s; }
+
+        /* Featured Bento Logic */
+        @media (min-width: 1024px) {
+          .featured-item { grid-column: span 2; }
+          .featured-card { flex-direction: row !important; height: 380px !important; }
+          .featured-card .card-image-wrapper { width: 50%; height: 100%; }
+          .featured-card .card-title { font-size: 28px; }
+        }
+
+        /* Hover States */
+        .tournament-card:hover .card-image { transform: scale(1.08); }
+        .tournament-card:hover .arrow-icon { background: ${COLORS.primary}; color: #fff; transform: rotate(45deg); border-color: ${COLORS.primary}; }
+
+        /* Loader & Scroll */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .loader { width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.05); border-radius: 50%; border-top-color: ${COLORS.primary}; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+          .page-header { padding: 40px 20px 24px !important; }
+          .filter-sticky { padding: 12px 16px !important; }
+          .tournament-grid { grid-template-columns: 1fr; }
+          .card-content { padding: 20px; }
+          .card-title { font-size: 18px; }
+        }
+      `}</style>
     </div>
   );
 }

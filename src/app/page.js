@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useMemo, useRef, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Trophy, Calendar, Star, Zap, CircleDot, Volleyball, Footprints, BadgeCheck, X, Home as HomeIcon, Flame, CheckCircle, Award, Maximize2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MatchDetailPanel from '../components/MatchDetailPanel';
@@ -84,7 +84,7 @@ const STATUS_FILTERS = [
   { id: 'finished', label: 'Selesai' },
 ];
 
-export default function Home() {
+function Home() {
   const [matches, setMatches] = useState([]);
   const [tournaments, setTournaments] = useState([]);
   const [sports, setSports] = useState([]);
@@ -108,10 +108,24 @@ export default function Home() {
   const [mobileCalendarOpen, setMobileCalendarOpen] = useState(false);
   const router = useRouter();
 
+  const searchParams = useSearchParams();
+  const filterParam = searchParams.get('filter');
+
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (filterParam) {
+      if (STATUS_FILTERS.find(f => f.id === filterParam)) {
+        setStatusFilter(filterParam);
+        setMobileTab('matches');
+      } else if (filterParam === 'leagues') {
+        setMobileTab('leagues');
+      }
+    }
+  }, [filterParam]);
 
   const handleMatchClick = (matchId) => {
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
@@ -1437,109 +1451,14 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* ═══ Floating Mobile/Tablet Bottom Navigation Bar ═══ */}
-      <div className="fixed bottom-4 left-4 right-4 z-[9999] h-[64px] max-w-md mx-auto bg-[#11131a]/95 backdrop-blur-xl border border-white/5 lg:hidden px-3 flex justify-around items-center" style={{ borderRadius: 32, boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 16px rgba(234,179,8,0.05)' }}>
-        {/* SEMUA */}
-        <button
-          onClick={() => { setStatusFilter('all'); setMobileTab('matches'); }}
-          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', flex: 1, height: '100%', justifyContent: 'center' }}
-        >
-          <div style={{
-            padding: '6px 14px', borderRadius: 20,
-            background: statusFilter === 'all' && mobileTab === 'matches' ? 'rgba(234,179,8,0.12)' : 'transparent',
-            border: statusFilter === 'all' && mobileTab === 'matches' ? '1px solid rgba(234,179,8,0.3)' : '1px solid transparent',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            transition: 'all 0.2s ease',
-          }}>
-            <HomeIcon size={18} color={statusFilter === 'all' && mobileTab === 'matches' ? '#fbbf24' : '#8b92a5'} style={{ fill: statusFilter === 'all' && mobileTab === 'matches' ? '#fbbf24' : 'none' }} />
-          </div>
-          <span style={{ fontSize: 10, fontWeight: statusFilter === 'all' && mobileTab === 'matches' ? 700 : 500, color: statusFilter === 'all' && mobileTab === 'matches' ? '#fbbf24' : '#8b92a5', transition: 'all 0.2s ease' }}>
-            Semua
-          </span>
-        </button>
-
-        {/* LIVE */}
-        <button
-          onClick={() => { setStatusFilter('live'); setMobileTab('matches'); }}
-          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', flex: 1, height: '100%', justifyContent: 'center' }}
-        >
-          <div style={{
-            padding: '6px 14px', borderRadius: 20,
-            background: statusFilter === 'live' && mobileTab === 'matches' ? 'rgba(239,68,68,0.12)' : 'transparent',
-            border: statusFilter === 'live' && mobileTab === 'matches' ? '1px solid rgba(239,68,68,0.3)' : '1px solid transparent',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            transition: 'all 0.2s ease', position: 'relative',
-          }}>
-            <Flame size={18} color={statusFilter === 'live' && mobileTab === 'matches' ? '#ef4444' : '#8b92a5'} style={{ fill: statusFilter === 'live' && mobileTab === 'matches' ? '#ef4444' : 'none' }} />
-            {liveCount > 0 && (
-              <span style={{ position: 'absolute', top: -1, right: -4, background: '#ef4444', color: '#fff', fontSize: 8, fontWeight: 800, padding: '1px 4px', borderRadius: 6, minWidth: 14, textAlign: 'center', boxShadow: '0 2px 6px rgba(239,68,68,0.4)' }}>
-                {liveCount}
-              </span>
-            )}
-          </div>
-          <span style={{ fontSize: 10, fontWeight: statusFilter === 'live' && mobileTab === 'matches' ? 700 : 500, color: statusFilter === 'live' && mobileTab === 'matches' ? '#f1f5f9' : '#8b92a5', transition: 'all 0.2s ease' }}>
-            LIVE
-          </span>
-        </button>
-
-        {/* MENDATANG */}
-        <button
-          onClick={() => { setStatusFilter('upcoming'); setMobileTab('matches'); }}
-          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', flex: 1, height: '100%', justifyContent: 'center' }}
-        >
-          <div style={{
-            padding: '6px 14px', borderRadius: 20,
-            background: statusFilter === 'upcoming' && mobileTab === 'matches' ? 'rgba(59,130,246,0.12)' : 'transparent',
-            border: statusFilter === 'upcoming' && mobileTab === 'matches' ? '1px solid rgba(59,130,246,0.3)' : '1px solid transparent',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            transition: 'all 0.2s ease',
-          }}>
-            <Calendar size={18} color={statusFilter === 'upcoming' && mobileTab === 'matches' ? '#3b82f6' : '#8b92a5'} />
-          </div>
-          <span style={{ fontSize: 10, fontWeight: statusFilter === 'upcoming' && mobileTab === 'matches' ? 700 : 500, color: statusFilter === 'upcoming' && mobileTab === 'matches' ? '#f1f5f9' : '#8b92a5', transition: 'all 0.2s ease' }}>
-            Mendatang
-          </span>
-        </button>
-
-        {/* SELESAI */}
-        <button
-          onClick={() => { setStatusFilter('finished'); setMobileTab('matches'); }}
-          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', flex: 1, height: '100%', justifyContent: 'center' }}
-        >
-          <div style={{
-            padding: '6px 14px', borderRadius: 20,
-            background: statusFilter === 'finished' && mobileTab === 'matches' ? 'rgba(16,185,129,0.12)' : 'transparent',
-            border: statusFilter === 'finished' && mobileTab === 'matches' ? '1px solid rgba(16,185,129,0.3)' : '1px solid transparent',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            transition: 'all 0.2s ease',
-          }}>
-            <CheckCircle size={18} color={statusFilter === 'finished' && mobileTab === 'matches' ? '#10b981' : '#8b92a5'} />
-          </div>
-          <span style={{ fontSize: 10, fontWeight: statusFilter === 'finished' && mobileTab === 'matches' ? 700 : 500, color: statusFilter === 'finished' && mobileTab === 'matches' ? '#f1f5f9' : '#8b92a5', transition: 'all 0.2s ease' }}>
-            Selesai
-          </span>
-        </button>
-
-        {/* LIGA / MENGIKUTI */}
-        <button
-          onClick={() => setMobileTab('leagues')}
-          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', flex: 1, height: '100%', justifyContent: 'center' }}
-        >
-          <div style={{
-            padding: '6px 14px', borderRadius: 20,
-            background: mobileTab === 'leagues' ? 'rgba(139,92,246,0.12)' : 'transparent',
-            border: mobileTab === 'leagues' ? '1px solid rgba(139,92,246,0.3)' : '1px solid transparent',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            transition: 'all 0.2s ease',
-          }}>
-            <Trophy size={18} color={mobileTab === 'leagues' ? '#a78bfa' : '#8b92a5'} />
-          </div>
-          <span style={{ fontSize: 10, fontWeight: mobileTab === 'leagues' ? 700 : 500, color: mobileTab === 'leagues' ? '#f1f5f9' : '#8b92a5', transition: 'all 0.2s ease' }}>
-            Liga
-          </span>
-        </button>
       </div>
-    </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<div className="loader"></div>}>
+      <Home />
+    </Suspense>
   );
 }
