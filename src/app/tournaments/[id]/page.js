@@ -116,53 +116,28 @@ export default function TournamentDetailPage({ params }) {
 
   return (
     <div className="page-container animate-fade-in" style={{ maxWidth: 1000, margin: '16px auto', padding: '0 16px 64px' }}>
-      {/* Mobile Back Navbar */}
-      <div 
-        className="mobile-back-navbar"
-        style={{
-          display: 'none',
-          alignItems: 'center',
-          gap: 12,
-          padding: '12px 16px',
-          background: 'rgba(255, 255, 255, 0.02)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-          width: '100%',
-          marginBottom: 16
-        }}
-      >
+      {/* Back button */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20, padding: '0 4px' }}>
         <button
           onClick={() => router.back()}
           style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: '#f8fafc',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 14,
-            fontWeight: 700
+            background: 'rgba(245,158,11,0.08)', border: 'none',
+            borderRadius: 12, width: 42, height: 42, cursor: 'pointer', color: '#f59e0b',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s ease',
           }}
         >
-          <ArrowLeft size={18} />
-          <span>Kembali</span>
+          <ArrowLeft size={20} />
         </button>
-      </div>
-
-      {/* Breadcrumb Navigation */}
-      <div className="breadcrumb-nav" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#64748b', marginBottom: 20 }}>
-        <Link href="/tournaments" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 500 }}>{tournament.sport?.name || 'Olahraga'}</Link>
-        <ChevronRight size={14} />
-        <span style={{ color: '#94a3b8', fontWeight: 500 }}>{tournament.name}</span>
+        <span style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9' }}>Detail Turnamen</span>
       </div>
 
       {/* Main Bronze/Gold Styled Banner Header */}
       <div 
         className="tournament-banner-card"
         style={{
-          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.85))',
+          background: 'linear-gradient(145deg, rgba(245,158,11,0.06) 0%, rgba(22,27,34,0.95) 35%, rgba(13,17,23,0.98) 100%)',
           backdropFilter: 'blur(30px)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          border: 'none',
           borderRadius: 32,
           padding: '40px',
           display: 'flex',
@@ -171,29 +146,19 @@ export default function TournamentDetailPage({ params }) {
           marginBottom: 32,
           position: 'relative',
           overflow: 'hidden',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6)'
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(245,158,11,0.06)'
         }}
       >
         <style dangerouslySetInnerHTML={{__html: `
            @media (max-width: 640px) {
-              .mobile-back-navbar {
-                display: flex !important;
-              }
               .page-container {
                margin: 0 !important;
-               padding: 0 !important;
+               padding: 0 12px 60px !important;
                max-width: 100% !important;
                width: 100% !important;
              }
-             .breadcrumb-nav {
-               padding: 12px 16px !important;
-               margin-bottom: 0 !important;
-             }
              .tournament-banner-card {
-               border-radius: 0 !important;
-               border-left: 0 !important;
-               border-right: 0 !important;
-               border-top: 0 !important;
+               border-radius: 16px !important;
                padding: 16px !important;
                margin-bottom: 12px !important;
              }
@@ -206,9 +171,7 @@ export default function TournamentDetailPage({ params }) {
                 gap: 16px !important;
               }
               .tab-contents-block {
-                border-radius: 0 !important;
-                border-left: 0 !important;
-                border-right: 0 !important;
+                border-radius: 16px !important;
                 padding: 16px !important;
               }
             }
@@ -239,8 +202,8 @@ export default function TournamentDetailPage({ params }) {
 
             {/* Title & Meta Info */}
             <div style={{ flex: 1 }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(59, 130, 246, 0.1)', color: '#60a5fa', padding: '3px 8px', borderRadius: 100, fontSize: 10, fontWeight: 700, marginBottom: 8, border: '1px solid rgba(59, 130, 246, 0.2)' }}>
-                <Star size={10} fill="#60a5fa" />
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(245, 158, 11, 0.1)', color: '#fbbf24', padding: '3px 8px', borderRadius: 100, fontSize: 10, fontWeight: 700, marginBottom: 8, border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+                <Star size={10} fill="#fbbf24" />
                 {tournament.sport?.name || 'Turnamen Utama'}
               </div>
               <h1 style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', lineHeight: 1.1, marginBottom: 8, letterSpacing: '-0.02em' }}>
@@ -263,7 +226,7 @@ export default function TournamentDetailPage({ params }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <button 
               style={{
-                background: '#3b82f6',
+                background: '#f59e0b',
                 color: 'white',
                 border: 'none',
                 borderRadius: 12,
@@ -271,7 +234,7 @@ export default function TournamentDetailPage({ params }) {
                 fontSize: 13,
                 fontWeight: 800,
                 cursor: 'pointer',
-                boxShadow: '0 8px 12px -3px rgba(59, 130, 246, 0.3)',
+                boxShadow: '0 8px 12px -3px rgba(245, 158, 11, 0.3)',
                 transition: 'all 0.2s'
               }}
               onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
@@ -335,14 +298,14 @@ export default function TournamentDetailPage({ params }) {
                   cursor: 'pointer', 
                   whiteSpace: 'nowrap', 
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  background: isActive ? 'rgba(59, 130, 246, 0.25)' : 'rgba(255, 255, 255, 0.05)',
-                  color: isActive ? '#60a5fa' : '#94a3b8',
-                  border: `1px solid ${isActive ? 'rgba(59, 130, 246, 0.4)' : 'rgba(255, 255, 255, 0.08)'}`,
+                  background: isActive ? 'rgba(245, 158, 11, 0.25)' : 'rgba(255, 255, 255, 0.05)',
+                  color: isActive ? '#fbbf24' : '#94a3b8',
+                  border: `1px solid ${isActive ? 'rgba(245, 158, 11, 0.4)' : 'rgba(255, 255, 255, 0.08)'}`,
                   display: 'flex', 
                   alignItems: 'center', 
                   gap: 6,
                   backdropFilter: 'blur(12px)',
-                  boxShadow: isActive ? '0 4px 12px rgba(59, 130, 246, 0.2)' : 'none'
+                  boxShadow: isActive ? '0 4px 12px rgba(245, 158, 11, 0.2)' : 'none'
                 }}
               >
                 <Icon size={14} />
@@ -356,13 +319,13 @@ export default function TournamentDetailPage({ params }) {
       <div 
         className="tab-contents-block"
         style={{
-          background: 'rgba(15, 23, 42, 0.4)',
+          background: 'linear-gradient(145deg, rgba(245,158,11,0.04) 0%, rgba(22,27,34,0.92) 35%, rgba(13,17,23,0.96) 100%)',
           backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
+          border: 'none',
           borderRadius: 24,
           padding: 20,
           minHeight: 400,
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(245,158,11,0.04)',
           position: 'relative',
           overflow: 'hidden'
         }}
@@ -377,8 +340,8 @@ export default function TournamentDetailPage({ params }) {
                   style={{
                     padding: '7px 16px', fontSize: 12, fontWeight: 700, borderRadius: 16, border: 'none',
                     cursor: 'pointer', transition: 'all 0.2s',
-                    background: matchView === 'upcoming' ? 'rgba(59, 130, 246, 0.25)' : 'transparent',
-                    color: matchView === 'upcoming' ? '#3b82f6' : '#64748b'
+                    background: matchView === 'upcoming' ? 'rgba(245, 158, 11, 0.25)' : 'transparent',
+                    color: matchView === 'upcoming' ? '#f59e0b' : '#64748b'
                   }}
                 >
                   Mendatang
@@ -388,8 +351,8 @@ export default function TournamentDetailPage({ params }) {
                   style={{
                     padding: '7px 16px', fontSize: 12, fontWeight: 700, borderRadius: 16, border: 'none',
                     cursor: 'pointer', transition: 'all 0.2s',
-                    background: matchView === 'finished' ? 'rgba(59, 130, 246, 0.25)' : 'transparent',
-                    color: matchView === 'finished' ? '#3b82f6' : '#64748b'
+                    background: matchView === 'finished' ? 'rgba(245, 158, 11, 0.25)' : 'transparent',
+                    color: matchView === 'finished' ? '#f59e0b' : '#64748b'
                   }}
                 >
                   Hasil
@@ -464,7 +427,7 @@ export default function TournamentDetailPage({ params }) {
                                 SELESAI
                               </div>
                             ) : (
-                              <div style={{ background: 'rgba(59, 130, 246, 0.08)', color: '#60a5fa', border: '1px solid rgba(59, 130, 246, 0.15)', fontSize: 11, fontWeight: 800, padding: '4px 12px', borderRadius: 20, letterSpacing: '0.05em' }}>
+                              <div style={{ background: 'rgba(245, 158, 11, 0.08)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.15)', fontSize: 11, fontWeight: 800, padding: '4px 12px', borderRadius: 20, letterSpacing: '0.05em' }}>
                                 {time}
                               </div>
                             )}
@@ -547,7 +510,7 @@ export default function TournamentDetailPage({ params }) {
                           style={{ 
                             padding: '4px 10px', borderRadius: 10, background: 'rgba(0, 0, 0, 0.45)', 
                             border: '1px solid rgba(255, 255, 255, 0.04)', fontSize: 11, fontWeight: 800, minWidth: 54, textAlign: 'center',
-                            color: hasScore ? '#3b82f6' : '#94a3b8'
+                            color: hasScore ? '#f59e0b' : '#94a3b8'
                           }}
                         >
                           {hasScore ? `${m.home_score} : ${m.away_score}` : time}
@@ -585,12 +548,12 @@ export default function TournamentDetailPage({ params }) {
                         {activeTab === 'players' && (
           <div className="animate-fade-in" style={{ padding: '0 4px', display: 'flex', flexDirection: 'column', gap: 24 }}>
             {/* Top Scorers Card */}
-            <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden', position: 'relative' }}>
-              <div style={{ position: 'absolute', top: -50, right: -50, width: 150, height: 150, background: '#3b82f6', filter: 'blur(80px)', opacity: 0.2 }} />
+            <div style={{ background: 'linear-gradient(145deg, rgba(245,158,11,0.04), rgba(13,17,23,0.92)', borderRadius: 24, border: 'none', overflow: 'hidden', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: -50, right: -50, width: 150, height: 150, background: '#f59e0b', filter: 'blur(80px)', opacity: 0.2 }} />
               
               <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 10, background: 'linear-gradient(135deg, rgba(59,130,246,0.2), rgba(37,99,235,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#60a5fa', border: '1px solid rgba(59,130,246,0.2)' }}>
+                  <div style={{ width: 32, height: 32, borderRadius: 10, background: 'linear-gradient(135deg, rgba(245,158,11,0.2), rgba(217,119,6,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fbbf24', border: '1px solid rgba(245,158,11,0.2)' }}>
                     <Award size={16} />
                   </div>
                   <div>
@@ -676,9 +639,9 @@ export default function TournamentDetailPage({ params }) {
                                   <div style={{ fontSize: 11, color: '#94a3b8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.player?.team || '-'}</div>
                                 </div>
                                 <div style={{ width: '25%', minWidth: 80, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
-                                  <div style={{ fontSize: 16, fontWeight: 900, color: '#3b82f6' }}>{item.goals}</div>
+                                  <div style={{ fontSize: 16, fontWeight: 900, color: '#f59e0b' }}>{item.goals}</div>
                                   <div style={{ width: '100%', height: 4, background: 'rgba(255,255,255,0.05)', borderRadius: 4, overflow: 'hidden' }}>
-                                    <div style={{ width: `${pct}%`, height: '100%', background: 'linear-gradient(90deg, #3b82f6, #60a5fa)', borderRadius: 4 }} />
+                                    <div style={{ width: `${pct}%`, height: '100%', background: 'linear-gradient(90deg, #f59e0b, #fbbf24)', borderRadius: 4 }} />
                                   </div>
                                 </div>
                               </div>
@@ -693,7 +656,7 @@ export default function TournamentDetailPage({ params }) {
             </div>
 
             {/* Top Clean Sheets Card */}
-            <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden', position: 'relative' }}>
+            <div style={{ background: 'linear-gradient(145deg, rgba(245,158,11,0.04), rgba(13,17,23,0.92)', borderRadius: 24, border: 'none', overflow: 'hidden', position: 'relative' }}>
               <div style={{ position: 'absolute', top: -50, right: -50, width: 150, height: 150, background: '#10b981', filter: 'blur(80px)', opacity: 0.15 }} />
               
               <div style={{ padding: '24px', borderBottom: '1px solid rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
@@ -832,8 +795,8 @@ export default function TournamentDetailPage({ params }) {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
                     
                     <div style={{ position: 'relative', background: 'rgba(255, 255, 255, 0.02)', padding: '24px 16px', borderRadius: 20, border: '1px solid rgba(255, 255, 255, 0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', overflow: 'hidden' }}>
-                      <div style={{ position: 'absolute', top: -30, left: -30, width: 100, height: 100, background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)', filter: 'blur(30px)' }} />
-                      <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(59, 130, 246, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#60a5fa', marginBottom: 12, border: '1px solid rgba(59, 130, 246, 0.15)' }}>
+                      <div style={{ position: 'absolute', top: -30, left: -30, width: 100, height: 100, background: 'radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, transparent 70%)', filter: 'blur(30px)' }} />
+                      <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(245, 158, 11, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fbbf24', marginBottom: 12, border: '1px solid rgba(245, 158, 11, 0.15)' }}>
                         <Calendar size={20} strokeWidth={2.5} />
                       </div>
                       <div style={{ fontSize: 28, fontWeight: 900, color: '#f8fafc', lineHeight: 1, marginBottom: 4, letterSpacing: '-0.02em' }}>{totalMatches}</div>
@@ -862,7 +825,7 @@ export default function TournamentDetailPage({ params }) {
                   {/* Highlighted Biggest Win Segment */}
                   {biggestWin && (
                     <div style={{ position: 'relative', background: 'rgba(255, 255, 255, 0.02)', borderRadius: 32, border: '1px solid rgba(255, 255, 255, 0.06)', overflow: 'hidden' }}>
-                      <div style={{ position: 'absolute', top: -150, right: -150, width: 400, height: 400, background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)', filter: 'blur(80px)' }} />
+                      <div style={{ position: 'absolute', top: -150, right: -150, width: 400, height: 400, background: 'radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, transparent 70%)', filter: 'blur(80px)' }} />
                       
                       <div style={{ padding: '24px 32px', background: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', display: 'flex', alignItems: 'center', gap: 16 }}>
                         <Trophy size={20} color="#eab308" />
@@ -878,7 +841,7 @@ export default function TournamentDetailPage({ params }) {
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-                          <div style={{ background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.1))', border: '1px solid rgba(59, 130, 246, 0.3)', padding: '24px 48px', borderRadius: 24, fontSize: 56, fontWeight: 900, color: '#60a5fa', letterSpacing: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 15px 35px rgba(0,0,0,0.4)', textShadow: '0 0 20px rgba(96, 165, 250, 0.4)' }}>
+                          <div style={{ background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.1))', border: '1px solid rgba(245, 158, 11, 0.3)', padding: '24px 48px', borderRadius: 24, fontSize: 56, fontWeight: 900, color: '#fbbf24', letterSpacing: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 15px 35px rgba(0,0,0,0.4)', textShadow: '0 0 20px rgba(96, 165, 250, 0.4)' }}>
                             {biggestWin.home_score}-{biggestWin.away_score}
                           </div>
                           <div style={{ background: 'rgba(255, 255, 255, 0.05)', padding: '6px 16px', borderRadius: 100, fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Skor Akhir</div>
@@ -912,7 +875,7 @@ export default function TournamentDetailPage({ params }) {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
               <div style={{ background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: 16, border: '1px solid rgba(255,255,255,0.04)' }}>
                 <span style={{ fontSize: 11, color: '#64748b', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Olahraga</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: '#f1f5f9', display: 'flex', alignItems: 'center', gap: 6 }}><Trophy size={14} color="#3b82f6" /> {tournament.sport?.name || 'Multi-Sport'}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: '#f1f5f9', display: 'flex', alignItems: 'center', gap: 6 }}><Trophy size={14} color="#f59e0b" /> {tournament.sport?.name || 'Multi-Sport'}</span>
               </div>
               <div style={{ background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: 16, border: '1px solid rgba(255,255,255,0.04)' }}>
                 <span style={{ fontSize: 11, color: '#64748b', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Status</span>
@@ -948,7 +911,7 @@ function KlasemenTab({ standings, match, sport }) {
           {standings.groups.map((g, i) => (
             <div key={i}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                <div style={{ width: 4, height: 18, borderRadius: 2, background: '#3b82f6' }} />
+                <div style={{ width: 4, height: 18, borderRadius: 2, background: '#f59e0b' }} />
                 <span style={{ fontSize: 13, fontWeight: 700, color: '#e8eaed', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{g.group?.name}</span>
               </div>
               <StandingsTable rows={g.standings} match={match} sport={sport} />
@@ -975,7 +938,7 @@ function StandingsTable({ rows = [], match, sport }) {
 
   const posColor = (pos) => {
     if (pos === 1) return { bg: 'rgba(234,179,8,0.15)', border: '#eab30866', color: '#eab308' };
-    if (pos === 2) return { bg: 'rgba(59,130,246,0.15)', border: '#3b82f666', color: '#60a5fa' };
+    if (pos === 2) return { bg: 'rgba(245,158,11,0.15)', border: '#f59e0b66', color: '#fbbf24' };
     if (pos <= 4) return { bg: 'rgba(34,197,94,0.1)', border: '#22c55e44', color: '#22c55e' };
     return { bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.08)', color: '#8b92a5' };
   };
@@ -1050,7 +1013,7 @@ function StandingsTable({ rows = [], match, sport }) {
                   display: 'flex', alignItems: 'center', padding: '12px 16px',
                   minWidth: 580,
                   background: isHome
-                    ? 'linear-gradient(90deg, rgba(59,130,246,0.1), transparent)'
+                    ? 'linear-gradient(90deg, rgba(245,158,11,0.1), transparent)'
                     : isAway
                       ? 'linear-gradient(90deg, rgba(234,179,8,0.1), transparent)'
                       : 'transparent',
@@ -1173,12 +1136,12 @@ function StatistikTab({ match }) {
     return (
       <div style={{ padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <Badge value={h} color={hWin ? '#3b82f6' : '#475569'} />
+          <Badge value={h} color={hWin ? '#f59e0b' : '#475569'} />
           <span style={{ fontSize: 12, fontWeight: 600, color: '#e8eaed', textAlign: 'center' }}>{label}</span>
           <Badge value={a} color={aWin ? '#eab308' : '#475569'} />
         </div>
         <div style={{ display: 'flex', height: 5, borderRadius: 3, background: 'rgba(255,255,255,0.08)', gap: 3, margin: '0 4px' }}>
-          <div style={{ width: `${homePct}%`, background: '#3b82f6', borderRadius: 3, transition: 'width 0.8s cubic-bezier(0.4,0,0.2,1)' }} />
+          <div style={{ width: `${homePct}%`, background: '#f59e0b', borderRadius: 3, transition: 'width 0.8s cubic-bezier(0.4,0,0.2,1)' }} />
           <div style={{ width: `${awayPct}%`, background: '#eab308', borderRadius: 3, transition: 'width 0.8s cubic-bezier(0.4,0,0.2,1)' }} />
         </div>
       </div>
@@ -1209,7 +1172,7 @@ function StatistikTab({ match }) {
             style={{
               flex: 1, padding: '8px 0', fontSize: 12, fontWeight: 700,
               border: 'none', cursor: 'pointer', transition: 'all 0.2s ease',
-              background: period === p.id ? '#3b82f6' : 'transparent',
+              background: period === p.id ? '#f59e0b' : 'transparent',
               color: period === p.id ? '#fff' : '#8b92a5',
             }}
           >
@@ -1223,7 +1186,7 @@ function StatistikTab({ match }) {
         <div style={{ fontSize: 11, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Penguasaan Bola</div>
         <div style={{ display: 'flex', alignItems: 'center', borderRadius: 8, overflow: 'hidden', height: 28, background: 'rgba(255,255,255,0.06)' }}>
           <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name, '3b82f6')} style={{ width: 22, height: 22, borderRadius: '50%', marginLeft: 3, flexShrink: 0, zIndex: 2 }} alt="" />
-          <div style={{ flex: possHome, background: '#3b82f6', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 8, transition: 'flex 1s ease' }}>
+          <div style={{ flex: possHome, background: '#f59e0b', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 8, transition: 'flex 1s ease' }}>
             <span style={{ fontSize: 12, fontWeight: 800, color: '#fff' }}>{possHome}%</span>
           </div>
           <div style={{ flex: possAway, background: '#eab308', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 8, transition: 'flex 1s ease' }}>
@@ -1269,7 +1232,7 @@ function TeamBestStats({ data }) {
     {
       title: 'Distribusi',
       icon: <Users size={20} />,
-      color: '#3b82f6',
+      color: '#f59e0b',
       subStats: [
         { key: 'corners', name: 'Tendangan Sudut' },
       ].filter(s => data[s.key]?.length > 0)
@@ -1306,7 +1269,7 @@ function TeamBestStats({ data }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 0 }}>
         <div style={{ height: 1, flex: 1, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06))' }} />
         <h2 style={{ fontSize: 13, fontWeight: 900, color: '#94a3b8', margin: 0, textTransform: 'uppercase', letterSpacing: '0.2em', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Shield size={16} color="#3b82f6" />
+          <Shield size={16} color="#f59e0b" />
           Tim Terbaik
         </h2>
         <div style={{ height: 1, flex: 1, background: 'linear-gradient(270deg, transparent, rgba(255,255,255,0.06))' }} />

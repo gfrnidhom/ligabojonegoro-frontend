@@ -85,22 +85,16 @@ export default function TeamDetailPage({ params }) {
 
   return (
     <div className="page-container animate-fade-in" style={{ maxWidth: 1200, margin: '24px auto', padding: '0 16px 64px' }}>
-      {/* Top action bar */}
-      <div className="team-action-bar" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
         <button
           onClick={() => router.back()}
           style={{
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: '50%',
-            width: 40, height: 40,
-            cursor: 'pointer', color: '#94a3b8',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            transition: 'all 0.2s ease',
+            background: 'rgba(245,158,11,0.08)', border: 'none',
+            borderRadius: 12, width: 42, height: 42, cursor: 'pointer', color: '#f59e0b',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s ease',
           }}
-          title="Kembali"
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={20} />
         </button>
         <span style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9' }}>Detail Tim</span>
       </div>
@@ -129,7 +123,7 @@ export default function TeamDetailPage({ params }) {
       `}} />
       <div className="card team-header-profile" style={{ marginBottom: 24, padding: 24, display: 'flex', flexDirection: 'column', gap: 18 }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, alignItems: 'center' }}>
-          <div style={{ width: 72, height: 72, borderRadius: 18, background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <div style={{ width: 72, height: 72, borderRadius: 18, background: 'rgba(245,158,11,0.08)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <img 
               src={getImageUrl(team.logo_path || team.logo) || avatar(team.name, '3b82f6')} 
               style={{ width: 48, height: 48, objectFit: 'contain' }}
@@ -143,7 +137,7 @@ export default function TeamDetailPage({ params }) {
               <span style={{
                 fontSize: 10, fontWeight: 700, padding: '3px 9px', borderRadius: 20,
                 textTransform: 'uppercase', letterSpacing: '0.05em', border: '1px solid',
-                background: 'rgba(59,130,246,0.15)', color: '#3b82f6', borderColor: 'rgba(59,130,246,0.25)',
+                background: 'rgba(245,158,11,0.15)', color: '#f59e0b', borderColor: 'rgba(245,158,11,0.25)',
               }}>
                 {team.sport?.name || 'Cabang Umum'}
               </span>
@@ -155,7 +149,7 @@ export default function TeamDetailPage({ params }) {
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#64748b' }}>
-                <Users size={14} style={{ color: '#3b82f6' }} />
+                <Users size={14} style={{ color: '#f59e0b' }} />
                 <span>Coach / PIC: <strong style={{ color: '#94a3b8' }}>{team.coach_name || team.contact_person || 'TBA'}</strong></span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#64748b' }}>
@@ -173,8 +167,8 @@ export default function TeamDetailPage({ params }) {
           onClick={() => setActiveTab('matches')}
           style={{
             padding: '12px 6px', fontSize: 13, fontWeight: 700, border: 'none', background: 'none', cursor: 'pointer',
-            color: activeTab === 'matches' ? '#3b82f6' : '#64748b',
-            borderBottom: activeTab === 'matches' ? '2px solid #3b82f6' : '2px solid transparent',
+            color: activeTab === 'matches' ? '#f59e0b' : '#64748b',
+            borderBottom: activeTab === 'matches' ? '2px solid #f59e0b' : '2px solid transparent',
             transition: 'all 0.2s ease', position: 'relative', bottom: -1,
           }}
         >
@@ -185,8 +179,8 @@ export default function TeamDetailPage({ params }) {
           onClick={() => setActiveTab('info')}
           style={{
             padding: '12px 6px', fontSize: 13, fontWeight: 700, border: 'none', background: 'none', cursor: 'pointer',
-            color: activeTab === 'info' ? '#3b82f6' : '#64748b',
-            borderBottom: activeTab === 'info' ? '2px solid #3b82f6' : '2px solid transparent',
+            color: activeTab === 'info' ? '#f59e0b' : '#64748b',
+            borderBottom: activeTab === 'info' ? '2px solid #f59e0b' : '2px solid transparent',
             transition: 'all 0.2s ease', position: 'relative', bottom: -1,
           }}
         >
@@ -231,7 +225,7 @@ export default function TeamDetailPage({ params }) {
                             <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} style={{ width: 22, height: 22, borderRadius: '50%' }} alt="" />
                             <span style={{ fontSize: 13, fontWeight: 700, color: '#f1f5f9' }}>{m.home_team?.name}</span>
                           </div>
-                          <div style={{ padding: '0 8px', minWidth: 40, textAlign: 'center', fontSize: 15, fontWeight: 800, color: hasScore ? '#3b82f6' : '#64748b' }}>
+                          <div style={{ padding: '0 8px', minWidth: 40, textAlign: 'center', fontSize: 15, fontWeight: 800, color: hasScore ? '#f59e0b' : '#64748b' }}>
                             {hasScore ? `${m.home_score} : ${m.away_score}` : 'VS'}
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, justifyContent: 'flex-end' }}>
@@ -273,7 +267,7 @@ export default function TeamDetailPage({ params }) {
 
               <div style={{ background: 'rgba(255,255,255,0.02)', padding: '12px 16px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.04)' }}>
                 <span style={{ fontSize: 11, color: '#64748b', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Coach / PIC</span>
-                <span style={{ fontSize: 14, fontWeight: 700, color: '#3b82f6' }}>{team.coach_name || team.contact_person || 'TBA'}</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#f59e0b' }}>{team.coach_name || team.contact_person || 'TBA'}</span>
               </div>
             </div>
           </div>

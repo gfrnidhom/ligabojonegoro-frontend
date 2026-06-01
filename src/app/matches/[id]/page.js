@@ -31,7 +31,7 @@ const formatGameMinute = (minute) => {
 
 const handlePlayerClick = (playerId) => {
   if (playerId && typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent('open-player-stats', { detail: { id: playerId } }));
+    window.location.href = `/players/${playerId}`;
   }
 };
 
@@ -116,37 +116,19 @@ export default function MatchDetailPage({ params }) {
 
   return (
     <div className="page-container animate-fade-in" style={{ maxWidth: 1000, margin: '16px auto', padding: '0 16px 64px' }}>
-      <button
-        onClick={() => router.back()}
-        style={{
-          background: 'rgba(255, 255, 255, 0.05)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '12px',
-          padding: '8px 16px',
-          cursor: 'pointer',
-          color: '#f8fafc',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          fontSize: 14,
-          fontWeight: 600,
-          marginBottom: 24,
-          transition: 'all 0.2s ease',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)';
-          e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.2)';
-          e.currentTarget.style.color = '#3b82f6';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-          e.currentTarget.style.color = '#f8fafc';
-        }}
-      >
-        <ArrowLeft size={18} />
-        <span>Kembali</span>
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+        <button
+          onClick={() => router.back()}
+          style={{
+            background: 'rgba(245,158,11,0.08)', border: 'none',
+            borderRadius: 12, width: 42, height: 42, cursor: 'pointer', color: '#f59e0b',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s ease',
+          }}
+        >
+          <ArrowLeft size={20} />
+        </button>
+        <span style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9' }}>Detail Pertandingan</span>
+      </div>
 
       <div className="card animate-slide-up" style={{ boxShadow: 'var(--shadow-md)' }}>
       {loading ? (
@@ -227,7 +209,7 @@ export default function MatchDetailPage({ params }) {
                     {homeGoals.map((g, idx) => (
                       <div key={idx} style={{ fontSize: 13, color: '#e2e8f0', display: 'flex', alignItems: 'center', gap: 6 }}>
                         <span
-                          onClick={() => handlePlayerClick(g.player?.id)}
+                          onClick={() => handlePlayerClick(g.player?.uuid)}
                           style={{ fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(255,255,255,0.2)' }}
                         >
                           {g.player?.name || 'Pemain'}
@@ -248,7 +230,7 @@ export default function MatchDetailPage({ params }) {
                       <div key={idx} style={{ fontSize: 13, color: '#e2e8f0', display: 'flex', alignItems: 'center', gap: 6 }}>
                         <span style={{ color: '#8b92a5', fontWeight: 500 }}>{formatGameMinute(g.minute)}&apos;</span>
                         <span
-                          onClick={() => handlePlayerClick(g.player?.id)}
+                          onClick={() => handlePlayerClick(g.player?.uuid)}
                           style={{ fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(255,255,255,0.2)' }}
                         >
                           {g.player?.name || 'Pemain'}
@@ -492,7 +474,7 @@ function GoalDetailSection({ match }) {
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span
-                    onClick={() => handlePlayerClick(g.player?.id)}
+                    onClick={() => handlePlayerClick(g.player?.uuid)}
                     style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(255,255,255,0.2)' }}
                   >
                     {g.player?.name || 'Pemain'}
@@ -694,7 +676,7 @@ function RincianTab({ match }) {
                         <>
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
                             <span
-                              onClick={() => handlePlayerClick(ev.player?.id)}
+                              onClick={() => handlePlayerClick(ev.player?.uuid)}
                               style={{ fontSize: 13, fontWeight: 600, color: '#f8fafc', cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(255,255,255,0.2)' }}
                             >
                               {ev.player?.name || 'Pemain'}
@@ -702,7 +684,7 @@ function RincianTab({ match }) {
                             {ev.event_data?.commentary && <span style={{ fontSize: 11, color: '#71717a' }}>{ev.event_data.commentary}</span>}
                           </div>
                           <img
-                            onClick={() => handlePlayerClick(ev.player?.id)}
+                            onClick={() => handlePlayerClick(ev.player?.uuid)}
                             src={getImageUrl(ev.player?.photo_path) || `https://ui-avatars.com/api/?name=${encodeURIComponent(ev.player?.name || 'P')}&size=32&background=27272a&color=fff`}
                             style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', cursor: 'pointer' }}
                             alt=""
@@ -730,14 +712,14 @@ function RincianTab({ match }) {
                         <>
                           <EventIconCircle type={ev.event_type} />
                           <img
-                            onClick={() => handlePlayerClick(ev.player?.id)}
+                            onClick={() => handlePlayerClick(ev.player?.uuid)}
                             src={getImageUrl(ev.player?.photo_path) || `https://ui-avatars.com/api/?name=${encodeURIComponent(ev.player?.name || 'P')}&size=32&background=27272a&color=fff`}
                             style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', cursor: 'pointer' }}
                             alt=""
                           />
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
                             <span
-                              onClick={() => handlePlayerClick(ev.player?.id)}
+                              onClick={() => handlePlayerClick(ev.player?.uuid)}
                               style={{ fontSize: 13, fontWeight: 600, color: '#f8fafc', cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(255,255,255,0.2)' }}
                             >
                               {ev.player?.name || 'Pemain'}
@@ -845,14 +827,14 @@ function LineupTab({ match }) {
                       {hP ? (
                         <>
                           <span
-                            onClick={() => handlePlayerClick(hP.player?.id)}
+                            onClick={() => handlePlayerClick(hP.player?.uuid)}
                             style={{ fontSize: 13, color: '#e8eaed', fontWeight: 500, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(255,255,255,0.2)' }}
                           >
                             {hP.player?.name}
                           </span>
                           <span style={{ fontSize: 11, color: '#8b92a5' }}>{hP.player?.jersey_number || '-'}</span>
                           <img
-                            onClick={() => handlePlayerClick(hP.player?.id)}
+                            onClick={() => handlePlayerClick(hP.player?.uuid)}
                             src={getImageUrl(hP.player?.photo_path) || avatar(hP.player?.name, '3b82f6')}
                             style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', cursor: 'pointer' }}
                             alt=""
@@ -866,14 +848,14 @@ function LineupTab({ match }) {
                       {aP ? (
                         <>
                           <img
-                            onClick={() => handlePlayerClick(aP.player?.id)}
+                            onClick={() => handlePlayerClick(aP.player?.uuid)}
                             src={getImageUrl(aP.player?.photo_path) || avatar(aP.player?.name, 'ef4444')}
                             style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', cursor: 'pointer' }}
                             alt=""
                           />
                           <span style={{ fontSize: 11, color: '#8b92a5' }}>{aP.player?.jersey_number || '-'}</span>
                           <span
-                            onClick={() => handlePlayerClick(aP.player?.id)}
+                            onClick={() => handlePlayerClick(aP.player?.uuid)}
                             style={{ fontSize: 13, color: '#e8eaed', fontWeight: 500, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(255,255,255,0.2)' }}
                           >
                             {aP.player?.name}
@@ -947,7 +929,7 @@ function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFor
         const c = aCoords[i] || { x: 50, y: 50 };
         const top = 50 - (c.y / 100) * 45;
         return (
-          <div key={p.id} onClick={() => handlePlayerClick(p.player?.id)} className="player-dot" style={{ position: 'absolute', left: `${c.x}%`, top: `${top}%`, transform: 'translate(-50%, -50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10, cursor: 'pointer' }}>
+          <div key={p.id} onClick={() => handlePlayerClick(p.player?.uuid)} className="player-dot" style={{ position: 'absolute', left: `${c.x}%`, top: `${top}%`, transform: 'translate(-50%, -50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10, cursor: 'pointer' }}>
             <img src={getImageUrl(p.player?.photo_path) || avatar(p.player?.name, 'ef4444')} style={{ width: 26, height: 26, borderRadius: '50%', boxShadow: '0 2px 6px rgba(0,0,0,0.4)', objectFit: 'cover' }} alt="" />
             <div style={{ background: 'rgba(0,0,0,0.7)', color: '#fff', fontSize: '9px', fontWeight: 600, padding: '2px 5px', borderRadius: '4px', marginTop: '3px', whiteSpace: 'nowrap' }}>
               {p.player?.jersey_number} {p.player?.name.split(' ').pop()}
@@ -961,7 +943,7 @@ function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFor
         const c = hCoords[i] || { x: 50, y: 50 };
         const top = 50 + (c.y / 100) * 45;
         return (
-          <div key={p.id} onClick={() => handlePlayerClick(p.player?.id)} className="player-dot" style={{ position: 'absolute', left: `${c.x}%`, top: `${top}%`, transform: 'translate(-50%, -50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10, cursor: 'pointer' }}>
+          <div key={p.id} onClick={() => handlePlayerClick(p.player?.uuid)} className="player-dot" style={{ position: 'absolute', left: `${c.x}%`, top: `${top}%`, transform: 'translate(-50%, -50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10, cursor: 'pointer' }}>
             <img src={getImageUrl(p.player?.photo_path) || avatar(p.player?.name, '3b82f6')} style={{ width: 26, height: 26, borderRadius: '50%', boxShadow: '0 2px 6px rgba(0,0,0,0.4)', objectFit: 'cover' }} alt="" />
             <div style={{ background: 'rgba(0,0,0,0.7)', color: '#fff', fontSize: '9px', fontWeight: 600, padding: '2px 5px', borderRadius: '4px', marginTop: '3px', whiteSpace: 'nowrap' }}>
               {p.player?.jersey_number} {p.player?.name.split(' ').pop()}

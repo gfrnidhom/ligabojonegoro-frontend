@@ -189,7 +189,7 @@ export default function MatchesPage() {
                           style={{
                             background: 'rgba(255, 255, 255, 0.02)',
                             backdropFilter: 'blur(10px)',
-                            border: \`1px solid \${isSelected ? 'rgba(59, 130, 246, 0.4)' : 'rgba(255, 255, 255, 0.05)'}\`,
+                            border: `1px solid ${isSelected ? 'rgba(59, 130, 246, 0.4)' : 'rgba(255, 255, 255, 0.05)'}`,
                             borderRadius: 20,
                             padding: '20px 16px',
                             position: 'relative',
@@ -285,7 +285,7 @@ export default function MatchesPage() {
       <style dangerouslySetInnerHTML={{__html: `
         .form-select-dark {
           padding: 11px 16px; background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.06); borderRadius: 12px;
+          border: 1px solid rgba(255,255,255,0.06); border-radius: 12px;
           color: #f1f5f9; font-size: 13px; font-weight: 500; outline: none;
           font-family: inherit; min-width: 180px; cursor: pointer;
           flex: 1 1 auto;
