@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Home as HomeIcon, Flame, Calendar, CheckCircle, Trophy } from 'lucide-react';
+import { Home as HomeIcon, Trophy, FileText } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import api from '../api';
 
@@ -34,11 +34,9 @@ export default function BottomNav() {
   }, []);
 
   const navItems = [
-    { id: 'all', label: 'Semua', icon: HomeIcon, path: '/', filter: 'all' },
-    { id: 'live', label: 'LIVE', icon: Flame, path: '/', filter: 'live', isLive: true },
-    { id: 'scheduled', label: 'Mendatang', icon: Calendar, path: '/', filter: 'scheduled' },
-    { id: 'finished', label: 'Selesai', icon: CheckCircle, path: '/', filter: 'finished' },
-    { id: 'leagues', label: 'Liga', icon: Trophy, path: '/tournaments' },
+    { id: 'all', label: 'Matches', icon: HomeIcon, path: '/', filter: 'all' },
+    { id: 'leagues', label: 'Leagues', icon: Trophy, path: '/tournaments' },
+    { id: 'news', label: 'News', icon: FileText, path: '/news' },
   ];
 
   const handleNav = (item) => {
@@ -51,25 +49,15 @@ export default function BottomNav() {
 
   return (
     <div 
-      className="fixed bottom-4 left-4 right-4 z-[100] h-[72px] max-w-md mx-auto bg-[#11131a]/95 backdrop-blur-xl border border-white/5 lg:hidden px-2 flex items-center overflow-x-auto hide-scrollbar" 
-      style={{ borderRadius: 32, boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 16px rgba(234,179,8,0.05)', scrollbarWidth: 'none' }}
+      className="fixed bottom-0 left-0 right-0 z-[100] h-[64px] bg-[var(--bg-card)] border-t border-[var(--border)] lg:hidden px-2 flex items-center overflow-x-auto hide-scrollbar" 
+      style={{ scrollbarWidth: 'none' }}
     >
       {navItems.map((item) => {
         const isActive = (item.path === '/' && pathname === '/' && currentFilter === item.filter) || 
                          (item.path !== '/' && pathname.startsWith(item.path));
         
-        const color = isActive 
-          ? (item.isLive ? '#ef4444' : '#fbbf24') 
-          : '#8b92a5';
+        const color = isActive ? 'var(--text-primary)' : 'var(--text-muted)';
         
-        const bgColor = isActive 
-          ? (item.isLive ? 'rgba(239,68,68,0.12)' : 'rgba(234,179,8,0.12)') 
-          : 'transparent';
-        
-        const borderColor = isActive 
-          ? (item.isLive ? 'rgba(239,68,68,0.3)' : 'rgba(234,179,8,0.3)') 
-          : 'transparent';
-
         return (
           <button
             key={item.id}
@@ -78,7 +66,7 @@ export default function BottomNav() {
               display: 'flex', 
               flexDirection: 'column', 
               alignItems: 'center', 
-              gap: 2, 
+              gap: 4, 
               background: 'none', 
               border: 'none', 
               cursor: 'pointer', 
@@ -87,32 +75,24 @@ export default function BottomNav() {
               justifyContent: 'center' 
             }}
           >
-            <div style={{
-              padding: '6px 14px', borderRadius: 20,
-              background: bgColor,
-              border: `1px solid ${borderColor}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              transition: 'all 0.2s ease', position: 'relative'
-            }}>
-              <item.icon size={18} color={color} style={{ fill: isActive && item.id !== 'scheduled' && item.id !== 'leagues' ? color : 'none' }} />
+            <div style={{ position: 'relative' }}>
+              <item.icon size={22} color={color} style={{ fill: isActive ? color : 'none' }} />
               {item.isLive && liveCount > 0 && (
                 <span style={{ 
-                  position: 'absolute', top: -1, right: -4, 
-                  background: '#ef4444', color: '#fff', 
-                  fontSize: 8, fontWeight: 800, 
-                  padding: '1px 4px', borderRadius: 6, 
-                  minWidth: 14, textAlign: 'center', 
-                  boxShadow: '0 2px 6px rgba(239,68,68,0.4)' 
+                  position: 'absolute', top: -4, right: -8, 
+                  background: 'var(--accent-rose)', color: '#fff', 
+                  fontSize: 9, fontWeight: 800, 
+                  padding: '2px 4px', borderRadius: 6, 
+                  minWidth: 16, textAlign: 'center', 
                 }}>
                   {liveCount}
                 </span>
               )}
             </div>
             <span style={{ 
-              fontSize: 10, 
+              fontSize: 11, 
               fontWeight: isActive ? 700 : 500, 
-              color: isActive ? '#f1f5f9' : '#8b92a5', 
-              transition: 'all 0.2s ease' 
+              color: color, 
             }}>
               {item.label}
             </span>

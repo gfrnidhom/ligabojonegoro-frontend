@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1/';
-export const STORAGE_URL = process.env.NEXT_PUBLIC_STORAGE_URL || 'http://127.0.0.1:8000/storage/';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://app.ligabojonegoro.id/api/v1/';
+export const STORAGE_URL = process.env.NEXT_PUBLIC_STORAGE_URL || 'https://app.ligabojonegoro.id/storage/';
 
 export const getImageUrl = (path) => {
   if (!path) return null;

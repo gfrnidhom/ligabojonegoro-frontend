@@ -114,7 +114,7 @@ export default function MatchDetailPanel({ matchId, onClose, hideMaximize = fals
     `https://ui-avatars.com/api/?name=${encodeURIComponent(name || '?')}&size=112&background=${bg}&color=fff&bold=true&font-size=0.36`;
 
   return (
-    <div className="card" style={{ overflow: 'hidden' }}>
+    <div className="card" style={{ overflow: 'hidden', marginTop: 24 }}>
       {loading ? (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
           <div className="loader"></div>
