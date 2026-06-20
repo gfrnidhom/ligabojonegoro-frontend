@@ -6,17 +6,22 @@ import { Search } from 'lucide-react';
 export default function Navbar() {
   return (
     <nav className="hidden lg:block" style={{
-      background: 'var(--bg-card)',
-      borderBottom: 'none',
+      background: 'rgba(255, 255, 255, 0.95)',
+      backdropFilter: 'blur(12px)',
+      borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
       position: 'sticky', top: 0, zIndex: 50,
+      transition: 'all 0.3s ease'
     }}>
       <div style={{
         maxWidth: 1340, margin: '0 auto', padding: '0 24px',
-        height: 80, display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+        height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', paddingLeft: 16 }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', fontWeight: 900, fontSize: 24, letterSpacing: '-0.02em', gap: 4 }}>
-            <span style={{ color: 'var(--text-primary)' }}>FOTMOB</span>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', fontWeight: 900, fontSize: 22, letterSpacing: '-0.03em', gap: 6, textDecoration: 'none' }}>
+            <div style={{ width: 32, height: 32, background: '#111827', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+              <span style={{ fontSize: 16, fontWeight: 900, lineHeight: 1 }}>LB</span>
+            </div>
+            <span style={{ color: '#111827' }}>Liga Bojonegoro</span>
           </Link>
         </div>
 
@@ -30,42 +35,57 @@ export default function Navbar() {
           }}
           style={{ 
             alignItems: 'center', 
-            background: 'var(--bg-app)', 
-            border: '1px solid var(--border)',
-            borderRadius: 20, padding: '8px 16px', gap: 12,
-            width: 320,
+            background: '#f1f5f9', 
+            border: '1px solid transparent',
+            borderRadius: 24, padding: '10px 18px', gap: 12,
+            width: 360, transition: 'all 0.2s ease',
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.background = '#fff';
+            e.currentTarget.style.border = '1px solid #e2e8f0';
+            e.currentTarget.style.boxShadow = '0 0 0 4px rgba(241, 245, 249, 1)';
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.background = '#f1f5f9';
+            e.currentTarget.style.border = '1px solid transparent';
+            e.currentTarget.style.boxShadow = 'none';
           }}
         >
-          <Search size={16} color="var(--text-muted)" />
+          <Search size={18} color="#94a3b8" />
           <input 
             name="search"
             type="text" 
-            placeholder="Search" 
+            placeholder="Cari tim, pemain, atau turnamen..." 
             style={{ 
-              background: 'transparent', border: 'none', color: 'var(--text-primary)', fontSize: 14, 
+              background: 'transparent', border: 'none', color: '#0f172a', fontSize: 14, 
               outline: 'none', width: '100%', fontWeight: 500,
             }} 
           />
         </form>
 
         {/* Right: nav links */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingRight: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingRight: 16 }}>
           {[
-            { label: 'News', href: '/news' },
-            { label: 'Transfers', href: '/transfers' },
-            { label: 'About', href: '/about' },
-            { label: 'TV schedules', href: '/tv' },
+            { label: 'Berita', href: '/news' },
+            { label: 'Turnamen', href: '/tournaments' },
+            { label: 'Tentang', href: '/about' },
           ].map(link => (
             <Link 
               key={link.href} 
               href={link.href}
               style={{ 
-                padding: '8px 16px', fontSize: 14, fontWeight: 700, 
-                color: 'var(--text-primary)', borderRadius: 20,
-                transition: 'all 0.15s ease',
+                padding: '10px 16px', fontSize: 14, fontWeight: 600, 
+                color: '#475569', borderRadius: 20,
+                transition: 'all 0.2s ease', textDecoration: 'none'
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+              onMouseEnter={(e) => { 
+                e.currentTarget.style.background = '#f1f5f9'; 
+                e.currentTarget.style.color = '#0f172a';
+              }}
+              onMouseLeave={(e) => { 
+                e.currentTarget.style.background = 'transparent'; 
+                e.currentTarget.style.color = '#475569';
+              }}
             >
               {link.label}
             </Link>

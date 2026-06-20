@@ -49,14 +49,20 @@ export default function BottomNav() {
 
   return (
     <div 
-      className="fixed bottom-0 left-0 right-0 z-[100] h-[64px] bg-[var(--bg-card)] border-t border-[var(--border)] lg:hidden px-2 flex items-center overflow-x-auto hide-scrollbar" 
-      style={{ scrollbarWidth: 'none' }}
+      className="fixed bottom-0 left-0 right-0 z-[100] h-[64px] lg:hidden px-2 flex items-center overflow-x-auto hide-scrollbar" 
+      style={{ 
+        scrollbarWidth: 'none', 
+        background: 'rgba(255, 255, 255, 0.95)', 
+        backdropFilter: 'blur(12px)',
+        borderTop: '1px solid rgba(0, 0, 0, 0.05)',
+        paddingBottom: 'env(safe-area-inset-bottom)'
+      }}
     >
       {navItems.map((item) => {
         const isActive = (item.path === '/' && pathname === '/' && currentFilter === item.filter) || 
                          (item.path !== '/' && pathname.startsWith(item.path));
         
-        const color = isActive ? 'var(--text-primary)' : 'var(--text-muted)';
+        const color = isActive ? '#0f172a' : '#94a3b8';
         
         return (
           <button
@@ -76,11 +82,11 @@ export default function BottomNav() {
             }}
           >
             <div style={{ position: 'relative' }}>
-              <item.icon size={22} color={color} style={{ fill: isActive ? color : 'none' }} />
+              <item.icon size={22} color={color} style={{ fill: isActive ? color : 'none', transition: 'all 0.2s ease' }} />
               {item.isLive && liveCount > 0 && (
                 <span style={{ 
                   position: 'absolute', top: -4, right: -8, 
-                  background: 'var(--accent-rose)', color: '#fff', 
+                  background: '#ef4444', color: '#fff', 
                   fontSize: 9, fontWeight: 800, 
                   padding: '2px 4px', borderRadius: 6, 
                   minWidth: 16, textAlign: 'center', 
@@ -91,8 +97,9 @@ export default function BottomNav() {
             </div>
             <span style={{ 
               fontSize: 11, 
-              fontWeight: isActive ? 700 : 500, 
+              fontWeight: isActive ? 700 : 600, 
               color: color, 
+              transition: 'all 0.2s ease'
             }}>
               {item.label}
             </span>

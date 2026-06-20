@@ -45,6 +45,7 @@ export default function MatchDetailPage({ params }) {
   const [standings, setStandings] = useState(null);
   const [activeTab, setActiveTab] = useState('rincian');
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState(null);
   const [tabHovered, setTabHovered] = useState(false);
   const tabsRef = useRef(null);
   const prevMatchIdRef = useRef(null);
@@ -59,6 +60,7 @@ export default function MatchDetailPage({ params }) {
       prevMatchIdRef.current = matchId;
       setMatch(null);
       setStandings(null);
+      setErrorMsg(null);
     }
 
     const fetchDetail = async (showLoading = true) => {
@@ -82,6 +84,7 @@ export default function MatchDetailPage({ params }) {
         }
       } catch (err) {
         console.error('Match detail error:', err.message);
+        if (isMounted) setErrorMsg(err.response?.data?.message || err.message);
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -101,6 +104,39 @@ export default function MatchDetailPage({ params }) {
   }, [matchId]);
 
   if (!matchId) return null;
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="loader"></div>
+        <p style={{ marginTop: 14, color: 'var(--text-secondary)', fontSize: 13, fontWeight: 500 }}>Memuat detail pertandingan...</p>
+      </div>
+    );
+  }
+
+  if (errorMsg) {
+    return (
+      <div style={{ maxWidth: 800, margin: '40px auto', textAlign: 'center', padding: '0 16px' }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>Terjadi Kesalahan Server</h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 6, marginBottom: 18 }}>Error: {errorMsg}</p>
+        <button onClick={() => router.back()} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          Kembali
+        </button>
+      </div>
+    );
+  }
+
+  if (!match) {
+    return (
+      <div style={{ maxWidth: 800, margin: '40px auto', textAlign: 'center', padding: '0 16px' }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>Pertandingan Tidak Ditemukan</h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 6, marginBottom: 18 }}>Maaf, pertandingan yang Anda cari tidak tersedia atau telah dihapus.</p>
+        <button onClick={() => router.push('/')} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+           Kembali ke Beranda
+        </button>
+      </div>
+    );
+  }
 
   const isLive = ['live', 'first_half', 'half_time', 'second_half', 'extra_time_1', 'extra_time_ht', 'extra_time_2', 'penalty_shootout', 'ongoing'].includes(match?.status);
   const isFinished = match?.status === 'finished';

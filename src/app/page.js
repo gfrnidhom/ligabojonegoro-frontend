@@ -77,6 +77,19 @@ function getDateRange() {
 
 const DAY_NAMES = ['MIN', 'SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB'];
 
+const formatTimeAgo = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+  if (diffInHours < 1) {
+    const diffInMins = Math.floor((now - date) / (1000 * 60));
+    return `${diffInMins} min ago`;
+  }
+  if (diffInHours < 24) return `${diffInHours} hr ago`;
+  return `${Math.floor(diffInHours / 24)} d ago`;
+};
+
 const STATUS_FILTERS = [
   { id: 'all', label: 'Semua' },
   { id: 'live', label: 'Langsung', live: true },
@@ -103,6 +116,7 @@ function Home() {
   const [playerStats, setPlayerStats] = useState([]);
   const [selectedPlayerId, setSelectedPlayerId] = useState(null);
   const [playerDetail, setPlayerDetail] = useState(null);
+  const [latestNews, setLatestNews] = useState([]);
   const [mobileTab, setMobileTab] = useState('matches');
   const [mobileSportsOpen, setMobileSportsOpen] = useState(false);
   const [mobileCalendarOpen, setMobileCalendarOpen] = useState(false);
@@ -158,15 +172,17 @@ function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [mRes, tRes, sRes] = await Promise.all([
+        const [mRes, tRes, sRes, nRes] = await Promise.all([
           api.get('/matches', { params: { per_page: 100 } }),
           api.get('/tournaments'),
           api.get('/sports'),
+          api.get('/news', { params: { limit: 3 } })
         ]);
         const mData = mRes.data.success ? (mRes.data.data || []) : [];
         setMatches(mData);
         if (tRes.data.success) setTournaments(tRes.data.data || []);
         if (sRes.data.success) setSports(sRes.data.data || []);
+        if (nRes?.data?.success) setLatestNews(nRes.data.data || []);
 
         // Fetch banners (graceful fallback)
         try {
@@ -345,55 +361,63 @@ function Home() {
       {isMounted && typeof window !== 'undefined' && window.innerWidth < 1024 && (
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '10px 14px', background: 'var(--bg-card-solid)', borderBottom: '1px solid var(--border)',
+          padding: '12px 16px', 
+          background: 'rgba(255, 255, 255, 0.85)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.02)',
           position: 'sticky', top: 0, zIndex: 60
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontWeight: 900, fontSize: 16, letterSpacing: '0.02em' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontWeight: 900, fontSize: 18, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center' }}>
               <span style={{ color: 'var(--primary)' }}>LIGA</span>
-              <span style={{ color: '#fbbf24' }}>BJN</span>
+              <span style={{ color: '#fbbf24', marginLeft: '1px' }}>BJN</span>
             </span>
             <button
               onClick={() => setMobileSportsOpen(true)}
               style={{
-                display: 'flex', alignItems: 'center', gap: 4,
-                background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)',
-                padding: '5px 10px', borderRadius: 6,
-                color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 6,
+                background: 'rgba(0, 0, 0, 0.04)', 
+                padding: '6px 12px', borderRadius: 20,
+                color: 'var(--text-primary)', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                transition: 'background 0.2s ease',
               }}
             >
               {(() => {
                 const currentSportObj = sports.find(s => s.id === activeSport);
                 const label = currentSportObj ? (SPORT_LABELS[currentSportObj.slug] || currentSportObj.name) : 'Semua Olahraga';
-                const icon = currentSportObj ? (SPORT_ICONS[currentSportObj.slug] || <Trophy size={14} />) : <Trophy size={14} />;
+                const icon = currentSportObj ? (SPORT_ICONS[currentSportObj.slug] || <Trophy size={13} />) : <Trophy size={13} />;
                 return (
                   <>
-                    <span style={{ display: 'flex', alignItems: 'center' }}>{icon}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', color: 'var(--primary)' }}>{icon}</span>
                     <span>{label}</span>
-                    <span style={{ fontSize: 9, color: 'var(--text-muted)' }}>▾</span>
+                    <ChevronDown size={12} style={{ opacity: 0.7, marginLeft: 2 }} />
                   </>
                 );
               })()}
             </button>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {liveCount > 0 && (
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 4,
-                background: 'var(--accent-soft)', border: '1px solid rgba(239,68,68,0.2)',
-                padding: '4px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, color: 'var(--accent)',
+                background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239,68,68,0.15)',
+                padding: '5px 10px', borderRadius: 20, fontSize: 11, fontWeight: 800, color: '#ef4444',
               }}>
-                <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--accent)', animation: 'pulseDot 1.2s infinite' }}></span>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444', animation: 'pulseDot 1.2s infinite' }}></span>
                 {liveCount} Live
               </div>
             )}
             <button 
               onClick={() => router.push('/search')}
               style={{
-                width: 34, height: 34, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: 'rgba(255,255,255,0.04)', color: 'var(--text-muted)', border: '1px solid var(--border)'
-            }}>
+                width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'rgba(0, 0, 0, 0.04)', color: 'var(--text-primary)',
+                transition: 'background 0.2s ease',
+                cursor: 'pointer'
+              }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </button>
           </div>
@@ -411,8 +435,8 @@ function Home() {
               exit={{ opacity: 0 }}
               onClick={() => setMobileSportsOpen(false)}
               style={{
-                position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
-                backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', zIndex: 1000
+                position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.3)',
+                backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', zIndex: 1000
               }}
             />
             {/* Drawer */}
@@ -423,24 +447,25 @@ function Home() {
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               style={{
                 position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1001,
-                background: '#0f172a', borderTop: '1px solid rgba(255,255,255,0.08)',
+                background: '#ffffff', borderTop: '1px solid rgba(0, 0, 0, 0.05)',
                 borderTopLeftRadius: 24, borderTopRightRadius: 24,
                 padding: '24px 16px 40px',
                 maxHeight: '60vh', overflowY: 'auto',
-                boxShadow: '0 -8px 32px rgba(0,0,0,0.4)'
+                boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.06)'
               }}
             >
               {/* Top notch */}
-              <div style={{ width: 40, height: 4, background: 'rgba(255,255,255,0.15)', borderRadius: 2, margin: '0 auto 20px' }} />
-              <div style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc', marginBottom: 16 }}>Pilih Olahraga</div>
+              <div style={{ width: 40, height: 4, background: 'rgba(0, 0, 0, 0.1)', borderRadius: 2, margin: '0 auto 20px' }} />
+              <div style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', marginBottom: 16 }}>Pilih Olahraga</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <button
                   onClick={() => { setActiveSport(null); setActiveTournament(null); setMobileSportsOpen(false); }}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderRadius: 16,
-                    background: !activeSport ? 'rgba(59,130,246,0.15)' : 'rgba(255,255,255,0.03)',
-                    border: '1px solid', borderColor: !activeSport ? 'rgba(59,130,246,0.3)' : 'rgba(255,255,255,0.05)',
-                    color: !activeSport ? '#3b82f6' : '#e2e8f0', cursor: 'pointer'
+                    background: !activeSport ? 'rgba(59,130,246,0.08)' : '#f8fafc',
+                    border: '1px solid', borderColor: !activeSport ? 'rgba(59,130,246,0.15)' : 'rgba(0,0,0,0.03)',
+                    color: !activeSport ? '#3b82f6' : '#334155', cursor: 'pointer',
+                    transition: 'all 0.2s ease',
                   }}
                 >
                   <Trophy size={20} />
@@ -455,9 +480,10 @@ function Home() {
                       onClick={() => { setActiveSport(isActive ? null : sport.id); setActiveTournament(null); setMobileSportsOpen(false); }}
                       style={{
                         display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderRadius: 16,
-                        background: isActive ? 'rgba(59,130,246,0.15)' : 'rgba(255,255,255,0.03)',
-                        border: '1px solid', borderColor: isActive ? 'rgba(59,130,246,0.3)' : 'rgba(255,255,255,0.05)',
-                        color: isActive ? '#3b82f6' : '#e2e8f0', cursor: 'pointer'
+                        background: isActive ? 'rgba(59,130,246,0.08)' : '#f8fafc',
+                        border: '1px solid', borderColor: isActive ? 'rgba(59,130,246,0.15)' : 'rgba(0,0,0,0.03)',
+                        color: isActive ? '#3b82f6' : '#334155', cursor: 'pointer',
+                        transition: 'all 0.2s ease',
                       }}
                     >
                       <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24 }}>
@@ -488,8 +514,8 @@ function Home() {
               exit={{ opacity: 0 }}
               onClick={() => setMobileCalendarOpen(false)}
               style={{
-                position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
-                backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', zIndex: 1000
+                position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.3)',
+                backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', zIndex: 1000
               }}
             />
             {/* Drawer */}
@@ -500,32 +526,32 @@ function Home() {
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               style={{
                 position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1001,
-                background: '#0f172a', borderTop: '1px solid rgba(255,255,255,0.08)',
+                background: '#ffffff', borderTop: '1px solid rgba(0, 0, 0, 0.05)',
                 borderTopLeftRadius: 24, borderTopRightRadius: 24,
                 padding: '24px 16px 40px',
                 maxHeight: '60vh', overflowY: 'auto',
-                boxShadow: '0 -8px 32px rgba(0,0,0,0.4)'
+                boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.06)'
               }}
             >
               {/* Top notch */}
-              <div style={{ width: 40, height: 4, background: 'rgba(255,255,255,0.15)', borderRadius: 2, margin: '0 auto 20px' }} />
-              <div style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc', marginBottom: 16, textAlign: 'center' }}>Pilih Tanggal</div>
+              <div style={{ width: 40, height: 4, background: 'rgba(0, 0, 0, 0.1)', borderRadius: 2, margin: '0 auto 20px' }} />
+              <div style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', marginBottom: 16, textAlign: 'center' }}>Pilih Tanggal</div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                 <button onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1))}
-                  style={{ color: '#8b92a5', padding: '6px 12px', borderRadius: 8, background: 'rgba(255,255,255,0.05)' }}>
+                  style={{ color: '#475569', padding: '8px 14px', borderRadius: 12, background: 'rgba(0,0,0,0.04)', cursor: 'pointer' }}>
                   ◀
                 </button>
-                <span style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc' }}>
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>
                   {calendarMonth.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
                 </span>
                 <button onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1))}
-                  style={{ color: '#8b92a5', padding: '6px 12px', borderRadius: 8, background: 'rgba(255,255,255,0.05)' }}>
+                  style={{ color: '#475569', padding: '8px 14px', borderRadius: 12, background: 'rgba(0,0,0,0.04)', cursor: 'pointer' }}>
                   ▶
                 </button>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6, marginBottom: 8, textAlign: 'center' }}>
                 {['Min','Sen','Sel','Rab','Kam','Jum','Sab'].map(d => (
-                  <span key={d} style={{ fontSize: 11, fontWeight: 700, color: '#555d75' }}>{d}</span>
+                  <span key={d} style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8' }}>{d}</span>
                 ))}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6 }}>
@@ -547,11 +573,11 @@ function Home() {
                       style={{
                         aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: 13, fontWeight: isSelected || isTdy ? 700 : 500, borderRadius: 10,
-                        color: isSelected ? '#fff' : isTdy ? '#3b82f6' : '#e8eaed',
-                        background: isSelected ? 'linear-gradient(135deg, #3b82f6, #60a5fa)' : isTdy ? 'rgba(59,130,246,0.15)' : 'transparent',
-                        boxShadow: isSelected ? '0 2px 10px rgba(59,130,246,0.4)' : 'none',
+                        color: isSelected ? '#fff' : isTdy ? '#3b82f6' : '#334155',
+                        background: isSelected ? 'linear-gradient(135deg, #3b82f6, #60a5fa)' : isTdy ? 'rgba(59,130,246,0.08)' : 'transparent',
+                        boxShadow: isSelected ? '0 4px 14px rgba(59,130,246,0.3)' : 'none',
                         border: '1px solid',
-                        borderColor: isSelected ? 'transparent' : 'rgba(255,255,255,0.02)',
+                        borderColor: isSelected ? 'transparent' : 'rgba(0,0,0,0.02)',
                         transition: 'all 0.2s ease',
                         cursor: 'pointer'
                       }}
@@ -621,7 +647,7 @@ function Home() {
          {/* ── Date Bar + Filters (Card) ── */}
         <div style={{
           zIndex: 50, position: 'relative',
-          margin: '0 0 16px 0',
+          margin: (isMounted && typeof window !== 'undefined' && window.innerWidth < 1024) ? '0 12px 16px 12px' : '0 0 16px 0',
           borderRadius: 16,
           background: 'var(--bg-card)',
           border: '1px solid var(--border)',
@@ -806,76 +832,76 @@ function Home() {
                           onClick={() => handleMatchClick(match.uuid || match.id)}
                           style={{
                             display: 'flex', alignItems: 'center',
-                            padding: '12px 16px',
-                            background: isSelected ? 'var(--bg-hover)' : 'var(--bg-card)',
+                            padding: viewMode === 'grid' ? '16px 20px' : '12px 16px',
+                            background: viewMode === 'grid' ? '#f8fafc' : (isSelected ? 'var(--bg-hover)' : 'var(--bg-card)'),
                             borderBottom: viewMode === 'grid' ? 'none' : '1px solid var(--border-light)',
-                            border: viewMode === 'grid' ? '1px solid var(--border)' : 'none',
-                            borderRadius: viewMode === 'grid' ? 12 : 0,
+                            border: viewMode === 'grid' ? '1px solid #e2e8f0' : 'none',
+                            borderRadius: viewMode === 'grid' ? 16 : 0,
                             cursor: 'pointer', transition: 'background 0.2s ease',
                           }}
                         >
                           {viewMode === 'grid' ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 12 }}>
-                               <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 8, borderBottom: '1px solid var(--border-light)' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                               <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 12, borderBottom: '1px solid #f1f5f9', marginBottom: 12 }}>
                                  {isLive ? (
-                                   <span style={{ color: '#ef4444', fontSize: 12, fontWeight: 800 }}>{formatGameMinute(match.minute)}'</span>
+                                   <span style={{ color: '#ef4444', fontSize: 15, fontWeight: 700 }}>{formatGameMinute(match.minute)}'</span>
                                  ) : isFinished ? (
-                                   <div style={{ background: '#f1f5f9', borderRadius: 12, padding: '2px 8px', fontSize: 11, fontWeight: 700, color: '#64748b' }}>FT</div>
+                                   <div style={{ background: '#f1f5f9', borderRadius: 16, padding: '4px 12px', fontSize: 13, fontWeight: 700, color: '#64748b' }}>FT</div>
                                  ) : (
-                                   <span style={{ fontSize: 12, fontWeight: 600, color: '#64748b' }}>{time}</span>
+                                   <span style={{ fontSize: 15, fontWeight: 700, color: '#64748b' }}>{time}</span>
                                  )}
                                </div>
                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
-                                    <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name)} style={{ width: 28, height: 28, objectFit: 'contain' }} alt="" />
-                                    <span style={{ fontSize: 14, fontWeight: homeWin ? 800 : 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.home_team?.name}</span>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+                                    <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name)} style={{ width: 32, height: 32, objectFit: 'contain' }} alt="" />
+                                    <span style={{ fontSize: 16, fontWeight: 600, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.home_team?.name}</span>
                                   </div>
-                                  <span style={{ fontSize: 18, fontWeight: 800, padding: '0 12px' }}>{hasScore ? `${match.home_score} - ${match.away_score}` : '-'}</span>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0, justifyContent: 'flex-end' }}>
-                                    <span style={{ fontSize: 14, fontWeight: awayWin ? 800 : 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.away_team?.name}</span>
-                                    <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name)} style={{ width: 28, height: 28, objectFit: 'contain' }} alt="" />
+                                  <span style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', padding: '0 16px' }}>{hasScore ? `${match.home_score} - ${match.away_score}` : '-'}</span>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0, justifyContent: 'flex-end' }}>
+                                    <span style={{ fontSize: 16, fontWeight: 600, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'right' }}>{match.away_team?.name}</span>
+                                    <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name)} style={{ width: 32, height: 32, objectFit: 'contain' }} alt="" />
                                   </div>
                                </div>
                             </div>
                           ) : (
-                            <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', width: '100%', minWidth: 0 }}>
                               {/* Time / Status */}
-                              <div style={{ width: 44, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <div style={{ width: 60, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
                                 {isLive ? (
-                                  <span style={{ color: '#ef4444', fontSize: 12, fontWeight: 700 }}>{formatGameMinute(match.minute)}'</span>
+                                  <span style={{ color: '#ef4444', fontSize: 13, fontWeight: 700 }}>{formatGameMinute(match.minute)}'</span>
                                 ) : isFinished ? (
-                                  <div style={{ background: '#f1f5f9', borderRadius: 12, padding: '2px 6px', fontSize: 11, fontWeight: 600, color: '#64748b' }}>FT</div>
+                                  <div style={{ background: '#f1f5f9', borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: '#94a3b8' }}>FT</div>
                                 ) : (
-                                  <span style={{ fontSize: 12, fontWeight: 500, color: '#64748b' }}>{time}</span>
+                                  <span style={{ fontSize: 13, fontWeight: 600, color: '#64748b' }}>{time}</span>
                                 )}
                               </div>
 
                               {/* Teams & Score Container */}
-                              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 0 }}>
                                 
                                 {/* Home Team */}
-                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, minWidth: 0 }}>
-                                  <span style={{ fontSize: 14, fontWeight: homeWin ? 700 : 400, color: 'var(--text-primary)', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, minWidth: 0 }}>
+                                  <span style={{ fontSize: 15, fontWeight: 500, color: '#1e293b', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                     {match.home_team?.name || 'Home'}
                                   </span>
-                                  <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name)} style={{ width: 20, height: 20, objectFit: 'contain', flexShrink: 0 }} alt="" />
+                                  <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name)} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} alt="" />
                                 </div>
 
                                 {/* Score */}
-                                <div style={{ width: 64, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
+                                <div style={{ width: 72, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
                                   {hasScore ? (
-                                    <span style={{ fontSize: 14, fontWeight: 700, color: isLive ? '#ef4444' : 'var(--text-primary)', whiteSpace: 'nowrap' }}>
+                                    <span style={{ fontSize: 16, fontWeight: 700, color: isLive ? '#ef4444' : '#1e293b', whiteSpace: 'nowrap', letterSpacing: '1px' }}>
                                       {match.home_score} - {match.away_score}
                                     </span>
                                   ) : (
-                                    <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-muted)' }}>-</span>
+                                    <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-muted)' }}>-</span>
                                   )}
                                 </div>
 
                                 {/* Away Team */}
-                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 8, minWidth: 0 }}>
-                                  <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name)} style={{ width: 20, height: 20, objectFit: 'contain', flexShrink: 0 }} alt="" />
-                                  <span style={{ fontSize: 14, fontWeight: awayWin ? 700 : 400, color: 'var(--text-primary)', textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 12, minWidth: 0 }}>
+                                  <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name)} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} alt="" />
+                                  <span style={{ fontSize: 15, fontWeight: 500, color: '#1e293b', textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                     {match.away_team?.name || 'Away'}
                                   </span>
                                 </div>
@@ -965,26 +991,67 @@ function Home() {
           )}
 
           {/* Latest News Widget */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1px solid var(--border)', overflow: 'hidden' }}>
-            <div style={{ padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Globe size={18} color="var(--primary)" />
-                <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>Berita Terbaru</span>
-              </div>
-              <button 
-                onClick={() => router.push('/news')}
-                style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--bg-app)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-              >
-                 <ChevronRight size={14} color="var(--text-primary)" />
-              </button>
+          {/* Latest News Widget */}
+          <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e5e7eb', overflow: 'hidden' }}>
+            <div style={{ padding: '20px 20px 16px' }}>
+              <span style={{ fontSize: 20, fontWeight: 700, color: '#111827' }}>News</span>
             </div>
-            <div style={{ padding: '24px 16px', textAlign: 'center' }}>
-              <div style={{ width: 48, height: 48, background: 'var(--bg-app)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
-                <Globe size={20} color="var(--text-muted)" />
+            {latestNews.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {latestNews.slice(0, 3).map((item, index) => {
+                  const isFirst = index === 0;
+                  const source = item.source || 'FotMob';
+                  
+                  if (isFirst) {
+                    return (
+                      <div 
+                        key={item.id} 
+                        onClick={() => router.push(`/news/${item.slug}`)}
+                        style={{ padding: '0 20px 24px', borderBottom: '1px solid #f1f5f9', cursor: 'pointer' }}
+                      >
+                        <img 
+                          src={getImageUrl(item.image_path)} 
+                          alt={item.title} 
+                          style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: 16, marginBottom: 12 }}
+                        />
+                        <h2 style={{ fontSize: 16, fontWeight: 600, color: '#111827', lineHeight: 1.35, margin: '0 0 8px 0', letterSpacing: '-0.01em' }}>
+                          {item.title}
+                        </h2>
+                        <div style={{ fontSize: 13, color: '#6b7280', fontWeight: 500 }}>
+                          {source} · {formatTimeAgo(item.published_at || item.created_at)}
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div 
+                      key={item.id} 
+                      onClick={() => router.push(`/news/${item.slug}`)}
+                      style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', display: 'flex', gap: 16 }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                    >
+                      <img 
+                        src={getImageUrl(item.image_path)} 
+                        alt={item.title} 
+                        style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 12, flexShrink: 0 }}
+                      />
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                        <h4 style={{ fontSize: 15, fontWeight: 600, color: '#111827', lineHeight: 1.35, margin: '0 0 6px 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', letterSpacing: '-0.01em' }}>
+                          {item.title}
+                        </h4>
+                        <span style={{ fontSize: 13, color: '#6b7280', fontWeight: 500 }}>{source} · {formatTimeAgo(item.published_at || item.created_at)}</span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-              <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Belum ada berita</p>
-              <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Cek lagi nanti untuk pembaruan</p>
-            </div>
+            ) : (
+              <div style={{ padding: '24px 16px', textAlign: 'center' }}>
+                <p style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>Belum ada berita</p>
+              </div>
+            )}
           </div>
 
         </div>

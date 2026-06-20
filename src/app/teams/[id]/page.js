@@ -19,7 +19,7 @@ export default function TeamDetailPage({ params }) {
     if (!path) return null;
     if (path.startsWith('http')) return path;
     const cleanPath = path.startsWith('/') ? path.slice(1) : path;
-    return `http://localhost:8000/storage/${cleanPath}`;
+    return `https://app.ligabojonegoro.id/storage/${cleanPath}`;
   };
 
   const avatar = (name, bg = '3b82f6') => {

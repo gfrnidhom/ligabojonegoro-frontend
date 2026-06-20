@@ -2,12 +2,34 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Newspaper, Calendar, Search } from 'lucide-react';
-import api from '../../api';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, Flame, TrendingUp } from 'lucide-react';
+import { motion } from 'framer-motion';
+import api, { getImageUrl } from '../../api';
+
+const formatTimeAgo = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+  
+  if (diffInHours < 1) {
+    const diffInMins = Math.floor((now - date) / (1000 * 60));
+    return `${diffInMins} min ago`;
+  }
+  if (diffInHours < 24) {
+    return `${diffInHours} hr ago`;
+  }
+  return `${Math.floor(diffInHours / 24)} d ago`;
+};
+
+const CATEGORIES = ['Semua', 'Liga', 'Turnamen', 'Transfer', 'Lokal'];
 
 export default function NewsPage() {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('Semua');
+  const router = useRouter();
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -26,78 +48,147 @@ export default function NewsPage() {
     fetchNews();
   }, []);
 
-  const getImageUrl = (path) => {
-    if (!path) return 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
-    if (path.startsWith('http')) return path;
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL ? process.env.NEXT_PUBLIC_API_URL.replace('/api/v1', '') : 'http://localhost:8000';
-    return `${baseUrl}/storage/${path}`;
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
-  };
-
   return (
-    <div className="space-y-12 pb-12 animate-fade-in">
+    <div style={{ maxWidth: 768, margin: '0 auto', minHeight: 'calc(100vh - 72px)', paddingBottom: 120 }}>
       {/* Header */}
-      <section className="relative glass rounded-3xl overflow-hidden mt-8 p-12 text-center border border-[var(--glass-border)]">
-        <div className="absolute inset-0 bg-gradient-to-r from-[var(--primary-color)]/10 to-[var(--secondary-color)]/10 blur-3xl -z-10" />
-        <Newspaper size={48} className="mx-auto mb-6 text-[var(--primary-color)]" />
-        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gradient">Berita Terbaru</h1>
-        <p className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto">
-          Dapatkan pembaruan terkini, pengumuman, dan artikel eksklusif dari Liga Bojonegoro.
-        </p>
-      </section>
+      <div 
+        className="sticky top-0 lg:top-[72px] z-40"
+        style={{ 
+        padding: '20px 20px 16px', 
+        background: 'rgba(242, 242, 242, 0.85)', 
+        backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid rgba(0,0,0,0.05)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+          <button 
+            onClick={() => router.push('/')}
+            style={{ 
+              width: 36, height: 36, borderRadius: '50%', background: '#f8fafc', 
+              border: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', transition: 'all 0.2s'
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = '#f1f5f9'}
+            onMouseLeave={e => e.currentTarget.style.background = '#f8fafc'}
+          >
+            <ArrowLeft size={18} color="#0f172a" />
+          </button>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', margin: 0, letterSpacing: '-0.02em' }}>Berita</h1>
+        </div>
 
-      {/* Content */}
-      <section>
-        {loading ? (
-          <div className="loading-container">
-            <div className="loader"></div>
-            <p className="mt-4">Memuat berita...</p>
-          </div>
-        ) : news.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {news.map((item) => (
-              <Link href={`/news/${item.slug}`} key={item.id} className="group">
-                <div className="glass rounded-2xl overflow-hidden h-full flex flex-col hover:border-[var(--primary-color)] transition-all duration-300 transform hover:-translate-y-2">
-                  <div className="relative h-56 overflow-hidden">
-                    <div 
-                      className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                      style={{ backgroundImage: `url('${getImageUrl(item.image_path)}')` }}
+        {/* Categories */}
+        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }} className="hide-scrollbar">
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              style={{
+                padding: '6px 16px',
+                borderRadius: 20,
+                fontSize: 14,
+                fontWeight: 600,
+                whiteSpace: 'nowrap',
+                border: activeCategory === cat ? 'none' : '1px solid #e2e8f0',
+                background: activeCategory === cat ? '#0f172a' : '#fff',
+                color: activeCategory === cat ? '#fff' : '#64748b',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {loading ? (
+        <div style={{ padding: 40, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div className="loader"></div>
+          <p style={{ marginTop: 12, color: '#64748b', fontSize: 14, fontWeight: 500 }}>Memuat berita terbaru...</p>
+        </div>
+      ) : news.length > 0 ? (
+        <motion.div 
+          initial={{ opacity: 0 }} 
+          animate={{ opacity: 1 }} 
+          style={{ display: 'flex', flexDirection: 'column' }}
+        >
+          {news.map((item, index) => {
+            const isFirst = index === 0;
+            const source = item.source || 'Liga Bojonegoro';
+            
+            if (isFirst) {
+              return (
+                <Link href={`/news/${item.slug}`} key={item.id} style={{ textDecoration: 'none', color: 'inherit', display: 'block', padding: '20px 20px 32px', borderBottom: '8px solid rgba(0,0,0,0.03)' }}>
+                  <div style={{ position: 'relative', width: '100%', paddingBottom: '62.5%', borderRadius: 20, overflow: 'hidden', marginBottom: 16 }}>
+                    <img 
+                      src={getImageUrl(item.image_path)} 
+                      alt={item.title} 
+                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
+                      onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
+                      onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent opacity-80" />
+                    <div style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(239, 68, 68, 0.9)', color: '#fff', padding: '4px 10px', borderRadius: 12, fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 4, backdropFilter: 'blur(4px)' }}>
+                      <Flame size={12} fill="currentColor" /> TRENDING
+                    </div>
                   </div>
-                  <div className="p-6 flex flex-col flex-grow">
-                    <div className="flex items-center gap-2 text-[var(--text-secondary)] text-sm mb-4 bg-[rgba(0,0,0,0.03)] w-max px-3 py-1 rounded-full border border-[var(--border-color)]">
-                      <Calendar size={14} />
-                      <span>{formatDate(item.published_at)}</span>
-                    </div>
-                    <h3 className="text-xl font-bold mb-3 group-hover:text-[var(--primary-color)] transition-colors leading-tight text-[var(--text-primary)]">
-                      {item.title}
-                    </h3>
-                    <p className="text-[var(--text-secondary)] line-clamp-3 text-sm mb-6 flex-grow">
-                      {item.excerpt || item.content?.substring(0, 120).replace(/(<([^>]+)>)/gi, "") + '...'}
-                    </p>
-                    <div className="mt-auto text-[var(--primary-color)] text-sm font-semibold flex items-center gap-2">
-                      Baca Selengkapnya <span className="transform group-hover:translate-x-1 transition-transform">→</span>
-                    </div>
+                  
+                  <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', lineHeight: 1.35, margin: '0 0 12px 0', letterSpacing: '-0.02em' }}>
+                    {item.title}
+                  </h2>
+                  <div style={{ display: 'flex', alignItems: 'center', fontSize: 13, color: '#64748b', fontWeight: 600 }}>
+                    <span style={{ color: '#3b82f6' }}>{source}</span>
+                    <span style={{ margin: '0 6px' }}>•</span>
+                    <span>{formatTimeAgo(item.published_at || item.created_at)}</span>
+                  </div>
+                </Link>
+              );
+            }
+
+            return (
+              <Link href={`/news/${item.slug}`} key={item.id} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', gap: 16, padding: '20px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                <div style={{ position: 'relative', width: 104, height: 104, borderRadius: 16, overflow: 'hidden', flexShrink: 0 }}>
+                  <img 
+                    src={getImageUrl(item.image_path)} 
+                    alt={item.title} 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
+                    onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
+                    onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                  />
+                </div>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#3b82f6', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    {item.category || 'Berita'}
+                  </div>
+                  <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', lineHeight: 1.4, margin: '0 0 8px 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', letterSpacing: '-0.01em' }}>
+                    {item.title}
+                  </h3>
+                  <div style={{ display: 'flex', alignItems: 'center', fontSize: 12, color: '#94a3b8', fontWeight: 500 }}>
+                    <TrendingUp size={12} style={{ marginRight: 4 }} />
+                    {formatTimeAgo(item.published_at || item.created_at)}
                   </div>
                 </div>
               </Link>
-            ))}
+            );
+          })}
+        </motion.div>
+      ) : (
+        <div style={{ padding: 60, textAlign: 'center', color: '#64748b', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ width: 64, height: 64, background: '#f1f5f9', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+             <TrendingUp size={28} color="#94a3b8" />
           </div>
-        ) : (
-          <div className="glass rounded-2xl p-16 text-center text-[var(--text-secondary)] border-dashed border-[var(--border-color)] flex flex-col items-center">
-            <Search size={48} className="mb-4 opacity-20" />
-            <p className="text-xl">Belum ada berita yang diterbitkan.</p>
-          </div>
-        )}
-      </section>
+          <p style={{ fontSize: 16, fontWeight: 600, color: '#0f172a', margin: '0 0 8px 0' }}>Belum ada berita</p>
+          <p style={{ fontSize: 14, margin: 0 }}>Kembali lagi nanti untuk informasi terbaru.</p>
+        </div>
+      )}
+
+      <style dangerouslySetInnerHTML={{__html: `
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}} />
     </div>
   );
 }

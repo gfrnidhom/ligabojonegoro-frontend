@@ -1,5 +1,5 @@
 export async function generateMetadata({ params }) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://app.ligabojonegoro.id/api/v1';
   try {
     const res = await fetch(`${baseUrl}/players/${params.id}`, { next: { revalidate: 60 } });
     if (res.ok) {
