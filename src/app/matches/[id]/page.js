@@ -604,36 +604,19 @@ function RincianTab({ match }) {
 
       {/* ── Mini Stats (Possession & Key Events) ── */}
       {match.statistics && (
-        <div style={{ background: 'var(--bg-subtle)', border: '1px solid var(--border)', borderRadius: 16, padding: '20px', marginTop: 8 }}>
-          <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--text-secondary)', fontWeight: 600, marginBottom: 16 }}>
+        <div style={{ padding: '16px 0', marginTop: 8 }}>
+          <div style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-primary)', fontWeight: 600, marginBottom: 16 }}>
             Persentase Penguasaan Bola
           </div>
 
-          <div style={{ display: 'flex', height: 32, borderRadius: 6, overflow: 'hidden' }}>
+          <div style={{ display: 'flex', height: 36, borderRadius: 18, overflow: 'hidden' }}>
             {/* Home Bar */}
-            <div style={{ flex: parseInt(match.statistics.possession_home) || 50, background: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px' }}>
-              <img src={getImageUrl(match.home_team?.logo_path) || `https://ui-avatars.com/api/?name=${encodeURIComponent(match.home_team?.name || '?')}`} style={{ width: 20, height: 20, borderRadius: '50%' }} alt="" />
-              <span style={{ color: '#fff', fontWeight: 800, fontSize: 13 }}>{match.statistics.possession_home || 50}%</span>
+            <div style={{ flex: parseInt(match.statistics.possession_home) || 50, background: '#1e3a8a', display: 'flex', alignItems: 'center', padding: '0 16px' }}>
+              <span style={{ color: '#fff', fontWeight: 700, fontSize: 14 }}>{match.statistics.possession_home || 50}%</span>
             </div>
             {/* Away Bar */}
-            <div style={{ flex: parseInt(match.statistics.possession_away) || 50, background: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px' }}>
-              <span style={{ color: '#fff', fontWeight: 800, fontSize: 13 }}>{match.statistics.possession_away || 50}%</span>
-              <img src={getImageUrl(match.away_team?.logo_path) || `https://ui-avatars.com/api/?name=${encodeURIComponent(match.away_team?.name || '?')}`} style={{ width: 20, height: 20, borderRadius: '50%' }} alt="" />
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 24 }}>
-            {/* Corners Pill */}
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '6px 20px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
-              <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>{match.statistics.corners_home || 0}</span>
-              <span style={{ fontSize: 13 }}>⛳️</span>
-              <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>{match.statistics.corners_away || 0}</span>
-            </div>
-            {/* Yellow Cards Pill */}
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '6px 20px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
-              <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>{match.statistics.yellow_cards_home || 0}</span>
-              <div style={{ width: 10, height: 14, background: '#eab308', borderRadius: 2 }}></div>
-              <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>{match.statistics.yellow_cards_away || 0}</span>
+            <div style={{ flex: parseInt(match.statistics.possession_away) || 50, background: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 16px' }}>
+              <span style={{ color: '#fff', fontWeight: 700, fontSize: 14 }}>{match.statistics.possession_away || 50}%</span>
             </div>
           </div>
         </div>
@@ -1435,25 +1418,46 @@ function StatistikTab({ match }) {
     </div>
   );
 
-  const StatRow = ({ label, homeVal, awayVal }) => {
-    const h = parseInt(homeVal) || 0;
-    const a = parseInt(awayVal) || 0;
-    const total = h + a;
-    let homePct = 50, awayPct = 50;
-    if (total > 0) { homePct = (h / total) * 100; awayPct = (a / total) * 100; }
-    const hWin = h > a;
-    const aWin = a > h;
+  const StatRow = ({ label, homeVal, awayVal, lowerIsBetter = false }) => {
+    const hStr = homeVal != null ? String(homeVal) : '0';
+    const aStr = awayVal != null ? String(awayVal) : '0';
+    const h = parseFloat(hStr) || 0;
+    const a = parseFloat(aStr) || 0;
+
+    let hWin = h > a;
+    let aWin = a > h;
+    
+    if (lowerIsBetter) {
+      hWin = h < a;
+      aWin = a < h;
+    }
 
     return (
-      <div style={{ padding: '14px 0', borderBottom: '1px solid var(--border-light)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <Badge value={h} color={hWin ? '#3b82f6' : '#94a3b8'} />
-          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', textAlign: 'center' }}>{label}</span>
-          <Badge value={a} color={aWin ? '#eab308' : '#94a3b8'} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0' }}>
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
+          {hWin ? (
+            <div style={{ background: '#1e3a8a', color: '#fff', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 14, minWidth: 32, textAlign: 'center' }}>
+              {hStr}
+            </div>
+          ) : (
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', padding: '4px 12px', minWidth: 32, textAlign: 'center' }}>
+              {hStr}
+            </div>
+          )}
         </div>
-        <div style={{ display: 'flex', height: 5, borderRadius: 3, background: 'var(--bg-subtle)', gap: 3, margin: '0 4px' }}>
-          <div style={{ width: `${homePct}%`, background: '#3b82f6', borderRadius: 3, transition: 'width 0.8s cubic-bezier(0.4,0,0.2,1)' }} />
-          <div style={{ width: `${awayPct}%`, background: '#eab308', borderRadius: 3, transition: 'width 0.8s cubic-bezier(0.4,0,0.2,1)' }} />
+        <div style={{ flex: 2, textAlign: 'center', fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)' }}>
+          {label}
+        </div>
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+          {aWin ? (
+            <div style={{ background: '#d97706', color: '#fff', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 14, minWidth: 32, textAlign: 'center' }}>
+              {aStr}
+            </div>
+          ) : (
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', padding: '4px 12px', minWidth: 32, textAlign: 'center' }}>
+              {aStr}
+            </div>
+          )}
         </div>
       </div>
     );
@@ -1535,8 +1539,7 @@ function StatistikTab({ match }) {
 
       {/* ── Tembakan ── */}
       {isFootballOrFutsal && (
-        <div style={{ background: 'var(--bg-subtle)', borderRadius: 12, padding: '14px 16px', border: '1px solid var(--border)' }}>
-          <div style={{ textAlign: 'center', fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>Tembakan</div>
+        <div style={{ marginTop: 16 }}>
           <StatRow label="Total Tembakan" homeVal={s('shots_home')} awayVal={s('shots_away')} />
           <StatRow label="Tembakan Tepat Sasaran" homeVal={s('shots_on_target_home')} awayVal={s('shots_on_target_away')} />
         </div>
@@ -1544,20 +1547,20 @@ function StatistikTab({ match }) {
 
       {/* ── Umum ── */}
       {isFootballOrFutsal && (
-        <div style={{ background: 'var(--bg-subtle)', borderRadius: 12, padding: '14px 16px', border: '1px solid var(--border)' }}>
+        <div style={{ marginTop: 16 }}>
           <StatRow label="Tendangan Sudut" homeVal={s('corners_home')} awayVal={s('corners_away')} />
-          <StatRow label="Pelanggaran" homeVal={s('fouls_home')} awayVal={s('fouls_away')} />
-          <StatRow label="Offside" homeVal={s('offsides_home')} awayVal={s('offsides_away')} />
-          <StatRow label="Kartu Kuning" homeVal={s('yellow_cards_home')} awayVal={s('yellow_cards_away')} />
-          <StatRow label="Kartu Merah" homeVal={s('red_cards_home')} awayVal={s('red_cards_away')} />
+          <StatRow label="Pelanggaran" homeVal={s('fouls_home')} awayVal={s('fouls_away')} lowerIsBetter />
+          <StatRow label="Offside" homeVal={s('offsides_home')} awayVal={s('offsides_away')} lowerIsBetter />
+          <StatRow label="Kartu Kuning" homeVal={s('yellow_cards_home')} awayVal={s('yellow_cards_away')} lowerIsBetter />
+          <StatRow label="Kartu Merah" homeVal={s('red_cards_home')} awayVal={s('red_cards_away')} lowerIsBetter />
         </div>
       )}
 
       {/* ── Statistik Akumulasi (Otomatis dari Pemain) ── */}
       {accumFields.length > 0 && (
-        <div style={{ background: 'var(--bg-subtle)', borderRadius: 12, padding: '14px 16px', border: '1px solid var(--border)' }}>
-          <div style={{ textAlign: 'center', fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>
-            Statistik Akumulasi
+        <div style={{ marginTop: 16 }}>
+          <div style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-primary)', fontWeight: 600, margin: '24px 0 16px' }}>
+            Statistik Pemain
           </div>
           {accumFields.map(field => (
             <StatRow
