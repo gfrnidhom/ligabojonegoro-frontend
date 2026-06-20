@@ -1408,13 +1408,17 @@ function StandingsTable({ rows = [], match, sport }) {
 function StatistikTab({ match }) {
   const [period, setPeriod] = useState('all');
   const stats = match.statistics;
-  if (!stats || stats.possession_home === undefined) {
+  if (!stats) {
     return (
       <div className="empty-state" style={{ padding: '36px 16px' }}>
         <p style={{ fontSize: 12, color: '#8b92a5', fontWeight: 600 }}>Statistik pertandingan belum tersedia.</p>
       </div>
     );
   }
+
+  const sport = match.tournament?.sport;
+  const sportSlug = String(sport?.slug || '').toLowerCase();
+  const isFootballOrFutsal = !sportSlug || sportSlug === 'football' || sportSlug === 'futsal';
 
   const prefix = period === 'all' ? '' : period === 'h1' ? 'h1_' : 'h2_';
   const s = (key) => stats[`${prefix}${key}`];
@@ -1454,6 +1458,26 @@ function StatistikTab({ match }) {
     );
   };
 
+  const labelMap = {
+    passing: 'Passing',
+    kontrol: 'Kontrol',
+    dribling: 'Dribling',
+    finishing: 'Finishing',
+    stamina: 'Stamina',
+    koordinasi_pemain: 'Koordinasi Antar Pemain',
+    tackles: 'Tackle',
+    saves: 'Penyelamatan',
+    service: 'Service',
+    block: 'Block',
+    smash: 'Smash',
+    dig: 'Dig',
+    assist: 'Assist',
+    footwalk: 'Footwalk',
+    penempatan_posisi: 'Penempatan Posisi',
+    loop: 'Loop',
+    error: 'Error'
+  };
+
   const possHome = parseInt(s('possession_home')) || 50;
   const possAway = parseInt(s('possession_away')) || 50;
 
@@ -1466,57 +1490,84 @@ function StatistikTab({ match }) {
     { id: 'h2', label: 'Babak 2' },
   ];
 
+  const sportFields = sport?.stat_fields || [];
+  const accumFields = sportFields.filter(f => !['goals', 'assists', 'yellow_cards', 'red_cards', 'minutes_played'].includes(f));
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-
       {/* Sub-tabs */}
-      <div style={{ display: 'flex', gap: 0, borderRadius: 10, overflow: 'hidden', border: '1px solid var(--border)' }}>
-        {periods.map(p => (
-          <button
-            key={p.id}
-            onClick={() => setPeriod(p.id)}
-            style={{
-              flex: 1, padding: '8px 0', fontSize: 12, fontWeight: 700,
-              border: 'none', cursor: 'pointer', transition: 'all 0.2s ease',
-              background: period === p.id ? 'var(--primary)' : 'var(--bg-subtle)',
-              color: period === p.id ? 'var(--bg-app)' : 'var(--text-secondary)',
-            }}
-          >
-            {p.label}
-          </button>
-        ))}
-      </div>
+      {isFootballOrFutsal && (
+        <div style={{ display: 'flex', gap: 0, borderRadius: 10, overflow: 'hidden', border: '1px solid var(--border)' }}>
+          {periods.map(p => (
+            <button
+              key={p.id}
+              onClick={() => setPeriod(p.id)}
+              style={{
+                flex: 1, padding: '8px 0', fontSize: 12, fontWeight: 700,
+                border: 'none', cursor: 'pointer', transition: 'all 0.2s ease',
+                background: period === p.id ? 'var(--primary)' : 'var(--bg-subtle)',
+                color: period === p.id ? 'var(--bg-app)' : 'var(--text-secondary)',
+              }}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* ── Penguasaan Bola ── */}
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Penguasaan Bola</div>
-        <div style={{ display: 'flex', alignItems: 'center', borderRadius: 8, overflow: 'hidden', height: 28, background: 'var(--bg-subtle)' }}>
-          <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name, '3b82f6')} style={{ width: 22, height: 22, borderRadius: '50%', marginLeft: 3, flexShrink: 0, zIndex: 2 }} alt="" />
-          <div style={{ flex: possHome, background: '#3b82f6', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 8, transition: 'flex 1s ease' }}>
-            <span style={{ fontSize: 12, fontWeight: 800, color: '#fff' }}>{possHome}%</span>
+      {isFootballOrFutsal && (
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Penguasaan Bola</div>
+          <div style={{ display: 'flex', alignItems: 'center', borderRadius: 8, overflow: 'hidden', height: 28, background: 'var(--bg-subtle)' }}>
+            <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name, '3b82f6')} style={{ width: 22, height: 22, borderRadius: '50%', marginLeft: 3, flexShrink: 0, zIndex: 2 }} alt="" />
+            <div style={{ flex: possHome, background: '#3b82f6', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 8, transition: 'flex 1s ease' }}>
+              <span style={{ fontSize: 12, fontWeight: 800, color: '#fff' }}>{possHome}%</span>
+            </div>
+            <div style={{ flex: possAway, background: '#eab308', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 8, transition: 'flex 1s ease' }}>
+              <span style={{ fontSize: 12, fontWeight: 800, color: '#1a1a1a' }}>{possAway}%</span>
+            </div>
+            <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name, 'eab308')} style={{ width: 22, height: 22, borderRadius: '50%', marginRight: 3, flexShrink: 0, zIndex: 2 }} alt="" />
           </div>
-          <div style={{ flex: possAway, background: '#eab308', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 8, transition: 'flex 1s ease' }}>
-            <span style={{ fontSize: 12, fontWeight: 800, color: '#1a1a1a' }}>{possAway}%</span>
-          </div>
-          <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name, 'eab308')} style={{ width: 22, height: 22, borderRadius: '50%', marginRight: 3, flexShrink: 0, zIndex: 2 }} alt="" />
         </div>
-      </div>
+      )}
 
       {/* ── Tembakan ── */}
-      <div style={{ background: 'var(--bg-subtle)', borderRadius: 12, padding: '14px 16px', border: '1px solid var(--border)' }}>
-        <div style={{ textAlign: 'center', fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>Tembakan</div>
-        <StatRow label="Total Tembakan" homeVal={s('shots_home')} awayVal={s('shots_away')} />
-        <StatRow label="Tembakan Tepat Sasaran" homeVal={s('shots_on_target_home')} awayVal={s('shots_on_target_away')} />
-      </div>
+      {isFootballOrFutsal && (
+        <div style={{ background: 'var(--bg-subtle)', borderRadius: 12, padding: '14px 16px', border: '1px solid var(--border)' }}>
+          <div style={{ textAlign: 'center', fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>Tembakan</div>
+          <StatRow label="Total Tembakan" homeVal={s('shots_home')} awayVal={s('shots_away')} />
+          <StatRow label="Tembakan Tepat Sasaran" homeVal={s('shots_on_target_home')} awayVal={s('shots_on_target_away')} />
+        </div>
+      )}
 
       {/* ── Umum ── */}
-      <div style={{ background: 'var(--bg-subtle)', borderRadius: 12, padding: '14px 16px', border: '1px solid var(--border)' }}>
-        <StatRow label="Tendangan Sudut" homeVal={s('corners_home')} awayVal={s('corners_away')} />
-        <StatRow label="Pelanggaran" homeVal={s('fouls_home')} awayVal={s('fouls_away')} />
-        <StatRow label="Offside" homeVal={s('offsides_home')} awayVal={s('offsides_away')} />
-        <StatRow label="Kartu Kuning" homeVal={s('yellow_cards_home')} awayVal={s('yellow_cards_away')} />
-        <StatRow label="Kartu Merah" homeVal={s('red_cards_home')} awayVal={s('red_cards_away')} />
-      </div>
+      {isFootballOrFutsal && (
+        <div style={{ background: 'var(--bg-subtle)', borderRadius: 12, padding: '14px 16px', border: '1px solid var(--border)' }}>
+          <StatRow label="Tendangan Sudut" homeVal={s('corners_home')} awayVal={s('corners_away')} />
+          <StatRow label="Pelanggaran" homeVal={s('fouls_home')} awayVal={s('fouls_away')} />
+          <StatRow label="Offside" homeVal={s('offsides_home')} awayVal={s('offsides_away')} />
+          <StatRow label="Kartu Kuning" homeVal={s('yellow_cards_home')} awayVal={s('yellow_cards_away')} />
+          <StatRow label="Kartu Merah" homeVal={s('red_cards_home')} awayVal={s('red_cards_away')} />
+        </div>
+      )}
+
+      {/* ── Statistik Akumulasi (Otomatis dari Pemain) ── */}
+      {accumFields.length > 0 && (
+        <div style={{ background: 'var(--bg-subtle)', borderRadius: 12, padding: '14px 16px', border: '1px solid var(--border)' }}>
+          <div style={{ textAlign: 'center', fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>
+            Statistik Akumulasi
+          </div>
+          {accumFields.map(field => (
+            <StatRow
+              key={field}
+              label={labelMap[field] || field.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+              homeVal={stats[`${field}_home`]}
+              awayVal={stats[`${field}_away`]}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

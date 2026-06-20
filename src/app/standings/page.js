@@ -57,6 +57,17 @@ export default function StandingsPage() {
     fetchStandings();
   }, [selectedTournament]);
 
+  // Get dynamic labels from scoring_info
+  const scoringInfo = standings?.scoring_info || {};
+  const goalsLabel = scoringInfo.goals_label || { for: 'GF', against: 'GA', diff: 'GD' };
+
+  // Map labels to Indonesian for legend
+  const goalsLabelMap = {
+    'GF': 'Gol Memasukkan', 'GA': 'Gol Kemasukan', 'GD': 'Selisih Gol',
+    'SW': 'Set Menang', 'SL': 'Set Kalah', 'SD': 'Selisih Set',
+    'PW': 'Partai Menang', 'PL': 'Partai Kalah', 'PD': 'Selisih Partai',
+  };
+
   const renderTable = (rows, title) => (
     <div style={{ marginBottom: 24 }}>
       {title && (
@@ -83,9 +94,9 @@ export default function StandingsPage() {
                 <th style={thStyle}>M</th>
                 <th style={thStyle}>S</th>
                 <th style={thStyle}>K</th>
-                <th style={thStyle}>GM</th>
-                <th style={thStyle}>GK</th>
-                <th style={thStyle}>SG</th>
+                <th style={thStyle}>{goalsLabel.for}</th>
+                <th style={thStyle}>{goalsLabel.against}</th>
+                <th style={thStyle}>{goalsLabel.diff}</th>
                 <th style={{ ...thStyle, color: '#3b82f6' }}>Poin</th>
               </tr>
             </thead>
@@ -237,9 +248,17 @@ export default function StandingsPage() {
           <span style={{ color: '#10b981' }}>M = Menang</span>
           <span>S = Seri</span>
           <span style={{ color: '#ef4444' }}>K = Kalah</span>
-          <span>GM = Gol Memasukkan</span>
-          <span>GK = Gol Kemasukan</span>
-          <span>SG = Selisih Gol</span>
+          <span>{goalsLabel.for} = {goalsLabelMap[goalsLabel.for] || goalsLabel.for}</span>
+          <span>{goalsLabel.against} = {goalsLabelMap[goalsLabel.against] || goalsLabel.against}</span>
+          <span>{goalsLabel.diff} = {goalsLabelMap[goalsLabel.diff] || goalsLabel.diff}</span>
+          {scoringInfo.point_system === 'scaled' && scoringInfo.point_rules && (
+            <span style={{ color: '#cca26b', fontWeight: 600 }}>
+              Sistem poin: {scoringInfo.point_rules.filter(r => r.condition === 'win').map(r => {
+                const detail = r.opponent_score !== undefined ? `(lawan ${r.opponent_score} set)` : '';
+                return `Menang ${detail} = ${r.points}pt`;
+              }).join(', ')}
+            </span>
+          )}
         </div>
       )}
 
