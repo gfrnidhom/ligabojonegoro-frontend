@@ -1215,10 +1215,10 @@ function Home() {
                     {[
                       { label: 'Main', value: playerDetail.statistics?.matches_played || 0 },
                       { label: 'Gol', value: playerDetail.statistics?.goals || 0 },
-                      { label: 'Asis', value: playerDetail.statistics?.assists || 0 },
+                      { label: 'Assist', value: playerDetail.statistics?.assists || 0 },
                       { label: 'K. Kuning', value: playerDetail.statistics?.yellow_cards || 0, color: '#fbbf24' },
                       { label: 'K. Merah', value: playerDetail.statistics?.red_cards || 0, color: '#ef4444' },
-                      { label: 'Foul', value: playerDetail.statistics?.fouls || 0 }
+                      { label: 'Pelanggaran', value: playerDetail.statistics?.fouls || 0 }
                     ].map((sumItem, idx) => (
                       <div key={idx} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: 10, padding: '10px 6px', textAlign: 'center' }}>
                         <span style={{ display: 'block', fontSize: 16, fontWeight: 900, color: sumItem.color || '#f1f5f9' }}>{sumItem.value}</span>

@@ -100,28 +100,24 @@ const getSportSkills = (sportId, sportSlug) => {
   const slug = String(sportSlug || '').toLowerCase();
   const id = Number(sportId);
 
-  if (id === 2 || slug === 'volleyball') { // Volleyball
+  if (id === 2 || slug === 'volleyball') { // Voli
     return [
       { key: 'passing', label: 'Passing', color: 'linear-gradient(90deg, #3b82f6, #60a5fa)' },
       { key: 'service', label: 'Service', color: 'linear-gradient(90deg, #10b981, #34d399)' },
       { key: 'block', label: 'Block', color: 'linear-gradient(90deg, #a855f7, #c084fc)' },
       { key: 'smash', label: 'Smash', color: 'linear-gradient(90deg, #ef4444, #f87171)' },
-      { key: 'dig', label: 'Dig', color: 'linear-gradient(90deg, #fbbf24, #f59e0b)' },
-      { key: 'assist', label: 'Assist', color: 'linear-gradient(90deg, #06b6d4, #22d3ee)' },
     ];
   }
-  if (id === 4 || slug === 'badminton') { // Badminton
+  if (id === 4 || slug === 'badminton') { // Bulu Tangkis
     return [
       { key: 'footwalk', label: 'Footwalk', color: 'linear-gradient(90deg, #3b82f6, #60a5fa)' },
       { key: 'penempatan_posisi', label: 'Penempatan Posisi', color: 'linear-gradient(90deg, #10b981, #34d399)' },
       { key: 'service', label: 'Service', color: 'linear-gradient(90deg, #a855f7, #c084fc)' },
       { key: 'loop', label: 'Loop', color: 'linear-gradient(90deg, #ef4444, #f87171)' },
       { key: 'stamina', label: 'Stamina', color: 'linear-gradient(90deg, #eab308, #fbbf24)' },
-      { key: 'smash', label: 'Smash', color: 'linear-gradient(90deg, #ec4899, #f472b6)' },
-      { key: 'error', label: 'Error', color: 'linear-gradient(90deg, #64748b, #94a3b8)' },
     ];
   }
-  // Default: Sepak Bola / Futsal (sportId === 1 or 3)
+  // Default: Sepak Bola / Futsal
   return [
     { key: 'passing', label: 'Passing', color: 'linear-gradient(90deg, #3b82f6, #60a5fa)' },
     { key: 'kontrol', label: 'Kontrol', color: 'linear-gradient(90deg, #10b981, #34d399)' },
