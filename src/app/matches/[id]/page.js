@@ -888,7 +888,8 @@ function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFor
 
   const getPosWeight = (pos) => {
     if (!pos) return 990;
-    const p = pos.toUpperCase();
+    const pStr = typeof pos === 'object' ? (pos.abbreviation || pos.name || '') : String(pos);
+    const p = pStr.toUpperCase();
     let weight = 0;
 
     if (p.includes('GK')) weight = 100;
