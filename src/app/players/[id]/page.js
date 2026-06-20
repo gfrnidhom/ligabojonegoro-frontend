@@ -138,6 +138,27 @@ export default function PlayerDetailPage({ params }) {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('skills'); // Default to skills to showcase user's requested feature
 
+  const TABS = ['skills', 'stats', 'matches', 'bio'];
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const urlTab = params.get('tab');
+      if (urlTab && TABS.includes(urlTab)) {
+        setTab(urlTab);
+      }
+    }
+  }, []);
+
+  const handleTabChange = (tabId) => {
+    setTab(tabId);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location);
+      url.searchParams.set('tab', tabId);
+      window.history.replaceState(null, '', url.toString());
+    }
+  };
+
   useEffect(() => {
     (async () => {
       try {

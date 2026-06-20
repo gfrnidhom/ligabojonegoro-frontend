@@ -22,6 +22,27 @@ export default function TournamentDetailPage({ params }) {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('matches'); // matches, standings, info, players, stats
+
+  const TABS = ['matches', 'standings', 'info', 'players', 'stats'];
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab && TABS.includes(tab)) {
+        setActiveTab(tab);
+      }
+    }
+  }, []);
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location);
+      url.searchParams.set('tab', tabId);
+      window.history.replaceState(null, '', url.toString());
+    }
+  };
   const [matchView, setMatchView] = useState('upcoming'); // upcoming, finished
   const [viewMode, setViewMode] = useState('list'); // list, grid
   const [playerStats, setPlayerStats] = useState({ top_scorers: [], top_cards: [], top_clean_sheets: [] });
@@ -263,6 +284,7 @@ export default function TournamentDetailPage({ params }) {
         </div>
 
         {/* Tab Selection Row (Glassmorphic Pills) */}
+        <div style={{ position: 'sticky', top: 0, zIndex: 40, paddingTop: 16, paddingBottom: 16, background: 'var(--bg-app)' }}>
         <div 
           className="hide-scrollbar"
           style={{ 
@@ -314,7 +336,7 @@ export default function TournamentDetailPage({ params }) {
             )
           })}
         </div>
-      </div>
+        </div>
 
       <div 
         className="tab-contents-block"
@@ -888,6 +910,7 @@ export default function TournamentDetailPage({ params }) {
         )}
       </div>
     </div>
+    </div>
   );
 }
 
@@ -1100,6 +1123,7 @@ function StandingsTable({ rows = [], match, sport }) {
 }
 /* ─── Statistik ─── */
 function StatistikTab({ match }) {
+
   const [period, setPeriod] = useState('all');
   const stats = match.statistics;
   if (!stats || stats.possession_home === undefined) {

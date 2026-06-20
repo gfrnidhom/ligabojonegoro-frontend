@@ -39,12 +39,32 @@ export default function MatchDetailPage({ params }) {
   const unwrappedParams = use(params);
   const matchId = unwrappedParams.id;
   const router = useRouter();
-  const hideMaximize = true;
 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('rincian');
+  const [hideMaximize, setHideMaximize] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab && TABS.some(t => t.id === tab)) {
+        setActiveTab(tab);
+      }
+    }
+  }, []);
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location);
+      url.searchParams.set('tab', tabId);
+      window.history.replaceState(null, '', url.toString());
+    }
+  };
   const [match, setMatch] = useState(null);
   const [standings, setStandings] = useState(null);
-  const [activeTab, setActiveTab] = useState('rincian');
-  const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
   const [tabHovered, setTabHovered] = useState(false);
   const tabsRef = useRef(null);
@@ -152,48 +172,43 @@ export default function MatchDetailPage({ params }) {
 
   return (
     <div className="page-container animate-fade-in" style={{ maxWidth: 1000, margin: '40px auto', padding: '0 16px 64px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-        <button
-          onClick={() => router.back()}
-          style={{
-            background: 'var(--bg-subtle)', border: '1px solid var(--border)',
-            borderRadius: '50%', width: 40, height: 40, cursor: 'pointer', color: 'var(--text-primary)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s ease',
-          }}
-        >
-          <ArrowLeft size={20} />
-        </button>
-        <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>Detail Pertandingan</span>
-      </div>
-
-      <div className="card animate-slide-up">
+      
+      <div className="animate-slide-up" style={{ width: '100%' }}>
       {loading ? (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
           <div className="loader"></div>
         </div>
       ) : match ? (
         <>
-          {/* Header Seamless */}
-          <div style={{ position: 'relative', padding: '48px 0 0' }}>
+          <div style={{ position: 'relative', padding: '24px 0 32px', background: 'linear-gradient(135deg, #fdfbf7 0%, #e0eaff 100%)', color: 'var(--text-primary)' }}>
+
+            <button onClick={() => router.back()} style={{ position: 'absolute', top: 16, left: 16, padding: 8, color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.5)', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s ease' }}>
+              <ArrowLeft size={16} />
+            </button>
 
             {!hideMaximize && (
-              <Link href={`/matches/${matchId}`} style={{ position: 'absolute', top: 16, right: 16, padding: 8, color: 'var(--text-secondary)', background: 'var(--bg-subtle)', borderRadius: '50%', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s ease' }}>
+              <Link href={`/matches/${matchId}`} style={{ position: 'absolute', top: 16, right: 16, padding: 8, color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.5)', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s ease' }}>
                 <Maximize2 size={16} />
               </Link>
             )}
+
+            {/* Top Info (Tournament Name, Round) */}
+            <div style={{ textAlign: 'center', fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 24 }}>
+              {match.tournament?.name} {match.round ? `• Babak ${match.round}` : ''} {sched ? `• ${sched.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}` : ''}
+            </div>
 
             {/* Teams & Score */}
             <div className="match-header-flex" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 32, marginTop: 10, padding: '0 24px' }}>
               {/* Home */}
               <div className="team-column" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
-                <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name, '3b82f6')} alt="" className="team-logo" style={{ width: 84, height: 84, objectFit: 'contain' }} />
-                <span className="team-name-text" style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', marginTop: 16, textAlign: 'center' }}>{match.home_team?.name}</span>
+                <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name, '3b82f6')} alt="" className="team-logo" style={{ width: 80, height: 80, objectFit: 'contain' }} />
+                <span className="team-name-text" style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', marginTop: 12, textAlign: 'center' }}>{match.home_team?.name}</span>
               </div>
 
               {/* Score Center */}
               <div className="score-center-column" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 {isLive && (
-                  <div style={{ background: 'var(--accent-rose)', color: '#fff', fontSize: 11, fontWeight: 800, padding: '4px 12px', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  <div style={{ background: '#ef4444', color: '#fff', fontSize: 11, fontWeight: 800, padding: '4px 12px', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     <Activity size={12} /> LIVE
                   </div>
                 )}
@@ -201,24 +216,24 @@ export default function MatchDetailPage({ params }) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                   {isFinished || isLive ? (
                     <>
-                      <span className="score-number" style={{ fontSize: 48, fontWeight: 800, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{match.home_score}</span>
-                      <span className="score-divider" style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-muted)' }}>-</span>
-                      <span className="score-number" style={{ fontSize: 48, fontWeight: 800, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{match.away_score}</span>
+                      <span className="score-number" style={{ fontSize: 44, fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{match.home_score}</span>
+                      <span className="score-divider" style={{ fontSize: 24, fontWeight: 600, color: 'var(--text-primary)' }}>-</span>
+                      <span className="score-number" style={{ fontSize: 44, fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{match.away_score}</span>
                     </>
                   ) : (
-                    <span className="score-time" style={{ fontSize: 32, fontWeight: 800, color: 'var(--text-primary)' }}>
+                    <span className="score-time" style={{ fontSize: 36, fontWeight: 800, color: 'var(--text-primary)' }}>
                       {sched?.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   )}
                 </div>
 
                 {isLive && match.minute && (
-                  <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--primary)', background: 'var(--primary-light)', padding: '2px 8px', borderRadius: 6, marginTop: 12 }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '2px 8px', borderRadius: 6, marginTop: 12 }}>
                     {formatGameMinute(match.minute)}{match.minute !== 'HT' && match.minute !== 'FT' ? "'" : ""}
                   </span>
                 )}
                 {isFinished && !isLive && (
-                  <div className="status-text" style={{ color: 'var(--text-secondary)', fontSize: 13, fontWeight: 600, marginTop: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  <div className="status-text" style={{ color: 'var(--text-secondary)', fontSize: 13, fontWeight: 500, marginTop: 12 }}>
                     Waktu Penuh
                   </div>
                 )}
@@ -226,8 +241,8 @@ export default function MatchDetailPage({ params }) {
 
               {/* Away */}
               <div className="team-column" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
-                <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name, 'ef4444')} alt="" className="team-logo" style={{ width: 84, height: 84, objectFit: 'contain' }} />
-                <span className="team-name-text" style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', marginTop: 16, textAlign: 'center' }}>{match.away_team?.name}</span>
+                <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name, 'ef4444')} alt="" className="team-logo" style={{ width: 80, height: 80, objectFit: 'contain' }} />
+                <span className="team-name-text" style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', marginTop: 12, textAlign: 'center' }}>{match.away_team?.name}</span>
               </div>
             </div>
 
@@ -246,53 +261,49 @@ export default function MatchDetailPage({ params }) {
                       <div key={idx} style={{ fontSize: 13, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}>
                         <span
                           onClick={() => handlePlayerClick(g.player?.uuid)}
-                          style={{ fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,0,0,0.1)' }}
+                          style={{ fontWeight: 500, cursor: 'pointer' }}
                         >
                           {g.player?.name || 'Pemain'}
                         </span>
-                        {g.event_type === 'penalty' && <span style={{ fontSize: 10, color: 'var(--warning)' }}>(P)</span>}
-                        {g.event_type === 'own_goal' && <span style={{ fontSize: 10, color: 'var(--accent-rose)' }}>(OG)</span>}
                         <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>{formatGameMinute(g.minute)}&apos;</span>
+                        {g.event_type === 'penalty' && <span style={{ fontSize: 10, color: '#6b7280' }}>(P)</span>}
+                        {g.event_type === 'own_goal' && <span style={{ fontSize: 10, color: '#6b7280' }}>(OG)</span>}
                       </div>
                     ))}
                   </div>
                   {/* Ball Icon */}
                   <div className="ball-icon-divider" style={{ display: 'flex', alignItems: 'flex-start', paddingTop: 2, flexShrink: 0 }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
                   </div>
                   {/* Away Scorers */}
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
                     {awayGoals.map((g, idx) => (
                       <div key={idx} style={{ fontSize: 13, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        {g.event_type === 'penalty' && <span style={{ fontSize: 10, color: '#6b7280' }}>(P)</span>}
+                        {g.event_type === 'own_goal' && <span style={{ fontSize: 10, color: '#6b7280' }}>(OG)</span>}
                         <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>{formatGameMinute(g.minute)}&apos;</span>
                         <span
                           onClick={() => handlePlayerClick(g.player?.uuid)}
-                          style={{ fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,0,0,0.1)' }}
+                          style={{ fontWeight: 500, cursor: 'pointer' }}
                         >
                           {g.player?.name || 'Pemain'}
                         </span>
-                        {g.event_type === 'penalty' && <span style={{ fontSize: 10, color: 'var(--warning)' }}>(P)</span>}
-                        {g.event_type === 'own_goal' && <span style={{ fontSize: 10, color: 'var(--accent-rose)' }}>(OG)</span>}
                       </div>
                     ))}
                   </div>
                 </div>
               );
             })()}
-
-            {/* Divider */}
-            <div style={{ margin: '32px 0 0', height: 1, background: 'var(--border)' }} />
-
-
+          </div>
 
             {/* Tabs */}
             <div
-              style={{ position: 'relative', marginTop: 16, padding: '0 24px' }}
+              style={{ position: 'sticky', top: 0, zIndex: 40, paddingTop: 16, paddingLeft: 24, paddingRight: 24, background: 'var(--bg-app)', borderBottom: '1px solid var(--border-light)' }}
             >
               {/* Scrollable Tabs */}
               <div
                 ref={tabsRef}
-                style={{ display: 'flex', gap: 32, overflowX: 'auto', borderBottom: '1px solid var(--border-light)', paddingBottom: 0, scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                style={{ display: 'flex', gap: 32, overflowX: 'auto', paddingBottom: 0, scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 className="hide-scrollbar"
               >
                 {TABS.map(tab => {
@@ -300,7 +311,7 @@ export default function MatchDetailPage({ params }) {
                   return (
                     <button
                       key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
+                      onClick={() => handleTabChange(tab.id)}
                       style={{
                         position: 'relative',
                         padding: '0 0 16px 0', fontSize: 14, fontWeight: isActive ? 700 : 600,
@@ -324,17 +335,32 @@ export default function MatchDetailPage({ params }) {
                 })}
               </div>
             </div>
-          </div>
 
           {/* Content */}
-          <div style={{ padding: '24px 24px' }}>
-            {activeTab === 'rincian' && <RincianTab match={match} />}
-            {activeTab === 'lineup' && <LineupTab match={match} />}
-            {activeTab === 'statistik' && <StatistikTab match={match} />}
-            {activeTab === 'h2h' && <H2HTab match={match} />}
-            {activeTab === 'klasemen' && (
-              <KlasemenTab standings={standings} match={match} sport={match.tournament?.sport} />
-            )}
+          <div style={{ padding: '24px 0' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {activeTab === 'rincian' && <RincianTab match={match} />}
+              {activeTab === 'lineup' && (
+                <div style={{ background: 'var(--bg-app)', borderRadius: 16, padding: '24px 16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+                  <LineupTab match={match} />
+                </div>
+              )}
+              {activeTab === 'statistik' && (
+                <div style={{ background: 'var(--bg-app)', borderRadius: 16, padding: '24px 16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+                  <StatistikTab match={match} />
+                </div>
+              )}
+              {activeTab === 'h2h' && (
+                <div style={{ background: 'var(--bg-app)', borderRadius: 16, padding: '24px 16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+                  <H2HTab match={match} />
+                </div>
+              )}
+              {activeTab === 'klasemen' && (
+                <div style={{ background: 'var(--bg-app)', borderRadius: 16, padding: '24px 16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+                  <KlasemenTab standings={standings} match={match} sport={match.tournament?.sport} />
+                </div>
+              )}
+            </div>
           </div>
         </>
       ) : (
@@ -572,13 +598,12 @@ function RincianTab({ match }) {
     );
     return <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#3b82f6' }} />;
   };
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
       {/* Info Pertandingan */}
-      <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+      <div style={{ background: 'var(--bg-app)', borderRadius: 16, padding: '20px 16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
           <div style={{ width: 4, height: 18, borderRadius: 2, background: 'var(--primary)' }} />
           <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Info Pertandingan</span>
         </div>
@@ -600,15 +625,22 @@ function RincianTab({ match }) {
       </div>
 
       {/* Detail Gol */}
-      <GoalDetailSection match={match} />
+      {match.events?.some(e => ['goal', 'own_goal', 'penalty'].includes(e.event_type)) && (
+        <div style={{ background: 'var(--bg-app)', borderRadius: 16, padding: '20px 16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <div style={{ width: 4, height: 18, borderRadius: 2, background: '#22c55e' }} />
+            <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Detail Gol</span>
+          </div>
+          <GoalDetailSection match={match} />
+        </div>
+      )}
 
       {/* ── Mini Stats (Possession & Key Events) ── */}
       {match.statistics && (
-        <div style={{ padding: '16px 0', marginTop: 8 }}>
+        <div style={{ background: 'var(--bg-app)', borderRadius: 16, padding: '20px 16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
           <div style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-primary)', fontWeight: 600, marginBottom: 16 }}>
             Persentase Penguasaan Bola
           </div>
-
           <div style={{ display: 'flex', height: 36, borderRadius: 18, overflow: 'hidden' }}>
             {/* Home Bar */}
             <div style={{ flex: parseInt(match.statistics.possession_home) || 50, background: '#1e3a8a', display: 'flex', alignItems: 'center', padding: '0 16px' }}>
