@@ -816,36 +816,13 @@ function RincianTab({ match }) {
 }
 
 function NextMatchSection({ match }) {
-  const [nextMatches, setNextMatches] = useState({ home: null, away: null });
+  const homeNext = match.home_next_match || null;
+  const awayNext = match.away_next_match || null;
 
-  useEffect(() => {
-    const generateMockMatch = (team, isHomeFallback = true) => {
-      const nextWeek = new Date(match.match_date || match.scheduled_at || new Date());
-      nextWeek.setDate(nextWeek.getDate() + 7);
-      const mockOpponent = {
-        id: 'tba-' + team.id,
-        name: 'TBA Opponent',
-        logo_path: null
-      };
-      return {
-        id: 'mock-' + team.id,
-        is_mock: true,
-        tournament: match.tournament,
-        home_team: isHomeFallback ? team : mockOpponent,
-        away_team: isHomeFallback ? mockOpponent : team,
-        home_team_id: isHomeFallback ? team.id : mockOpponent.id,
-        away_team_id: isHomeFallback ? mockOpponent.id : team.id,
-        scheduled_at: nextWeek.toISOString(),
-      };
-    };
+  if (!homeNext && !awayNext) return null;
 
-    setNextMatches({
-      home: match.home_next_match || generateMockMatch(match.home_team, true),
-      away: match.away_next_match || generateMockMatch(match.away_team, false)
-    });
-  }, [match]);
-
-  if (!nextMatches.home && !nextMatches.away) return null;
+  // Deduplicate: if both teams have the same next match, show only once
+  const isSameMatch = homeNext && awayNext && homeNext.id === awayNext.id;
 
   const renderMatchRow = (teamMatch, targetTeam) => {
     if (!teamMatch) return null;
@@ -900,6 +877,7 @@ function NextMatchSection({ match }) {
 
 /* ─── Lineup ─── */
 function LineupTab({ match }) {
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
   const stats = match.player_statistics || [];
   const home = stats.filter(s => s.player?.team_id === match.home_team?.id);
   const away = stats.filter(s => s.player?.team_id === match.away_team?.id);
@@ -910,6 +888,10 @@ function LineupTab({ match }) {
 
   const avatar = (name, bg) =>
     `https://ui-avatars.com/api/?name=${encodeURIComponent(name || '?')}&size=40&background=${bg}&color=fff`;
+
+  const handlePlayerSelect = (playerStat) => {
+    setSelectedPlayer(playerStat);
+  };
 
   if (stats.length === 0) {
     return (
@@ -933,6 +915,7 @@ function LineupTab({ match }) {
           awayPlayers={away}
           homeFormation={match.statistics?.home_formation}
           awayFormation={match.statistics?.away_formation}
+          onPlayerSelect={handlePlayerSelect}
         />
       </div>
 
@@ -970,14 +953,14 @@ function LineupTab({ match }) {
                       {hP ? (
                         <>
                           <span
-                            onClick={() => handlePlayerClick(hP.player?.uuid)}
+                            onClick={() => handlePlayerSelect(hP)}
                             style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 500, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,0,0,0.1)' }}
                           >
                             {hP.player?.name}
                           </span>
                           <span style={{ fontSize: 9, color: 'var(--text-secondary)' }}>{hP.player?.jersey_number || '-'}</span>
                           <img
-                            onClick={() => handlePlayerClick(hP.player?.uuid)}
+                            onClick={() => handlePlayerSelect(hP)}
                             src={getImageUrl(hP.player?.photo_path) || avatar(hP.player?.name, '3b82f6')}
                             style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', cursor: 'pointer' }}
                             alt=""
@@ -991,14 +974,14 @@ function LineupTab({ match }) {
                       {aP ? (
                         <>
                           <img
-                            onClick={() => handlePlayerClick(aP.player?.uuid)}
+                            onClick={() => handlePlayerSelect(aP)}
                             src={getImageUrl(aP.player?.photo_path) || avatar(aP.player?.name, 'ef4444')}
                             style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', cursor: 'pointer' }}
                             alt=""
                           />
                           <span style={{ fontSize: 9, color: 'var(--text-secondary)' }}>{aP.player?.jersey_number || '-'}</span>
                           <span
-                            onClick={() => handlePlayerClick(aP.player?.uuid)}
+                            onClick={() => handlePlayerSelect(aP)}
                             style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 500, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,0,0,0.1)' }}
                           >
                             {aP.player?.name}
@@ -1013,9 +996,19 @@ function LineupTab({ match }) {
           </div>
         </div>
       )}
+
+      {/* Player Stats Panel */}
+      {selectedPlayer && (
+        <PlayerStatsPanel
+          playerStat={selectedPlayer}
+          match={match}
+          onClose={() => setSelectedPlayer(null)}
+        />
+      )}
     </div>
   );
 }
+
 
 function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFormation, awayFormation }) {
   const homeStarters = homePlayers.filter(p => p.is_starter);
@@ -1593,6 +1586,377 @@ function StandingsTable({ rows = [], match, sport }) {
     </div>
   );
 }
+/* ─── Panel Statistik Pemain (Per Pertandingan) ─── */
+function PlayerStatsPanel({ playerStat, match, onClose }) {
+  const player = playerStat?.player;
+  const stats = playerStat?.statistics || {};
+
+  if (!player) return null;
+
+  const avatar = (name, bg) =>
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(name || '?')}&size=80&background=${bg}&color=fff&bold=true`;
+
+  const isHome = player.team_id === match.home_team?.id;
+  const teamColor = isHome ? '#3b82f6' : '#eab308';
+  const teamName = isHome ? match.home_team?.name : match.away_team?.name;
+
+  // Helper: get stat value with default
+  const g = (key, def = 0) => {
+    const v = stats[key];
+    if (v === undefined || v === null) return def;
+    return v;
+  };
+
+  // Helper: format ratio stat (e.g. "3/5 (60%)")
+  const ratio = (made, total) => {
+    const m = parseInt(g(made, 0));
+    const t = parseInt(g(total, 0));
+    if (t === 0) return '0';
+    const pct = Math.round((m / t) * 100);
+    return `${m}/${t} (${pct}%)`;
+  };
+
+  // Determine what stats are available
+  const hasVal = (key) => stats[key] !== undefined && stats[key] !== null;
+
+  // All categories with Indonesian labels — show as many as possible
+  const categories = [
+    {
+      title: 'Statistik Utama',
+      icon: '⭐',
+      color: '#f59e0b',
+      items: [
+        { label: 'Menit Bermain', value: g('minutes_played', '-'), show: true },
+        { label: 'Gol', value: g('goals', 0), show: true },
+        { label: 'Assist', value: g('assists', 0), show: true },
+        { label: 'Umpan Akurat', value: hasVal('accurate_passes') && hasVal('total_passes') ? ratio('accurate_passes', 'total_passes') : hasVal('passing') ? g('passing') : '-', show: true },
+        { label: 'Peluang Diciptakan', value: g('chances_created', g('key_passes', 0)), show: true },
+        { label: 'Kontribusi Pertahanan', value: g('defensive_contributions', parseInt(g('tackles', 0)) + parseInt(g('interceptions', 0)) + parseInt(g('clearances', 0)) + parseInt(g('blocks', 0))), show: true },
+      ],
+    },
+    {
+      title: 'Serangan',
+      icon: '⚔️',
+      color: '#ef4444',
+      items: [
+        { label: 'Sentuhan Bola', value: g('touches', g('ball_touches', 0)), show: true },
+        { label: 'Sentuhan di Kotak Penalti', value: g('touches_in_box', g('touches_opposition_box', 0)), show: true },
+        { label: 'Umpan ke Sepertiga Akhir', value: g('passes_final_third', 0), show: true },
+        { label: 'Umpan Silang Akurat', value: hasVal('accurate_crosses') && hasVal('total_crosses') ? ratio('accurate_crosses', 'total_crosses') : g('crosses', '-'), show: true },
+        { label: 'Umpan Panjang Akurat', value: hasVal('accurate_long_balls') && hasVal('total_long_balls') ? ratio('accurate_long_balls', 'total_long_balls') : g('long_balls', '-'), show: true },
+        { label: 'Tembakan', value: g('shots', g('total_shots', 0)), show: true },
+        { label: 'Tembakan Tepat Sasaran', value: g('shots_on_target', 0), show: true },
+        { label: 'Tembakan Melebar', value: g('shots_off_target', 0), show: true },
+        { label: 'Tembakan Diblok', value: g('shots_blocked', g('blocked_shots', 0)), show: true },
+        { label: 'Dribling Berhasil', value: hasVal('successful_dribbles') && hasVal('total_dribbles') ? ratio('successful_dribbles', 'total_dribbles') : g('dribbles', '-'), show: true },
+        { label: 'Kehilangan Bola', value: g('dispossessed', g('ball_lost', 0)), show: true },
+        { label: 'Offside', value: g('offsides', 0), show: true },
+      ],
+    },
+    {
+      title: 'Pertahanan',
+      icon: '🛡️',
+      color: '#10b981',
+      items: [
+        { label: 'Kontribusi Pertahanan', value: g('defensive_contributions', parseInt(g('tackles', 0)) + parseInt(g('interceptions', 0)) + parseInt(g('clearances', 0)) + parseInt(g('blocks', 0))), show: true },
+        { label: 'Tekel', value: g('tackles', 0), show: true },
+        { label: 'Tekel Berhasil', value: hasVal('successful_tackles') && hasVal('total_tackles') ? ratio('successful_tackles', 'total_tackles') : '-', show: hasVal('successful_tackles') },
+        { label: 'Hadangan', value: g('blocks', g('block', 0)), show: true },
+        { label: 'Sapuan', value: g('clearances', 0), show: true },
+        { label: 'Sapuan Dengan Kepala', value: g('headed_clearances', 0), show: hasVal('headed_clearances') },
+        { label: 'Intersepsi', value: g('interceptions', 0), show: true },
+        { label: 'Pemulihan Bola', value: g('recoveries', g('ball_recoveries', 0)), show: true },
+        { label: 'Dilewati Lawan', value: g('dribbled_past', 0), show: true },
+        { label: 'Penyelamatan', value: g('saves', 0), show: hasVal('saves') },
+        { label: 'Penyelamatan Dalam Kotak', value: g('saves_inside_box', 0), show: hasVal('saves_inside_box') },
+        { label: 'Tendangan Ditinju', value: g('punches', 0), show: hasVal('punches') },
+        { label: 'Gol Dimasukkan', value: g('goals_conceded', 0), show: hasVal('goals_conceded') },
+        { label: 'Cleansheet', value: g('clean_sheet', '-'), show: hasVal('clean_sheet') },
+      ],
+    },
+    {
+      title: 'Duel',
+      icon: '🤝',
+      color: '#8b5cf6',
+      items: [
+        { label: 'Duel Udara Dimenangkan', value: hasVal('aerial_won') && hasVal('aerial_total') ? ratio('aerial_won', 'aerial_total') : hasVal('aerial_won') ? g('aerial_won', 0) : '-', show: true },
+        { label: 'Duel Tanah Dimenangkan', value: hasVal('ground_duels_won') && hasVal('ground_duels_total') ? ratio('ground_duels_won', 'ground_duels_total') : g('ground_duels_won', '-'), show: hasVal('ground_duels_won') || hasVal('ground_duels_total') },
+        { label: 'Total Duel Dimenangkan', value: hasVal('duels_won') && hasVal('duels_total') ? ratio('duels_won', 'duels_total') : g('duels_won', '-'), show: hasVal('duels_won') || hasVal('duels_total') },
+        { label: 'Dilanggar Lawan', value: g('was_fouled', g('fouls_won', 0)), show: true },
+        { label: 'Pelanggaran Dilakukan', value: g('fouls_committed', g('fouls', 0)), show: true },
+      ],
+    },
+    {
+      title: 'Distribusi',
+      icon: '📊',
+      color: '#3b82f6',
+      items: [
+        { label: 'Total Umpan', value: g('total_passes', g('passes', 0)), show: true },
+        { label: 'Umpan Akurat', value: hasVal('accurate_passes') && hasVal('total_passes') ? ratio('accurate_passes', 'total_passes') : g('passing', '-'), show: true },
+        { label: 'Umpan Kunci', value: g('key_passes', 0), show: true },
+        { label: 'Umpan Silang', value: hasVal('accurate_crosses') && hasVal('total_crosses') ? ratio('accurate_crosses', 'total_crosses') : g('crosses', '-'), show: true },
+        { label: 'Umpan Panjang', value: hasVal('accurate_long_balls') && hasVal('total_long_balls') ? ratio('accurate_long_balls', 'total_long_balls') : g('long_balls', '-'), show: true },
+        { label: 'Lemparan Ke Dalam', value: g('throw_ins', 0), show: hasVal('throw_ins') },
+      ],
+    },
+    {
+      title: 'Kedisiplinan',
+      icon: '📋',
+      color: '#eab308',
+      items: [
+        { label: 'Kartu Kuning', value: g('yellow_cards', g('yellow_card', 0)), show: true },
+        { label: 'Kartu Merah', value: g('red_cards', g('red_card', 0)), show: true },
+      ],
+    },
+    {
+      // Sport-specific: Passing / Kontrol / Finishing / Stamina etc
+      title: 'Penilaian Pelatih',
+      icon: '📝',
+      color: '#06b6d4',
+      items: [
+        { label: 'Passing', value: g('passing', '-'), show: hasVal('passing') },
+        { label: 'Kontrol', value: g('kontrol', '-'), show: hasVal('kontrol') },
+        { label: 'Dribling', value: g('dribling', '-'), show: hasVal('dribling') },
+        { label: 'Finishing', value: g('finishing', '-'), show: hasVal('finishing') },
+        { label: 'Stamina', value: g('stamina', '-'), show: hasVal('stamina') },
+        { label: 'Koordinasi Antar Pemain', value: g('koordinasi_pemain', '-'), show: hasVal('koordinasi_pemain') },
+        { label: 'Service', value: g('service', '-'), show: hasVal('service') },
+        { label: 'Block', value: g('block', '-'), show: hasVal('block') && !hasVal('blocks') },
+        { label: 'Smash', value: g('smash', '-'), show: hasVal('smash') },
+        { label: 'Dig', value: g('dig', '-'), show: hasVal('dig') },
+        { label: 'Footwalk', value: g('footwalk', '-'), show: hasVal('footwalk') },
+        { label: 'Penempatan Posisi', value: g('penempatan_posisi', '-'), show: hasVal('penempatan_posisi') },
+        { label: 'Loop', value: g('loop', '-'), show: hasVal('loop') },
+        { label: 'Error', value: g('error', '-'), show: hasVal('error') },
+      ],
+    },
+  ];
+
+  // Filter categories: only show categories that have at least one visible item
+  const visibleCategories = categories
+    .map(cat => ({
+      ...cat,
+      items: cat.items.filter(item => item.show),
+    }))
+    .filter(cat => cat.items.length > 0);
+
+  const rating = g('rating', null);
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        onClick={onClose}
+        style={{
+          position: 'fixed', inset: 0, zIndex: 1000,
+          background: 'rgba(0,0,0,0.5)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+        }}
+      >
+        <motion.div
+          initial={{ y: '100%' }}
+          animate={{ y: 0 }}
+          exit={{ y: '100%' }}
+          transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            width: '100%', maxWidth: 560,
+            maxHeight: '90vh',
+            background: '#ffffff',
+            borderRadius: '24px 24px 0 0',
+            overflow: 'hidden',
+            display: 'flex', flexDirection: 'column',
+          }}
+        >
+          {/* Header */}
+          <div style={{
+            background: `linear-gradient(135deg, ${teamColor}12, ${teamColor}05)`,
+            padding: '20px 20px 16px',
+            borderBottom: '1px solid rgba(0,0,0,0.06)',
+            position: 'relative',
+          }}>
+            {/* Close Handle */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
+              <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(0,0,0,0.12)' }} />
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              {/* Photo */}
+              <div style={{ position: 'relative', flexShrink: 0 }}>
+                <img
+                  src={getImageUrl(player.photo_path) || avatar(player.name, teamColor.replace('#', ''))}
+                  alt={player.name}
+                  style={{
+                    width: 56, height: 56, borderRadius: 16,
+                    objectFit: 'cover', border: `3px solid ${teamColor}30`,
+                    boxShadow: `0 4px 14px ${teamColor}20`,
+                  }}
+                />
+                {rating && (
+                  <div style={{
+                    position: 'absolute', top: -4, right: -8,
+                    background: parseFloat(rating) >= 7 ? '#10b981' : parseFloat(rating) >= 6 ? '#f59e0b' : '#ef4444',
+                    color: '#fff', fontSize: 10, fontWeight: 900,
+                    padding: '2px 6px', borderRadius: 8,
+                    border: '2px solid #fff',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                  }}>
+                    {rating}
+                  </div>
+                )}
+              </div>
+
+              {/* Player Info */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 16, fontWeight: 800, color: '#111827', lineHeight: 1.2 }}>
+                  {player.name}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
+                  {player.jersey_number && (
+                    <span style={{
+                      fontSize: 9, fontWeight: 700, color: teamColor,
+                      background: `${teamColor}12`, border: `1px solid ${teamColor}25`,
+                      padding: '2px 8px', borderRadius: 6,
+                    }}>
+                      #{player.jersey_number}
+                    </span>
+                  )}
+                  {playerStat.position && (
+                    <span style={{
+                      fontSize: 9, fontWeight: 700, color: '#6b7280',
+                      background: '#f3f4f6', border: '1px solid #e5e7eb',
+                      padding: '2px 8px', borderRadius: 6,
+                    }}>
+                      {typeof playerStat.position === 'object' ? (playerStat.position.abbreviation || playerStat.position.name) : playerStat.position}
+                    </span>
+                  )}
+                  <span style={{ fontSize: 9, fontWeight: 600, color: '#9ca3af' }}>
+                    {teamName}
+                  </span>
+                </div>
+              </div>
+
+              {/* Close Button */}
+              <button
+                onClick={onClose}
+                style={{
+                  width: 32, height: 32, borderRadius: 10,
+                  background: 'rgba(0,0,0,0.05)', border: 'none',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', color: '#6b7280',
+                  transition: 'background 0.15s',
+                  flexShrink: 0,
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Quick stats bar */}
+            <div style={{
+              display: 'flex', gap: 0, marginTop: 14,
+              background: '#ffffff', borderRadius: 12,
+              border: '1px solid rgba(0,0,0,0.06)',
+              overflow: 'hidden',
+            }}>
+              {[
+                { label: 'Menit', value: g('minutes_played', '-'), color: '#8b5cf6' },
+                { label: 'Gol', value: g('goals', 0), color: '#ef4444' },
+                { label: 'Assist', value: g('assists', 0), color: '#3b82f6' },
+                { label: 'Sentuhan', value: g('touches', g('ball_touches', '-')), color: '#10b981' },
+              ].map((item, i) => (
+                <div key={i} style={{
+                  flex: 1, textAlign: 'center', padding: '10px 4px',
+                  borderRight: i < 3 ? '1px solid rgba(0,0,0,0.06)' : 'none',
+                }}>
+                  <div style={{ fontSize: 16, fontWeight: 900, color: item.color, lineHeight: 1 }}>
+                    {item.value}
+                  </div>
+                  <div style={{ fontSize: 8, fontWeight: 700, color: '#9ca3af', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    {item.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Scrollable stats body */}
+          <div style={{
+            flex: 1, overflowY: 'auto',
+            padding: '8px 0 24px',
+          }}>
+            {visibleCategories.map((cat, catIdx) => (
+              <div key={catIdx} style={{ padding: '0 20px' }}>
+                {/* Category Title */}
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  padding: '16px 0 10px',
+                  borderBottom: '1px solid rgba(0,0,0,0.06)',
+                }}>
+                  <span style={{ fontSize: 14 }}>{cat.icon}</span>
+                  <span style={{
+                    fontSize: 13, fontWeight: 800, color: '#111827',
+                    letterSpacing: '-0.01em',
+                  }}>
+                    {cat.title}
+                  </span>
+                </div>
+
+                {/* Stat Items */}
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  {cat.items.map((item, itemIdx) => (
+                    <div
+                      key={itemIdx}
+                      style={{
+                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                        padding: '12px 0',
+                        borderBottom: itemIdx < cat.items.length - 1 ? '1px solid rgba(0,0,0,0.04)' : 'none',
+                      }}
+                    >
+                      <span style={{
+                        fontSize: 13, fontWeight: 500, color: '#374151',
+                      }}>
+                        {item.label}
+                      </span>
+                      <span style={{
+                        fontSize: 13, fontWeight: 700, color: '#111827',
+                        fontVariantNumeric: 'tabular-nums',
+                      }}>
+                        {item.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            {/* View Full Profile Link */}
+            <div style={{ padding: '20px', textAlign: 'center' }}>
+              <a
+                href={`/players/${player.uuid}`}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  fontSize: 11, fontWeight: 700, color: teamColor,
+                  textDecoration: 'none',
+                  padding: '10px 24px', borderRadius: 12,
+                  background: `${teamColor}08`, border: `1px solid ${teamColor}20`,
+                  transition: 'all 0.2s',
+                }}
+              >
+                Lihat Profil Lengkap →
+              </a>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 /* ─── Statistik ─── */
 function StatistikTab({ match }) {
   const [period, setPeriod] = useState('all');
@@ -1756,8 +2120,8 @@ function StatistikTab({ match }) {
       {/* ── Penguasaan Bola ── */}
       {isFootballOrFutsal && (
         <div style={{ textAlign: 'center', marginBottom: 16 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 20 }}>Top stats</div>
-          <div style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 16 }}>Ball possession</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 20 }}>Statistik Utama</div>
+          <div style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 16 }}>Penguasaan Bola</div>
           <div style={{ display: 'flex', alignItems: 'center', height: 36, gap: 2 }}>
             <div style={{ flex: possHome, background: '#27345b', height: '100%', borderRadius: '18px 0 0 18px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 16, transition: 'flex 1s ease' }}>
               <span style={{ fontSize: 11, fontWeight: 600, color: '#fff' }}>{possHome}%</span>
@@ -1807,4 +2171,5 @@ function StatistikTab({ match }) {
     </div>
   );
 }
+
 
