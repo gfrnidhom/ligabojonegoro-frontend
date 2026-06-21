@@ -3,7 +3,7 @@ import { use } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { useState, useEffect, useRef } from 'react';
-import { Clock, ArrowLeft, MapPin, Users, Trophy, CalendarDays, CloudSun, Target, Activity, Star, ChevronLeft, ChevronRight, FileText, BarChart2, Zap, List, Maximize2, ChevronUp, ChevronDown, Minus } from 'lucide-react';
+import { Clock, ArrowLeft, MapPin, Users, User, Trophy, CalendarDays, CloudSun, Target, Activity, Star, ChevronLeft, ChevronRight, FileText, BarChart2, Zap, List, Maximize2, ChevronUp, ChevronDown, Minus } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import api, { getImageUrl } from '../../../api';
@@ -867,9 +867,9 @@ function NextMatchSection({ match }) {
       <div style={{ textAlign: 'center', fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 8 }}>
         Next match
       </div>
-      {renderMatchRow(nextMatches.home, match.home_team)}
-      {nextMatches.home && nextMatches.away && nextMatches.home.id !== nextMatches.away.id && <div style={{ height: 1, background: 'rgba(0,0,0,0.05)' }} />}
-      {nextMatches.home?.id !== nextMatches.away?.id && renderMatchRow(nextMatches.away, match.away_team)}
+      {renderMatchRow(homeNext, match.home_team)}
+      {!isSameMatch && homeNext && awayNext && <div style={{ height: 1, background: 'rgba(0,0,0,0.05)' }} />}
+      {!isSameMatch && renderMatchRow(awayNext, match.away_team)}
     </div>
   );
 }
@@ -953,14 +953,14 @@ function LineupTab({ match }) {
                       {hP ? (
                         <>
                           <span
-                            onClick={() => handlePlayerSelect(hP)}
+                            onClick={() => handlePlayerClick(hP.player?.uuid)}
                             style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 500, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,0,0,0.1)' }}
                           >
                             {hP.player?.name}
                           </span>
                           <span style={{ fontSize: 9, color: 'var(--text-secondary)' }}>{hP.player?.jersey_number || '-'}</span>
                           <img
-                            onClick={() => handlePlayerSelect(hP)}
+                            onClick={() => handlePlayerClick(hP.player?.uuid)}
                             src={getImageUrl(hP.player?.photo_path) || avatar(hP.player?.name, '3b82f6')}
                             style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', cursor: 'pointer' }}
                             alt=""
@@ -974,14 +974,14 @@ function LineupTab({ match }) {
                       {aP ? (
                         <>
                           <img
-                            onClick={() => handlePlayerSelect(aP)}
+                            onClick={() => handlePlayerClick(aP.player?.uuid)}
                             src={getImageUrl(aP.player?.photo_path) || avatar(aP.player?.name, 'ef4444')}
                             style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', cursor: 'pointer' }}
                             alt=""
                           />
                           <span style={{ fontSize: 9, color: 'var(--text-secondary)' }}>{aP.player?.jersey_number || '-'}</span>
                           <span
-                            onClick={() => handlePlayerSelect(aP)}
+                            onClick={() => handlePlayerClick(aP.player?.uuid)}
                             style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 500, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,0,0,0.1)' }}
                           >
                             {aP.player?.name}
@@ -1010,7 +1010,7 @@ function LineupTab({ match }) {
 }
 
 
-function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFormation, awayFormation }) {
+function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFormation, awayFormation, onPlayerSelect }) {
   const homeStarters = homePlayers.filter(p => p.is_starter);
   const awayStarters = awayPlayers.filter(p => p.is_starter);
 
@@ -1088,7 +1088,7 @@ function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFor
         // Mock a rating if it exists, otherwise just a clean layout
         const rating = p.statistics?.rating || null;
         return (
-          <div key={p.id} onClick={() => handlePlayerClick(p.player?.uuid)} className="player-dot" style={{ position: 'absolute', left: `${c.x}%`, top: `${top}%`, transform: 'translate(-50%, -50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10, cursor: 'pointer' }}>
+          <div key={p.id} onClick={() => onPlayerSelect(p)} className="player-dot" style={{ position: 'absolute', left: `${c.x}%`, top: `${top}%`, transform: 'translate(-50%, -50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10, cursor: 'pointer' }}>
             <div style={{ position: 'relative' }}>
               <img src={getImageUrl(p.player?.photo_path) || avatar(p.player?.name, 'ef4444')} style={{ width: 56, height: 56, borderRadius: '50%', boxShadow: '0 4px 10px rgba(0,0,0,0.3)', objectFit: 'cover', border: '3px solid #fff' }} alt="" />
               {rating && (
@@ -1110,7 +1110,7 @@ function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFor
         const top = 50 + (c.y / 100) * 45;
         const rating = p.statistics?.rating || null;
         return (
-          <div key={p.id} onClick={() => handlePlayerClick(p.player?.uuid)} className="player-dot" style={{ position: 'absolute', left: `${c.x}%`, top: `${top}%`, transform: 'translate(-50%, -50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10, cursor: 'pointer' }}>
+          <div key={p.id} onClick={() => onPlayerSelect ? onPlayerSelect(p) : handlePlayerClick(p.player?.uuid)} className="player-dot" style={{ position: 'absolute', left: `${c.x}%`, top: `${top}%`, transform: 'translate(-50%, -50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10, cursor: 'pointer' }}>
             <div style={{ position: 'relative' }}>
               <img src={getImageUrl(p.player?.photo_path) || avatar(p.player?.name, '3b82f6')} style={{ width: 56, height: 56, borderRadius: '50%', boxShadow: '0 4px 10px rgba(0,0,0,0.3)', objectFit: 'cover', border: '3px solid #fff' }} alt="" />
               {rating && (
@@ -1934,21 +1934,26 @@ function PlayerStatsPanel({ playerStat, match, onClose }) {
               </div>
             ))}
 
-            {/* View Full Profile Link */}
-            <div style={{ padding: '20px', textAlign: 'center' }}>
+            {/* Bottom Bar: Player Profile Link & Done Button */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderTop: '1px solid rgba(0,0,0,0.06)', background: '#fff' }}>
               <a
                 href={`/players/${player.uuid}`}
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6,
-                  fontSize: 11, fontWeight: 700, color: teamColor,
-                  textDecoration: 'none',
-                  padding: '10px 24px', borderRadius: 12,
-                  background: `${teamColor}08`, border: `1px solid ${teamColor}20`,
-                  transition: 'all 0.2s',
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  textDecoration: 'none', color: '#111827', cursor: 'pointer'
                 }}
               >
-                Lihat Profil Lengkap →
+                <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <User style={{ width: 14, height: 14, color: '#111827' }} />
+                </div>
+                <span style={{ fontSize: 14, fontWeight: 700 }}>Player profile</span>
               </a>
+              <span
+                onClick={onClose}
+                style={{ fontSize: 14, fontWeight: 700, color: '#10b981', cursor: 'pointer' }}
+              >
+                Done
+              </span>
             </div>
           </div>
         </motion.div>
