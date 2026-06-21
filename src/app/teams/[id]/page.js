@@ -65,7 +65,7 @@ export default function TeamDetailPage({ params }) {
     return (
       <div style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <div className="loader"></div>
-        <p style={{ marginTop: 14, color: '#9ca3af', fontSize: 13, fontWeight: 500 }}>Memuat detail tim...</p>
+        <p style={{ marginTop: 14, color: '#9ca3af', fontSize: 11, fontWeight: 500 }}>Memuat detail tim...</p>
       </div>
     );
   }
@@ -74,8 +74,8 @@ export default function TeamDetailPage({ params }) {
     return (
       <div style={{ maxWidth: 800, margin: '40px auto', textAlign: 'center', padding: '0 16px' }}>
         <Shield size={48} style={{ color: '#ef4444', margin: '0 auto 12px' }} />
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f1f5f9' }}>Tim Tidak Ditemukan</h2>
-        <p style={{ color: '#94a3b8', fontSize: 13, marginTop: 6, marginBottom: 18 }}>Maaf, tim yang Anda cari tidak tersedia atau telah dihapus.</p>
+        <h2 style={{ fontSize: 17, fontWeight: 700, color: '#f1f5f9' }}>Tim Tidak Ditemukan</h2>
+        <p style={{ color: '#94a3b8', fontSize: 11, marginTop: 6, marginBottom: 18 }}>Maaf, tim yang Anda cari tidak tersedia atau telah dihapus.</p>
         <button onClick={() => router.push('/')} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           <ArrowLeft size={16} /> Kembali ke Beranda
         </button>
@@ -96,7 +96,7 @@ export default function TeamDetailPage({ params }) {
         >
           <ArrowLeft size={20} />
         </button>
-        <span style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9' }}>Detail Tim</span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: '#f1f5f9' }}>Detail Tim</span>
       </div>
 
       {/* Team Profile Header Card */}
@@ -133,9 +133,9 @@ export default function TeamDetailPage({ params }) {
 
           <div style={{ flex: 1, minWidth: 200 }}>
             <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 6 }}>
-              <h1 style={{ fontSize: 24, fontWeight: 800, color: '#f1f5f9', lineHeight: 1.2 }}>{team.name}</h1>
+              <h1 style={{ fontSize: 20, fontWeight: 800, color: '#f1f5f9', lineHeight: 1.2 }}>{team.name}</h1>
               <span style={{
-                fontSize: 10, fontWeight: 700, padding: '3px 9px', borderRadius: 20,
+                fontSize: 9, fontWeight: 700, padding: '3px 9px', borderRadius: 20,
                 textTransform: 'uppercase', letterSpacing: '0.05em', border: '1px solid',
                 background: 'rgba(245,158,11,0.15)', color: '#f59e0b', borderColor: 'rgba(245,158,11,0.25)',
               }}>
@@ -143,16 +143,16 @@ export default function TeamDetailPage({ params }) {
               </span>
             </div>
 
-            <p style={{ color: '#94a3b8', fontSize: 12, lineHeight: 1.5, marginBottom: 10, maxWidth: 800 }}>
+            <p style={{ color: '#94a3b8', fontSize: 10, lineHeight: 1.5, marginBottom: 10, maxWidth: 800 }}>
               {team.description || 'Ini adalah tim resmi yang berkompetisi di platform Liga Bojonegoro.'}
             </p>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#64748b' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, color: '#64748b' }}>
                 <Users size={14} style={{ color: '#f59e0b' }} />
                 <span>Coach / PIC: <strong style={{ color: '#94a3b8' }}>{team.coach_name || team.contact_person || 'TBA'}</strong></span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#64748b' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, color: '#64748b' }}>
                 <MapPin size={14} style={{ color: '#ef4444' }} />
                 <span>Asal: <strong style={{ color: '#94a3b8' }}>{team.address || 'Bojonegoro'}</strong></span>
               </div>
@@ -166,7 +166,7 @@ export default function TeamDetailPage({ params }) {
         <button
           onClick={() => setActiveTab('matches')}
           style={{
-            padding: '12px 6px', fontSize: 13, fontWeight: 700, border: 'none', background: 'none', cursor: 'pointer',
+            padding: '12px 6px', fontSize: 11, fontWeight: 700, border: 'none', background: 'none', cursor: 'pointer',
             color: activeTab === 'matches' ? '#f59e0b' : '#64748b',
             borderBottom: activeTab === 'matches' ? '2px solid #f59e0b' : '2px solid transparent',
             transition: 'all 0.2s ease', position: 'relative', bottom: -1,
@@ -178,7 +178,7 @@ export default function TeamDetailPage({ params }) {
         <button
           onClick={() => setActiveTab('info')}
           style={{
-            padding: '12px 6px', fontSize: 13, fontWeight: 700, border: 'none', background: 'none', cursor: 'pointer',
+            padding: '12px 6px', fontSize: 11, fontWeight: 700, border: 'none', background: 'none', cursor: 'pointer',
             color: activeTab === 'info' ? '#f59e0b' : '#64748b',
             borderBottom: activeTab === 'info' ? '2px solid #f59e0b' : '2px solid transparent',
             transition: 'all 0.2s ease', position: 'relative', bottom: -1,
@@ -217,19 +217,19 @@ export default function TeamDetailPage({ params }) {
                           }}>
                             {isLive ? 'LIVE' : m.status || 'Belum Mulai'}
                           </span>
-                          <span style={{ fontSize: 11, color: '#64748b' }}>{m.match_date ? new Date(m.match_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Tanggal TBA'}</span>
+                          <span style={{ fontSize: 9, color: '#64748b' }}>{m.match_date ? new Date(m.match_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Tanggal TBA'}</span>
                         </div>
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
                             <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} style={{ width: 22, height: 22, borderRadius: '50%' }} alt="" />
-                            <span style={{ fontSize: 13, fontWeight: 700, color: '#f1f5f9' }}>{m.home_team?.name}</span>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: '#f1f5f9' }}>{m.home_team?.name}</span>
                           </div>
-                          <div style={{ padding: '0 8px', minWidth: 40, textAlign: 'center', fontSize: 15, fontWeight: 800, color: hasScore ? '#f59e0b' : '#64748b' }}>
+                          <div style={{ padding: '0 8px', minWidth: 40, textAlign: 'center', fontSize: 13, fontWeight: 800, color: hasScore ? '#f59e0b' : '#64748b' }}>
                             {hasScore ? `${m.home_score} : ${m.away_score}` : 'VS'}
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, justifyContent: 'flex-end' }}>
-                            <span style={{ fontSize: 13, fontWeight: 700, color: '#f1f5f9' }}>{m.away_team?.name}</span>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: '#f1f5f9' }}>{m.away_team?.name}</span>
                             <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name)} style={{ width: 22, height: 22, borderRadius: '50%' }} alt="" />
                           </div>
                         </div>
@@ -241,7 +241,7 @@ export default function TeamDetailPage({ params }) {
             ) : (
               <div style={{ padding: '32px 0', textAlign: 'center', color: '#64748b' }}>
                 <Calendar size={32} style={{ margin: '0 auto 10px', opacity: 0.3 }} />
-                <p style={{ fontSize: 13 }}>Belum ada pertandingan terdaftar untuk tim ini.</p>
+                <p style={{ fontSize: 11 }}>Belum ada pertandingan terdaftar untuk tim ini.</p>
               </div>
             )}
           </div>
@@ -249,25 +249,25 @@ export default function TeamDetailPage({ params }) {
 
         {activeTab === 'info' && (
           <div className="card" style={{ padding: 24 }}>
-            <h3 style={{ fontSize: 15, fontWeight: 800, color: '#f1f5f9', marginBottom: 12 }}>Informasi Profil Tim</h3>
-            <p style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.6, marginBottom: 18 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 800, color: '#f1f5f9', marginBottom: 12 }}>Informasi Profil Tim</h3>
+            <p style={{ color: '#94a3b8', fontSize: 11, lineHeight: 1.6, marginBottom: 18 }}>
               Tim <strong>{team.name}</strong> didirikan dan berkompetisi di Bojonegoro. Tim ini aktif berpartisipasi dalam ajang olahraga resmi yang terdaftar di sistem Liga Bojonegoro.
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
               <div style={{ background: 'rgba(255,255,255,0.02)', padding: '12px 16px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.04)' }}>
-                <span style={{ fontSize: 11, color: '#64748b', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Nama Tim</span>
-                <span style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9' }}>{team.name}</span>
+                <span style={{ fontSize: 9, color: '#64748b', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Nama Tim</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#f1f5f9' }}>{team.name}</span>
               </div>
 
               <div style={{ background: 'rgba(255,255,255,0.02)', padding: '12px 16px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.04)' }}>
-                <span style={{ fontSize: 11, color: '#64748b', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Cabang Olahraga</span>
-                <span style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9' }}>{team.sport?.name || 'Cabang Umum'}</span>
+                <span style={{ fontSize: 9, color: '#64748b', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Cabang Olahraga</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#f1f5f9' }}>{team.sport?.name || 'Cabang Umum'}</span>
               </div>
 
               <div style={{ background: 'rgba(255,255,255,0.02)', padding: '12px 16px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.04)' }}>
-                <span style={{ fontSize: 11, color: '#64748b', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Coach / PIC</span>
-                <span style={{ fontSize: 14, fontWeight: 700, color: '#f59e0b' }}>{team.coach_name || team.contact_person || 'TBA'}</span>
+                <span style={{ fontSize: 9, color: '#64748b', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Coach / PIC</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#f59e0b' }}>{team.coach_name || team.contact_person || 'TBA'}</span>
               </div>
             </div>
           </div>

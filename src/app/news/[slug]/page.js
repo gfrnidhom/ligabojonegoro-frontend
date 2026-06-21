@@ -66,7 +66,7 @@ export default function NewsDetailPage({ params }) {
     return (
       <div style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <div className="loader"></div>
-        <p style={{ marginTop: 14, color: '#9ca3af', fontSize: 13, fontWeight: 500 }}>Memuat berita...</p>
+        <p style={{ marginTop: 14, color: '#9ca3af', fontSize: 11, fontWeight: 500 }}>Memuat berita...</p>
       </div>
     );
   }
@@ -74,7 +74,7 @@ export default function NewsDetailPage({ params }) {
   if (!news) {
     return (
       <div style={{ maxWidth: 800, margin: '80px auto', textAlign: 'center', padding: '0 16px' }}>
-        <h2 style={{ fontSize: 24, fontWeight: 700, color: '#111827', marginBottom: 12 }}>Berita Tidak Ditemukan</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#111827', marginBottom: 12 }}>Berita Tidak Ditemukan</h2>
         <p style={{ color: '#6b7280', marginBottom: 24 }}>Berita yang Anda cari mungkin telah dihapus atau URL tidak valid.</p>
         <button onClick={() => router.push('/news')} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
           <ArrowLeft size={16} /> Kembali ke Daftar Berita
@@ -94,7 +94,7 @@ export default function NewsDetailPage({ params }) {
           onClick={() => router.push('/news')}
           style={{ 
             display: 'inline-flex', alignItems: 'center', gap: 6, 
-            color: '#6b7280', fontSize: 14, fontWeight: 600, 
+            color: '#6b7280', fontSize: 12, fontWeight: 600, 
             background: 'none', border: 'none', cursor: 'pointer',
             padding: '8px 0', transition: 'color 0.2s'
           }}
@@ -110,7 +110,7 @@ export default function NewsDetailPage({ params }) {
         {news.is_published === 0 && (
           <span style={{ 
             display: 'inline-block', padding: '4px 12px', background: 'rgba(245,158,11,0.15)', 
-            color: '#f59e0b', borderRadius: 20, fontSize: 12, fontWeight: 700, marginBottom: 16 
+            color: '#f59e0b', borderRadius: 20, fontSize: 10, fontWeight: 700, marginBottom: 16 
           }}>
             DRAFT
           </span>
@@ -125,7 +125,7 @@ export default function NewsDetailPage({ params }) {
         
         <div style={{ 
           display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 20, 
-          color: '#6b7280', fontSize: 13, fontWeight: 500,
+          color: '#6b7280', fontSize: 11, fontWeight: 500,
           borderBottom: '1px solid #e5e7eb', paddingBottom: 24
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -144,7 +144,7 @@ export default function NewsDetailPage({ params }) {
               marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6,
               background: 'rgba(59,130,246,0.1)', color: '#60a5fa',
               border: '1px solid rgba(59,130,246,0.2)', borderRadius: 20,
-              padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer'
+              padding: '6px 14px', fontSize: 10, fontWeight: 700, cursor: 'pointer'
             }}
           >
             <Share2 size={14} /> Bagikan

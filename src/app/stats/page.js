@@ -110,8 +110,8 @@ export default function StatsInfographicsPage() {
             <TrendingUp size={28} color="white" />
           </div>
           <div>
-            <h1 style={{ fontSize: 32, fontWeight: 900, color: '#f8fafc', lineHeight: 1.1, letterSpacing: '-0.02em' }}>Infografis & Statistik</h1>
-            <p style={{ fontSize: 15, color: '#94a3b8', marginTop: 4, fontWeight: 500 }}>
+            <h1 style={{ fontSize: 27, fontWeight: 900, color: '#f8fafc', lineHeight: 1.1, letterSpacing: '-0.02em' }}>Infografis & Statistik</h1>
+            <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 4, fontWeight: 500 }}>
               Pusat data Klasemen, Tim Terbaik, dan Pemain Terbaik Liga Bojonegoro.
             </p>
           </div>
@@ -124,7 +124,7 @@ export default function StatsInfographicsPage() {
               key={t.id}
               onClick={() => setSelectedTournament(t)}
               style={{
-                padding: '8px 20px', fontSize: 13, fontWeight: 700, borderRadius: 24,
+                padding: '8px 20px', fontSize: 11, fontWeight: 700, borderRadius: 24,
                 border: '1px solid', cursor: 'pointer', whiteSpace: 'nowrap',
                 transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                 background: selectedTournament?.id === t.id ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255, 255, 255, 0.03)',
@@ -142,12 +142,12 @@ export default function StatsInfographicsPage() {
       {loading ? (
         <div style={{ minHeight: 400, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <div className="loader"></div>
-          <p style={{ marginTop: 16, color: '#9ca3af', fontSize: 14, fontWeight: 600 }}>Menyusun Infografis...</p>
+          <p style={{ marginTop: 16, color: '#9ca3af', fontSize: 12, fontWeight: 600 }}>Menyusun Infografis...</p>
         </div>
       ) : !selectedTournament ? (
         <div style={{ padding: '64px 0', textAlign: 'center', color: '#64748b' }}>
           <BarChart3 size={48} style={{ margin: '0 auto 16px', opacity: 0.2 }} />
-          <p style={{ fontSize: 16, fontWeight: 600 }}>Belum ada data turnamen.</p>
+          <p style={{ fontSize: 14, fontWeight: 600 }}>Belum ada data turnamen.</p>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 32 }}>
@@ -163,14 +163,14 @@ export default function StatsInfographicsPage() {
               <div style={{ padding: '20px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <Shield size={20} style={{ color: '#10b981' }} />
-                  <h2 style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc' }}>Klub & Tim Terbaik</h2>
+                  <h2 style={{ fontSize: 14, fontWeight: 800, color: '#f8fafc' }}>Klub & Tim Terbaik</h2>
                 </div>
-                <Link href="/standings" style={{ fontSize: 12, fontWeight: 700, color: '#3b82f6', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>Lihat Klasemen <ChevronRight size={14} /></Link>
+                <Link href="/standings" style={{ fontSize: 10, fontWeight: 700, color: '#3b82f6', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>Lihat Klasemen <ChevronRight size={14} /></Link>
               </div>
               
               <div style={{ padding: '24px', flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 16, minHeight: 240, position: 'relative' }}>
                 {bestTeams.length === 0 ? (
-                  <p style={{ color: '#64748b', fontSize: 13, alignSelf: 'center' }}>Belum ada data tim.</p>
+                  <p style={{ color: '#64748b', fontSize: 11, alignSelf: 'center' }}>Belum ada data tim.</p>
                 ) : (
                   <>
                     {/* Rank 2 */}
@@ -178,11 +178,11 @@ export default function StatsInfographicsPage() {
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '30%', zIndex: 2 }}>
                         <div style={{ position: 'relative', marginBottom: 12 }}>
                           <img src={getImageUrl(bestTeams[1].team?.logo_path) || avatar(bestTeams[1].team?.name)} style={{ width: 56, height: 56, borderRadius: '50%', border: '3px solid #94a3b8', background: '#0f172a', padding: 2 }} alt="" />
-                          <div style={{ position: 'absolute', bottom: -8, left: '50%', transform: 'translateX(-50%)', background: '#94a3b8', color: '#0f172a', width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 900 }}>2</div>
+                          <div style={{ position: 'absolute', bottom: -8, left: '50%', transform: 'translateX(-50%)', background: '#94a3b8', color: '#0f172a', width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 900 }}>2</div>
                         </div>
                         <div style={{ background: 'linear-gradient(180deg, rgba(148,163,184,0.15) 0%, rgba(148,163,184,0.05) 100%)', width: '100%', height: 80, borderTopLeftRadius: 12, borderTopRightRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 8px', border: '1px solid rgba(148,163,184,0.2)', borderBottom: 'none' }}>
-                           <span style={{ fontSize: 12, fontWeight: 800, color: '#e2e8f0', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>{bestTeams[1].team?.name}</span>
-                           <span style={{ fontSize: 16, fontWeight: 900, color: '#3b82f6', marginTop: 'auto' }}>{bestTeams[1].points} <span style={{ fontSize: 10, color: '#64748b' }}>Pts</span></span>
+                           <span style={{ fontSize: 10, fontWeight: 800, color: '#e2e8f0', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>{bestTeams[1].team?.name}</span>
+                           <span style={{ fontSize: 14, fontWeight: 900, color: '#3b82f6', marginTop: 'auto' }}>{bestTeams[1].points} <span style={{ fontSize: 9, color: '#64748b' }}>Pts</span></span>
                         </div>
                       </div>
                     )}
@@ -193,11 +193,11 @@ export default function StatsInfographicsPage() {
                         <div style={{ position: 'relative', marginBottom: 12 }}>
                           <div style={{ position: 'absolute', top: -20, left: '50%', transform: 'translateX(-50%)' }}><Trophy size={20} color="#eab308" /></div>
                           <img src={getImageUrl(bestTeams[0].team?.logo_path) || avatar(bestTeams[0].team?.name)} style={{ width: 72, height: 72, borderRadius: '50%', border: '4px solid #eab308', background: '#0f172a', padding: 2, boxShadow: '0 0 20px rgba(234,179,8,0.3)' }} alt="" />
-                          <div style={{ position: 'absolute', bottom: -10, left: '50%', transform: 'translateX(-50%)', background: '#eab308', color: '#0f172a', width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 900 }}>1</div>
+                          <div style={{ position: 'absolute', bottom: -10, left: '50%', transform: 'translateX(-50%)', background: '#eab308', color: '#0f172a', width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 900 }}>1</div>
                         </div>
                         <div style={{ background: 'linear-gradient(180deg, rgba(234,179,8,0.2) 0%, rgba(234,179,8,0.05) 100%)', width: '100%', height: 110, borderTopLeftRadius: 12, borderTopRightRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px 8px', border: '1px solid rgba(234,179,8,0.3)', borderBottom: 'none' }}>
-                           <span style={{ fontSize: 13, fontWeight: 800, color: '#f8fafc', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>{bestTeams[0].team?.name}</span>
-                           <span style={{ fontSize: 20, fontWeight: 900, color: '#eab308', marginTop: 'auto' }}>{bestTeams[0].points} <span style={{ fontSize: 11, color: '#cca26b' }}>Pts</span></span>
+                           <span style={{ fontSize: 11, fontWeight: 800, color: '#f8fafc', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>{bestTeams[0].team?.name}</span>
+                           <span style={{ fontSize: 17, fontWeight: 900, color: '#eab308', marginTop: 'auto' }}>{bestTeams[0].points} <span style={{ fontSize: 9, color: '#cca26b' }}>Pts</span></span>
                         </div>
                       </div>
                     )}
@@ -207,11 +207,11 @@ export default function StatsInfographicsPage() {
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '30%', zIndex: 1 }}>
                         <div style={{ position: 'relative', marginBottom: 12 }}>
                           <img src={getImageUrl(bestTeams[2].team?.logo_path) || avatar(bestTeams[2].team?.name)} style={{ width: 48, height: 48, borderRadius: '50%', border: '3px solid #b45309', background: '#0f172a', padding: 2 }} alt="" />
-                          <div style={{ position: 'absolute', bottom: -8, left: '50%', transform: 'translateX(-50%)', background: '#b45309', color: '#fff', width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 900 }}>3</div>
+                          <div style={{ position: 'absolute', bottom: -8, left: '50%', transform: 'translateX(-50%)', background: '#b45309', color: '#fff', width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 900 }}>3</div>
                         </div>
                         <div style={{ background: 'linear-gradient(180deg, rgba(180,83,9,0.2) 0%, rgba(180,83,9,0.05) 100%)', width: '100%', height: 60, borderTopLeftRadius: 12, borderTopRightRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px', border: '1px solid rgba(180,83,9,0.3)', borderBottom: 'none' }}>
-                           <span style={{ fontSize: 11, fontWeight: 800, color: '#e2e8f0', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>{bestTeams[2].team?.name}</span>
-                           <span style={{ fontSize: 14, fontWeight: 900, color: '#fb923c', marginTop: 'auto' }}>{bestTeams[2].points} <span style={{ fontSize: 9, color: '#64748b' }}>Pts</span></span>
+                           <span style={{ fontSize: 9, fontWeight: 800, color: '#e2e8f0', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>{bestTeams[2].team?.name}</span>
+                           <span style={{ fontSize: 12, fontWeight: 900, color: '#fb923c', marginTop: 'auto' }}>{bestTeams[2].points} <span style={{ fontSize: 9, color: '#64748b' }}>Pts</span></span>
                         </div>
                       </div>
                     )}
@@ -227,12 +227,12 @@ export default function StatsInfographicsPage() {
             }}>
               <div style={{ padding: '20px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: 10 }}>
                 <BarChart3 size={20} style={{ color: '#3b82f6' }} />
-                <h2 style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc' }}>Klasemen Top 5</h2>
+                <h2 style={{ fontSize: 14, fontWeight: 800, color: '#f8fafc' }}>Klasemen Top 5</h2>
               </div>
               <div style={{ padding: '0', flex: 1, overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: 320 }}>
                   <thead>
-                    <tr style={{ fontSize: 10, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    <tr style={{ fontSize: 9, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                       <th style={{ padding: '12px 16px', width: 40 }}>Pos</th>
                       <th style={{ padding: '12px 8px' }}>Tim</th>
                       <th style={{ padding: '12px 8px', textAlign: 'center' }}>M</th>
@@ -242,7 +242,7 @@ export default function StatsInfographicsPage() {
                   </thead>
                   <tbody>
                     {(standings?.type === 'grouped' ? (standings.groups?.[0]?.standings || []) : (standings?.standings || [])).slice(0, 5).map((row, idx) => (
-                       <tr key={row.team?.id || idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.02)', fontSize: 13 }}>
+                       <tr key={row.team?.id || idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.02)', fontSize: 11 }}>
                          <td style={{ padding: '12px 16px', fontWeight: 800, color: idx === 0 ? '#10b981' : '#f1f5f9' }}>{idx + 1}</td>
                          <td style={{ padding: '12px 8px' }}>
                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -256,13 +256,13 @@ export default function StatsInfographicsPage() {
                        </tr>
                     ))}
                     {(!standings || ((standings?.type === 'grouped' ? (standings.groups?.[0]?.standings || []) : (standings?.standings || [])).length === 0)) && (
-                      <tr><td colSpan={5} style={{ padding: '32px', textAlign: 'center', color: '#64748b', fontSize: 13 }}>Belum ada data klasemen.</td></tr>
+                      <tr><td colSpan={5} style={{ padding: '32px', textAlign: 'center', color: '#64748b', fontSize: 11 }}>Belum ada data klasemen.</td></tr>
                     )}
                   </tbody>
                 </table>
               </div>
               <div style={{ padding: '12px 24px', background: 'rgba(0,0,0,0.2)', borderTop: '1px solid rgba(255,255,255,0.03)', textAlign: 'center' }}>
-                <Link href="/standings" style={{ color: '#94a3b8', fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>Lihat Seluruh Klasemen →</Link>
+                <Link href="/standings" style={{ color: '#94a3b8', fontSize: 10, fontWeight: 600, textDecoration: 'none' }}>Lihat Seluruh Klasemen →</Link>
               </div>
             </div>
             
@@ -282,14 +282,14 @@ export default function StatsInfographicsPage() {
                   <Flame size={20} style={{ color: '#eab308' }} />
                 </div>
                 <div>
-                  <h2 style={{ fontSize: 18, fontWeight: 800, color: '#f8fafc', lineHeight: 1.2 }}>Top Skor</h2>
-                  <p style={{ fontSize: 12, color: '#94a3b8' }}>Pencetak Gol Terbanyak</p>
+                  <h2 style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc', lineHeight: 1.2 }}>Top Skor</h2>
+                  <p style={{ fontSize: 10, color: '#94a3b8' }}>Pencetak Gol Terbanyak</p>
                 </div>
               </div>
               
               <div style={{ padding: '16px 24px', position: 'relative', zIndex: 2 }}>
                 {topScorers.length === 0 ? (
-                  <p style={{ color: '#64748b', fontSize: 13, textAlign: 'center', padding: '32px 0' }}>Belum ada data gol.</p>
+                  <p style={{ color: '#64748b', fontSize: 11, textAlign: 'center', padding: '32px 0' }}>Belum ada data gol.</p>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {topScorers.map((stat, idx) => (
@@ -303,16 +303,16 @@ export default function StatsInfographicsPage() {
                         }}
                         className="hover-card"
                       >
-                        <div style={{ fontSize: 16, fontWeight: 900, color: idx === 0 ? '#eab308' : '#64748b', width: 20, textAlign: 'center' }}>{idx + 1}</div>
+                        <div style={{ fontSize: 14, fontWeight: 900, color: idx === 0 ? '#eab308' : '#64748b', width: 20, textAlign: 'center' }}>{idx + 1}</div>
                         <img src={avatar(stat.player.name)} style={{ width: 44, height: 44, borderRadius: '50%', border: idx === 0 ? '2px solid #eab308' : 'none' }} alt="" />
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 15, fontWeight: 800, color: idx === 0 ? '#f8fafc' : '#e2e8f0' }}>{stat.player.name}</div>
-                          <div style={{ fontSize: 12, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ fontSize: 13, fontWeight: 800, color: idx === 0 ? '#f8fafc' : '#e2e8f0' }}>{stat.player.name}</div>
+                          <div style={{ fontSize: 10, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 6 }}>
                             <Shield size={10} /> {stat.player.team || 'Tim'}
                           </div>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: idx === 0 ? '#eab308' : 'rgba(255,255,255,0.05)', color: idx === 0 ? '#0f172a' : '#f1f5f9', width: 40, height: 40, borderRadius: 12 }}>
-                          <span style={{ fontSize: 18, fontWeight: 900, lineHeight: 1 }}>{stat.goals}</span>
+                          <span style={{ fontSize: 15, fontWeight: 900, lineHeight: 1 }}>{stat.goals}</span>
                         </div>
                       </Link>
                     ))}
@@ -332,14 +332,14 @@ export default function StatsInfographicsPage() {
                   <Star size={20} style={{ color: '#3b82f6' }} />
                 </div>
                 <div>
-                  <h2 style={{ fontSize: 18, fontWeight: 800, color: '#f8fafc', lineHeight: 1.2 }}>Top Assist</h2>
-                  <p style={{ fontSize: 12, color: '#94a3b8' }}>Pemberi Umpan Terbanyak</p>
+                  <h2 style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc', lineHeight: 1.2 }}>Top Assist</h2>
+                  <p style={{ fontSize: 10, color: '#94a3b8' }}>Pemberi Umpan Terbanyak</p>
                 </div>
               </div>
               
               <div style={{ padding: '16px 24px', position: 'relative', zIndex: 2 }}>
                 {topAssists.length === 0 ? (
-                  <p style={{ color: '#64748b', fontSize: 13, textAlign: 'center', padding: '32px 0' }}>Belum ada data assist.</p>
+                  <p style={{ color: '#64748b', fontSize: 11, textAlign: 'center', padding: '32px 0' }}>Belum ada data assist.</p>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {topAssists.map((stat, idx) => (
@@ -353,16 +353,16 @@ export default function StatsInfographicsPage() {
                         }}
                         className="hover-card"
                       >
-                        <div style={{ fontSize: 16, fontWeight: 900, color: idx === 0 ? '#3b82f6' : '#64748b', width: 20, textAlign: 'center' }}>{idx + 1}</div>
+                        <div style={{ fontSize: 14, fontWeight: 900, color: idx === 0 ? '#3b82f6' : '#64748b', width: 20, textAlign: 'center' }}>{idx + 1}</div>
                         <img src={avatar(stat.player.name)} style={{ width: 44, height: 44, borderRadius: '50%', border: idx === 0 ? '2px solid #3b82f6' : 'none' }} alt="" />
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 15, fontWeight: 800, color: idx === 0 ? '#f8fafc' : '#e2e8f0' }}>{stat.player.name}</div>
-                          <div style={{ fontSize: 12, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ fontSize: 13, fontWeight: 800, color: idx === 0 ? '#f8fafc' : '#e2e8f0' }}>{stat.player.name}</div>
+                          <div style={{ fontSize: 10, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 6 }}>
                             <Shield size={10} /> {stat.player.team || 'Tim'}
                           </div>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: idx === 0 ? '#3b82f6' : 'rgba(255,255,255,0.05)', color: idx === 0 ? '#0f172a' : '#f1f5f9', width: 40, height: 40, borderRadius: 12 }}>
-                          <span style={{ fontSize: 18, fontWeight: 900, lineHeight: 1 }}>{stat.assists}</span>
+                          <span style={{ fontSize: 15, fontWeight: 900, lineHeight: 1 }}>{stat.assists}</span>
                         </div>
                       </Link>
                     ))}

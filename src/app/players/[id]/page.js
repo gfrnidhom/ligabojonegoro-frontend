@@ -67,9 +67,9 @@ function MatchRow({ m, player, idx, router }) {
         {isLive ? (
           <span className="live-badge"><span className="live-dot-anim" /> LIVE</span>
         ) : isFinished ? (
-          <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)' }}>FT</span>
+          <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-secondary)' }}>FT</span>
         ) : (
-          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)' }}>
+          <span style={{ fontSize: 9, fontWeight: 600, color: 'var(--text-secondary)' }}>
             {m.scheduled_at ? new Date(m.scheduled_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : 'TBA'}
           </span>
         )}
@@ -182,14 +182,14 @@ export default function PlayerDetailPage({ params }) {
 
   if (loading) return (
     <div style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-      <div className="loader" /><p style={{ marginTop: 14, color: 'var(--text-secondary)', fontSize: 13, fontWeight: 600 }}>Memuat profil...</p>
+      <div className="loader" /><p style={{ marginTop: 14, color: 'var(--text-secondary)', fontSize: 11, fontWeight: 600 }}>Memuat profil...</p>
     </div>
   );
 
   if (!player) return (
     <div style={{ maxWidth: 600, margin: '40px auto', textAlign: 'center', padding: '0 16px' }}>
       <User size={48} style={{ color: 'var(--text-muted)', margin: '0 auto 12px' }} />
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>Pemain Tidak Ditemukan</h2>
+      <h2 style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)' }}>Pemain Tidak Ditemukan</h2>
       <button onClick={() => router.back()} style={{ marginTop: 16, background: 'var(--bg-subtle)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 20px', color: 'var(--text-primary)', fontWeight: 700, cursor: 'pointer' }}>
         <ArrowLeft size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} /> Kembali
       </button>
@@ -342,8 +342,8 @@ export default function PlayerDetailPage({ params }) {
               return (
                 <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: 14, color: 'var(--text-secondary)', fontWeight: 700 }}>{skill.label}</span>
-                    <span style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)' }}>{val}</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 700 }}>{skill.label}</span>
+                    <span style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-primary)' }}>{val}</span>
                   </div>
                   <div style={{ width: '100%', height: 8, background: 'var(--bg-app)', borderRadius: 4, overflow: 'hidden' }}>
                     <motion.div
@@ -385,7 +385,7 @@ export default function PlayerDetailPage({ params }) {
         .player-hero { position: relative; overflow: hidden; padding-bottom: 24px; }
         .hero-gradient { position: absolute; inset: 0; background: linear-gradient(180deg, var(--pc, #f59e0b)15 0%, var(--bg-app) 100%); pointer-events: none; }
         .hero-orb { position: absolute; top: -80px; right: -60px; width: 280px; height: 280px; background: radial-gradient(circle, var(--pc, #f59e0b)10, transparent 60%); pointer-events: none; }
-        .hero-jersey-num { position: absolute; right: 20px; top: 10px; font-size: 100px; font-weight: 900; color: rgba(0,0,0,0.03); line-height: 1; pointer-events: none; }
+        .hero-jersey-num { position: absolute; right: 20px; top: 10px; font-size: 85px; font-weight: 900; color: rgba(0,0,0,0.03); line-height: 1; pointer-events: none; }
         .hero-back { position: relative; z-index: 5; padding: 16px 16px 0; }
         .hero-back-btn { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; width: 42px; height: 42px; cursor: pointer; color: var(--text-primary); display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .hero-back-btn:hover { background: var(--bg-subtle); }
@@ -393,11 +393,11 @@ export default function PlayerDetailPage({ params }) {
         .hero-content { position: relative; z-index: 5; padding: 16px 20px 0; display: flex; gap: 18px; align-items: flex-end; }
         .hero-photo-wrap { position: relative; flex-shrink: 0; }
         .hero-photo { width: 100px; height: 100px; border-radius: 20px; object-fit: cover; box-shadow: 0 8px 24px rgba(0,0,0,0.08), 0 0 0 4px var(--bg-app); display: block; background: var(--bg-card); }
-        .hero-rating { position: absolute; top: -6px; left: -6px; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; font-size: 13px; font-weight: 900; width: 36px; height: 28px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 3px solid var(--bg-app); box-shadow: 0 4px 14px rgba(245,158,11,0.3); }
+        .hero-rating { position: absolute; top: -6px; left: -6px; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; font-size: 11px; font-weight: 900; width: 36px; height: 28px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 3px solid var(--bg-app); box-shadow: 0 4px 14px rgba(245,158,11,0.3); }
         .hero-info { flex: 1; min-width: 0; padding-bottom: 4px; }
-        .hero-name { font-size: 24px; font-weight: 900; color: var(--text-primary); line-height: 1.1; margin: 0 0 8px; letter-spacing: -0.02em; }
+        .hero-name { font-size: 20px; font-weight: 900; color: var(--text-primary); line-height: 1.1; margin: 0 0 8px; letter-spacing: -0.02em; }
         .hero-badges { display: flex; flex-wrap: wrap; gap: 6px; }
-        .hero-badge { padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; transition: all 0.2s; }
+        .hero-badge { padding: 4px 10px; border-radius: 8px; font-size: 9px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; transition: all 0.2s; }
         .hero-badge-num { background: var(--bg-subtle); color: var(--text-secondary); border: 1px solid var(--border); }
         .hero-badge-team { background: rgba(59,130,246,0.1); color: #3b82f6; text-decoration: none; border: 1px solid rgba(59,130,246,0.2); }
         .hero-badge-team:hover { background: rgba(59,130,246,0.15); }
@@ -406,11 +406,11 @@ export default function PlayerDetailPage({ params }) {
         .hero-info-bar { position: relative; z-index: 5; display: flex; margin: 20px 16px 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
         .hero-info-item { flex: 1; padding: 12px 8px; text-align: center; }
         .hero-info-label { display: block; font-size: 9px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; }
-        .hero-info-value { display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .hero-info-value { display: block; font-size: 11px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* ── Tabs ── */
         .player-tabs { display: flex; margin: 0 16px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); }
-        .player-tab { flex: 1; padding: 14px 0; font-size: 13px; font-weight: 700; color: var(--text-secondary); background: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s; letter-spacing: 0.02em; }
+        .player-tab { flex: 1; padding: 14px 0; font-size: 11px; font-weight: 700; color: var(--text-secondary); background: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s; letter-spacing: 0.02em; }
         .player-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
 
         /* ── Content ── */
@@ -422,23 +422,23 @@ export default function PlayerDetailPage({ params }) {
         .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
         .stat-card-accent { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 40px; height: 3px; border-radius: 2px; }
         .stat-card-icon { width: 38px; height: 38px; border-radius: 12px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; }
-        .stat-card-value { font-size: 28px; font-weight: 900; color: var(--text-primary); font-variant-numeric: tabular-nums; line-height: 1; }
-        .stat-card-label { font-size: 10px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 6px; }
+        .stat-card-value { font-size: 24px; font-weight: 900; color: var(--text-primary); font-variant-numeric: tabular-nums; line-height: 1; }
+        .stat-card-label { font-size: 9px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 6px; }
 
         /* ── Matches List ── */
         .matches-list-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
         .match-row-item { display: flex; align-items: center; gap: 10px; padding: 14px; border-bottom: 1px solid var(--border-light); cursor: pointer; transition: background 0.15s; }
         .match-row-item:last-child { border-bottom: none; }
         .match-row-item:hover { background: var(--bg-subtle); }
-        .match-result-badge { width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; }
-        .match-team-line { display: flex; align-items: center; gap: 6px; font-size: 13px; margin-bottom: 3px; }
+        .match-result-badge { width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; }
+        .match-team-line { display: flex; align-items: center; gap: 6px; font-size: 11px; margin-bottom: 3px; }
         .match-team-line:last-child { margin-bottom: 0; }
         .match-team-logo { width: 16px; height: 16px; object-fit: contain; border-radius: 3px; flex-shrink: 0; }
-        .live-badge { background: rgba(239,68,68,0.12); border-radius: 6px; padding: 3px 8px; font-size: 10px; font-weight: 800; color: #ef4444; display: inline-flex; align-items: center; gap: 4px; }
+        .live-badge { background: rgba(239,68,68,0.12); border-radius: 6px; padding: 3px 8px; font-size: 9px; font-weight: 800; color: #ef4444; display: inline-flex; align-items: center; gap: 4px; }
         .live-dot-anim { width: 5px; height: 5px; border-radius: 50%; background: #ef4444; animation: blink 1.2s infinite; }
 
         .empty-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 40px 20px; text-align: center; grid-column: 1 / -1; }
-        .empty-card p { font-size: 13px; color: var(--text-secondary); font-weight: 600; margin: 10px 0 0; }
+        .empty-card p { font-size: 11px; color: var(--text-secondary); font-weight: 600; margin: 10px 0 0; }
 
         @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
@@ -447,16 +447,16 @@ export default function PlayerDetailPage({ params }) {
           .player-page { max-width: 900px; }
           .hero-content { padding: 20px 32px 0; gap: 24px; }
           .hero-photo { width: 130px; height: 130px; border-radius: 24px; }
-          .hero-rating { width: 42px; height: 32px; font-size: 15px; top: -8px; left: -8px; }
-          .hero-name { font-size: 32px; }
+          .hero-rating { width: 42px; height: 32px; font-size: 13px; top: -8px; left: -8px; }
+          .hero-name { font-size: 27px; }
           .hero-info-bar { margin: 24px 32px 0; }
-          .hero-info-value { font-size: 14px; }
-          .hero-jersey-num { font-size: 140px; right: 32px; top: 20px; }
+          .hero-info-value { font-size: 12px; }
+          .hero-jersey-num { font-size: 119px; right: 32px; top: 20px; }
           .player-tabs { margin: 0 32px; }
           .player-content { padding: 20px 32px 0; }
           .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 14px; }
           .stat-card { padding: 24px 16px 18px; }
-          .stat-card-value { font-size: 36px; }
+          .stat-card-value { font-size: 31px; }
           .stat-card-icon { width: 44px; height: 44px; }
         }
 
@@ -464,14 +464,14 @@ export default function PlayerDetailPage({ params }) {
         @media (max-width: 480px) {
           .hero-content { gap: 14px; padding: 12px 14px 0; }
           .hero-photo { width: 80px; height: 80px; border-radius: 16px; }
-          .hero-name { font-size: 20px; }
-          .hero-badge { font-size: 10px; padding: 3px 8px; }
+          .hero-name { font-size: 17px; }
+          .hero-badge { font-size: 9px; padding: 3px 8px; }
           .hero-info-bar { margin: 16px 12px 0; }
           .player-tabs { margin: 0 12px; }
           .player-content { padding: 12px 12px 0; }
           .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
           .stat-card { padding: 14px 10px 12px; }
-          .stat-card-value { font-size: 24px; }
+          .stat-card-value { font-size: 20px; }
           .stat-card-icon { width: 32px; height: 32px; }
           .match-row-item { padding: 12px; }
         }

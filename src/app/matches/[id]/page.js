@@ -129,7 +129,7 @@ export default function MatchDetailPage({ params }) {
     return (
       <div style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <div className="loader"></div>
-        <p style={{ marginTop: 14, color: 'var(--text-secondary)', fontSize: 13, fontWeight: 500 }}>Memuat detail pertandingan...</p>
+        <p style={{ marginTop: 14, color: 'var(--text-secondary)', fontSize: 11, fontWeight: 500 }}>Memuat detail pertandingan...</p>
       </div>
     );
   }
@@ -137,8 +137,8 @@ export default function MatchDetailPage({ params }) {
   if (errorMsg) {
     return (
       <div style={{ maxWidth: 800, margin: '40px auto', textAlign: 'center', padding: '0 16px' }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>Terjadi Kesalahan Server</h2>
-        <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 6, marginBottom: 18 }}>Error: {errorMsg}</p>
+        <h2 style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)' }}>Terjadi Kesalahan Server</h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 11, marginTop: 6, marginBottom: 18 }}>Error: {errorMsg}</p>
         <button onClick={() => router.back()} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           Kembali
         </button>
@@ -149,8 +149,8 @@ export default function MatchDetailPage({ params }) {
   if (!match) {
     return (
       <div style={{ maxWidth: 800, margin: '40px auto', textAlign: 'center', padding: '0 16px' }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>Pertandingan Tidak Ditemukan</h2>
-        <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 6, marginBottom: 18 }}>Maaf, pertandingan yang Anda cari tidak tersedia atau telah dihapus.</p>
+        <h2 style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)' }}>Pertandingan Tidak Ditemukan</h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 11, marginTop: 6, marginBottom: 18 }}>Maaf, pertandingan yang Anda cari tidak tersedia atau telah dihapus.</p>
         <button onClick={() => router.push('/')} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
            Kembali ke Beranda
         </button>
@@ -180,35 +180,41 @@ export default function MatchDetailPage({ params }) {
         </div>
       ) : match ? (
         <>
-          <div style={{ position: 'relative', padding: '24px 0 32px', background: 'linear-gradient(135deg, #fdfbf7 0%, #e0eaff 100%)', color: 'var(--text-primary)' }}>
-
-            <button onClick={() => router.back()} style={{ position: 'absolute', top: 16, left: 16, padding: 8, color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.5)', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s ease' }}>
-              <ArrowLeft size={16} />
+          {/* Navbar Khusus Detail Pertandingan */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+            <button onClick={() => router.back()} style={{ width: 40, height: 40, color: '#374151', background: '#ffffff', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s ease', zIndex: 10 }}>
+              <ArrowLeft size={20} />
             </button>
 
-            {!hideMaximize && (
-              <Link href={`/matches/${matchId}`} style={{ position: 'absolute', top: 16, right: 16, padding: 8, color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.5)', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s ease' }}>
-                <Maximize2 size={16} />
-              </Link>
-            )}
-
             {/* Top Info (Tournament Name, Round) */}
-            <div style={{ textAlign: 'center', fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 24 }}>
-              {match.tournament?.name} {match.round ? `• Babak ${match.round}` : ''} {sched ? `• ${sched.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}` : ''}
+            <div style={{ flex: 1, textAlign: 'center', fontSize: 9, fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '0 16px' }}>
+              {match.tournament?.name} {match.round ? `• Babak ${match.round}` : ''} {sched ? `• ${sched.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}` : ''}
             </div>
+
+            {!hideMaximize ? (
+              <Link href={`/matches/${matchId}`} style={{ width: 40, height: 40, color: '#374151', background: '#ffffff', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s ease', zIndex: 10 }}>
+                <Maximize2 size={18} />
+              </Link>
+            ) : (
+              <div style={{ width: 40, height: 40 }} />
+            )}
+          </div>
+
+          {/* Card dibawahnya arrow */}
+          <div style={{ position: 'relative', padding: '32px 0 40px', background: 'linear-gradient(135deg, #fdfbf7 0%, #eef2ff 100%)', color: 'var(--text-primary)', borderRadius: 24, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.05)', marginBottom: 24 }}>
 
             {/* Teams & Score */}
             <div className="match-header-flex" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 32, marginTop: 10, padding: '0 24px' }}>
               {/* Home */}
               <div className="team-column" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
-                <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name, '3b82f6')} alt="" className="team-logo" style={{ width: 80, height: 80, objectFit: 'contain' }} />
-                <span className="team-name-text" style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', marginTop: 12, textAlign: 'center' }}>{match.home_team?.name}</span>
+                <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name, '3b82f6')} alt="" className="team-logo" style={{ width: 64, height: 64, objectFit: 'contain' }} />
+                <span className="team-name-text" style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginTop: 12, textAlign: 'center' }}>{match.home_team?.name}</span>
               </div>
 
               {/* Score Center */}
               <div className="score-center-column" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 {isLive && (
-                  <div style={{ background: '#ef4444', color: '#fff', fontSize: 11, fontWeight: 800, padding: '4px 12px', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  <div style={{ background: '#ef4444', color: '#fff', fontSize: 9, fontWeight: 800, padding: '4px 12px', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     <Activity size={12} /> LIVE
                   </div>
                 )}
@@ -216,24 +222,24 @@ export default function MatchDetailPage({ params }) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                   {isFinished || isLive ? (
                     <>
-                      <span className="score-number" style={{ fontSize: 44, fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{match.home_score}</span>
-                      <span className="score-divider" style={{ fontSize: 24, fontWeight: 600, color: 'var(--text-primary)' }}>-</span>
-                      <span className="score-number" style={{ fontSize: 44, fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{match.away_score}</span>
+                      <span className="score-number" style={{ fontSize: 31, fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{match.home_score}</span>
+                      <span className="score-divider" style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>-</span>
+                      <span className="score-number" style={{ fontSize: 31, fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{match.away_score}</span>
                     </>
                   ) : (
-                    <span className="score-time" style={{ fontSize: 36, fontWeight: 800, color: 'var(--text-primary)' }}>
+                    <span className="score-time" style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)' }}>
                       {sched?.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   )}
                 </div>
 
                 {isLive && match.minute && (
-                  <span style={{ fontSize: 14, fontWeight: 700, color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '2px 8px', borderRadius: 6, marginTop: 12 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '2px 8px', borderRadius: 6, marginTop: 12 }}>
                     {formatGameMinute(match.minute)}{match.minute !== 'HT' && match.minute !== 'FT' ? "'" : ""}
                   </span>
                 )}
                 {isFinished && !isLive && (
-                  <div className="status-text" style={{ color: 'var(--text-secondary)', fontSize: 13, fontWeight: 500, marginTop: 12 }}>
+                  <div className="status-text" style={{ color: 'var(--text-secondary)', fontSize: 9, fontWeight: 500, marginTop: 12 }}>
                     Waktu Penuh
                   </div>
                 )}
@@ -241,8 +247,8 @@ export default function MatchDetailPage({ params }) {
 
               {/* Away */}
               <div className="team-column" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
-                <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name, 'ef4444')} alt="" className="team-logo" style={{ width: 80, height: 80, objectFit: 'contain' }} />
-                <span className="team-name-text" style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', marginTop: 12, textAlign: 'center' }}>{match.away_team?.name}</span>
+                <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name, 'ef4444')} alt="" className="team-logo" style={{ width: 64, height: 64, objectFit: 'contain' }} />
+                <span className="team-name-text" style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginTop: 12, textAlign: 'center' }}>{match.away_team?.name}</span>
               </div>
             </div>
 
@@ -258,7 +264,7 @@ export default function MatchDetailPage({ params }) {
                   {/* Home Scorers */}
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
                     {homeGoals.map((g, idx) => (
-                      <div key={idx} style={{ fontSize: 13, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <div key={idx} style={{ fontSize: 9, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}>
                         <span
                           onClick={() => handlePlayerClick(g.player?.uuid)}
                           style={{ fontWeight: 500, cursor: 'pointer' }}
@@ -266,8 +272,8 @@ export default function MatchDetailPage({ params }) {
                           {g.player?.name || 'Pemain'}
                         </span>
                         <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>{formatGameMinute(g.minute)}&apos;</span>
-                        {g.event_type === 'penalty' && <span style={{ fontSize: 10, color: '#6b7280' }}>(P)</span>}
-                        {g.event_type === 'own_goal' && <span style={{ fontSize: 10, color: '#6b7280' }}>(OG)</span>}
+                        {g.event_type === 'penalty' && <span style={{ fontSize: 9, color: '#6b7280' }}>(P)</span>}
+                        {g.event_type === 'own_goal' && <span style={{ fontSize: 9, color: '#6b7280' }}>(OG)</span>}
                       </div>
                     ))}
                   </div>
@@ -278,9 +284,9 @@ export default function MatchDetailPage({ params }) {
                   {/* Away Scorers */}
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
                     {awayGoals.map((g, idx) => (
-                      <div key={idx} style={{ fontSize: 13, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        {g.event_type === 'penalty' && <span style={{ fontSize: 10, color: '#6b7280' }}>(P)</span>}
-                        {g.event_type === 'own_goal' && <span style={{ fontSize: 10, color: '#6b7280' }}>(OG)</span>}
+                      <div key={idx} style={{ fontSize: 9, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        {g.event_type === 'penalty' && <span style={{ fontSize: 9, color: '#6b7280' }}>(P)</span>}
+                        {g.event_type === 'own_goal' && <span style={{ fontSize: 9, color: '#6b7280' }}>(OG)</span>}
                         <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>{formatGameMinute(g.minute)}&apos;</span>
                         <span
                           onClick={() => handlePlayerClick(g.player?.uuid)}
@@ -314,12 +320,14 @@ export default function MatchDetailPage({ params }) {
                       onClick={() => handleTabChange(tab.id)}
                       style={{
                         position: 'relative',
-                        padding: '0 0 16px 0', fontSize: 14, fontWeight: isActive ? 700 : 600,
+                        display: 'flex', alignItems: 'center', gap: 6,
+                        padding: '0 0 16px 0', fontSize: 10, fontWeight: isActive ? 700 : 600,
                         color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
                         whiteSpace: 'nowrap', transition: 'all 0.2s ease', cursor: 'pointer',
                         background: 'none', border: 'none'
                       }}
                     >
+                      <tab.icon size={14} />
                       {tab.label}
                       {isActive && (
                         <motion.div
@@ -364,7 +372,7 @@ export default function MatchDetailPage({ params }) {
           </div>
         </>
       ) : (
-        <div style={{ padding: 32, textAlign: 'center', color: '#8b92a5', fontSize: 13 }}>
+        <div style={{ padding: 32, textAlign: 'center', color: '#8b92a5', fontSize: 11 }}>
           Data tidak ditemukan.
         </div>
       )}
@@ -384,7 +392,7 @@ export default function MatchDetailPage({ params }) {
           }
           .team-logo { width: 48px !important; height: 48px !important; }
           .team-name-text { 
-            font-size: 11px !important; 
+            font-size: 9px !important; 
             margin-top: 8px !important; 
             line-height: 1.2 !important;
             max-width: 100% !important;
@@ -398,9 +406,9 @@ export default function MatchDetailPage({ params }) {
             min-width: 90px !important; 
             padding-top: 10px !important;
           }
-          .score-number { font-size: 28px !important; }
-          .score-divider { font-size: 12px !important; margin: 0 4px !important; }
-          .score-time { font-size: 18px !important; }
+          .score-number { font-size: 24px !important; }
+          .score-divider { font-size: 10px !important; margin: 0 4px !important; }
+          .score-time { font-size: 15px !important; }
           .status-text { font-size: 9px !important; margin-top: 8px !important; }
           
           .scorers-container { 
@@ -408,20 +416,20 @@ export default function MatchDetailPage({ params }) {
             gap: 6px !important;
             margin-top: 16px !important;
           }
-          .scorers-container > div { font-size: 10px !important; }
-          .scorers-container span { font-size: 10px !important; }
+          .scorers-container > div { font-size: 9px !important; }
+          .scorers-container span { font-size: 9px !important; }
           .ball-icon-divider { display: flex !important; transform: scale(0.8); }
 
           .info-cards-grid { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
           .info-card { padding: 10px !important; }
-          .info-card-label { font-size: 8px !important; }
-          .info-card-value { font-size: 11px !important; }
+          .info-card-label { font-size: 9px !important; }
+          .info-card-value { font-size: 9px !important; }
           
           .timeline-container { padding-left: 0 !important; }
           .timeline-event { gap: 4px !important; }
           .timeline-left { padding-right: 4px !important; }
           .timeline-right { padding-left: 4px !important; }
-          .timeline-center { width: 18px !important; height: 18px !important; font-size: 7px !important; }
+          .timeline-center { width: 18px !important; height: 18px !important; font-size: 9px !important; }
 
           .pitch-container { height: 380px !important; }
           .player-dot img { width: 18px !important; height: 18px !important; }
@@ -442,7 +450,7 @@ function GoalDetailSection({ match }) {
   if (goals.length === 0) {
     return (
       <div style={{ marginTop: 24, padding: '20px 0', textAlign: 'center' }}>
-        <div style={{ fontSize: 12, color: '#555d75', fontWeight: 600 }}>Belum ada gol dalam pertandingan ini.</div>
+        <div style={{ fontSize: 10, color: '#555d75', fontWeight: 600 }}>Belum ada gol dalam pertandingan ini.</div>
       </div>
     );
   }
@@ -499,7 +507,7 @@ function GoalDetailSection({ match }) {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 flexShrink: 0,
               }}>
-                <span style={{ fontSize: 13, fontWeight: 800, color: teamColor }}>
+                <span style={{ fontSize: 11, fontWeight: 800, color: teamColor }}>
                   {g.minute ? `${formatGameMinute(g.minute)}'` : '-'}
                 </span>
               </div>
@@ -509,12 +517,12 @@ function GoalDetailSection({ match }) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span
                     onClick={() => handlePlayerClick(g.player?.uuid)}
-                    style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,0,0,0.1)' }}
+                    style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,0,0,0.1)' }}
                   >
                     {g.player?.name || 'Pemain'}
                   </span>
                   <div style={{
-                    fontSize: 10, fontWeight: 700, color: typeInfo.color,
+                    fontSize: 9, fontWeight: 700, color: typeInfo.color,
                     background: typeInfo.bg, padding: '2px 8px', borderRadius: 10,
                     border: `1px solid ${typeInfo.color}30`, flexShrink: 0,
                   }}>
@@ -523,12 +531,12 @@ function GoalDetailSection({ match }) {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <img src={teamLogo} alt="" style={{ width: 16, height: 16, borderRadius: '50%', objectFit: 'contain' }} />
-                  <span style={{ fontSize: 11, color: 'var(--text-secondary)', fontWeight: 500 }}>{teamName}</span>
+                  <span style={{ fontSize: 9, color: 'var(--text-secondary)', fontWeight: 500 }}>{teamName}</span>
                   {g.event_data?.assist && (
-                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>• Assist: {g.event_data.assist}</span>
+                    <span style={{ fontSize: 9, color: 'var(--text-muted)' }}>• Assist: {g.event_data.assist}</span>
                   )}
                   {g.event_data?.commentary && (
-                    <span style={{ fontSize: 11, color: 'var(--text-muted)', fontStyle: 'italic' }}>• {g.event_data.commentary}</span>
+                    <span style={{ fontSize: 9, color: 'var(--text-muted)', fontStyle: 'italic' }}>• {g.event_data.commentary}</span>
                   )}
                 </div>
               </div>
@@ -539,9 +547,9 @@ function GoalDetailSection({ match }) {
                 background: 'var(--bg-subtle)', border: '1px solid var(--border)',
                 borderRadius: 10, padding: '6px 12px', flexShrink: 0,
               }}>
-                <span style={{ fontSize: 14, fontWeight: 900, color: '#3b82f6' }}>{runHome}</span>
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#475569' }}>-</span>
-                <span style={{ fontSize: 14, fontWeight: 900, color: '#ef4444' }}>{runAway}</span>
+                <span style={{ fontSize: 12, fontWeight: 900, color: '#3b82f6' }}>{runHome}</span>
+                <span style={{ fontSize: 10, fontWeight: 600, color: '#475569' }}>-</span>
+                <span style={{ fontSize: 12, fontWeight: 900, color: '#ef4444' }}>{runAway}</span>
               </div>
             </div>
           );
@@ -570,8 +578,8 @@ function RincianTab({ match }) {
         <Icon size={16} color={color} />
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
-        <span className="info-card-label" style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</span>
-        <span className="info-card-value" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{value}</span>
+        <span className="info-card-label" style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</span>
+        <span className="info-card-value" style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{value}</span>
       </div>
     </div>
   );
@@ -601,25 +609,87 @@ function RincianTab({ match }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-      {/* Info Pertandingan */}
-      <div style={{ background: 'var(--bg-app)', borderRadius: 16, padding: '20px 16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-          <div style={{ width: 4, height: 18, borderRadius: 2, background: 'var(--primary)' }} />
-          <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Info Pertandingan</span>
-        </div>
-        <div className="info-cards-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-          <InfoCard icon={CalendarDays} label="Tanggal" value={d?.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) || '-'} />
-          <InfoCard icon={Clock} label="Waktu" value={d?.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) || '-'} />
-          <InfoCard icon={MapPin} label="Tempat" value={match.venue?.name || match.field_court || 'TBD'} color="#22c55e" />
-          <InfoCard icon={Trophy} label="Babak" value={match.round ? `Pekan ${match.round}` : '-'} color="#eab308" />
-          {match.referee && (
-            <InfoCard icon={Target} label="Wasit" value={match.referee.name} color="#a855f7" />
-          )}
-          {match.statistics?.weather && (
-            <InfoCard icon={CloudSun} label="Cuaca" value={match.statistics.weather} color="#f97316" />
-          )}
+      {/* Info Pertandingan (Match Info Cards) */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {/* Top Card: Venue, Attendance, Weather */}
+        <div style={{ background: '#ffffff', borderRadius: 16, padding: '0 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.05)' }}>
+          {/* Venue Row */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+            <MapPin size={20} color="#4b5563" />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#111827' }}>{match.venue?.name || match.field_court || 'Venue Belum Ditentukan'}</div>
+              {match.venue?.city && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{match.venue?.city}</div>}
+            </div>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#ffffff', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <MapPin size={14} color="#10b981" />
+            </div>
+          </div>
+
+          {/* Attendance Row */}
           {match.statistics?.attendance && (
-            <InfoCard icon={Users} label="Penonton" value={match.statistics.attendance} color="#06b6d4" />
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, padding: '16px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+              <Users size={20} color="#4b5563" style={{ marginTop: 2 }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginBottom: 12 }}>
+                  {match.venue?.capacity && (
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      <span style={{ fontSize: 12, color: '#111827' }}>Kapasitas</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: '#111827' }}>{match.venue?.capacity}</span>
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <span style={{ fontSize: 12, color: '#111827' }}>Penonton</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#111827' }}>{match.statistics.attendance}</span>
+                  </div>
+                </div>
+                {/* Progress Bar (Mocked 100% or calculated) */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ flex: 1, height: 4, background: '#10b981', borderRadius: 2 }} />
+                  <div style={{ background: '#10b981', color: '#ffffff', fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 10 }}>
+                    {match.venue?.capacity ? Math.min(100, Math.round((parseInt(match.statistics.attendance) / parseInt(match.venue?.capacity)) * 100)) : 100}%
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Weather Row */}
+          {match.statistics?.weather && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 0' }}>
+              <CloudSun size={20} color="#4b5563" />
+              <div style={{ flex: 1, fontSize: 12, fontWeight: 700, color: '#111827' }}>
+                Cuaca
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 12, color: '#111827' }}>{match.statistics.weather}</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Card: Date, Tournament, Referee */}
+        <div style={{ background: '#ffffff', borderRadius: 16, padding: '8px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 0' }}>
+            <CalendarDays size={20} color="#4b5563" />
+            <div style={{ fontSize: 12, color: '#6b7280' }}>
+              {d?.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}, {d?.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) || '-'}
+            </div>
+          </div>
+          {match.round && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 0' }}>
+              <Trophy size={20} color="#4b5563" />
+              <div style={{ fontSize: 12, color: '#6b7280' }}>
+                Pekan / Babak {match.round}
+              </div>
+            </div>
+          )}
+          {match.referee && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 0' }}>
+              <Target size={20} color="#4b5563" />
+              <div style={{ fontSize: 12, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span>{match.referee.name}</span>
+              </div>
+            </div>
           )}
         </div>
       </div>
@@ -629,7 +699,7 @@ function RincianTab({ match }) {
         <div style={{ background: 'var(--bg-app)', borderRadius: 16, padding: '20px 16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
             <div style={{ width: 4, height: 18, borderRadius: 2, background: '#22c55e' }} />
-            <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Detail Gol</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Detail Gol</span>
           </div>
           <GoalDetailSection match={match} />
         </div>
@@ -638,17 +708,15 @@ function RincianTab({ match }) {
       {/* ── Mini Stats (Possession & Key Events) ── */}
       {match.statistics && (
         <div style={{ background: 'var(--bg-app)', borderRadius: 16, padding: '20px 16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
-          <div style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-primary)', fontWeight: 600, marginBottom: 16 }}>
+          <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-primary)', fontWeight: 600, marginBottom: 16 }}>
             Persentase Penguasaan Bola
           </div>
-          <div style={{ display: 'flex', height: 36, borderRadius: 18, overflow: 'hidden' }}>
-            {/* Home Bar */}
-            <div style={{ flex: parseInt(match.statistics.possession_home) || 50, background: '#1e3a8a', display: 'flex', alignItems: 'center', padding: '0 16px' }}>
-              <span style={{ color: '#fff', fontWeight: 700, fontSize: 14 }}>{match.statistics.possession_home || 50}%</span>
+          <div style={{ display: 'flex', alignItems: 'center', height: 36, gap: 2 }}>
+            <div style={{ flex: parseInt(match.statistics.possession_home) || 50, background: '#27345b', height: '100%', borderRadius: '18px 0 0 18px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 16, transition: 'flex 1s ease' }}>
+              <span style={{ color: '#fff', fontWeight: 600, fontSize: 11 }}>{match.statistics.possession_home || 50}%</span>
             </div>
-            {/* Away Bar */}
-            <div style={{ flex: parseInt(match.statistics.possession_away) || 50, background: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 16px' }}>
-              <span style={{ color: '#fff', fontWeight: 700, fontSize: 14 }}>{match.statistics.possession_away || 50}%</span>
+            <div style={{ flex: parseInt(match.statistics.possession_away) || 50, background: '#df9a0f', height: '100%', borderRadius: '0 18px 18px 0', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 16, transition: 'flex 1s ease' }}>
+              <span style={{ color: '#fff', fontWeight: 600, fontSize: 11 }}>{match.statistics.possession_away || 50}%</span>
             </div>
           </div>
         </div>
@@ -656,113 +724,175 @@ function RincianTab({ match }) {
 
       {/* Kejadian Pertandingan */}
       {match.events && match.events.length > 0 ? (
-        <div style={{ marginTop: 8 }}>
-          <div style={{ position: 'relative' }}>
-            {/* Center line */}
-            <div style={{ position: 'absolute', left: '50%', top: 12, bottom: 0, width: 2, background: 'var(--border)', transform: 'translateX(-50%)' }} />
+        <div style={{ marginTop: 16, background: '#ffffff', borderRadius: 16, padding: '24px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.05)' }}>
+          <div style={{ textAlign: 'center', fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 32 }}>
+            Events
+          </div>
 
-            {/* Top Score Marker */}
-            <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', zIndex: 10, marginBottom: 24 }}>
-              <div className="timeline-marker" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '4px 16px', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
-                <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>{match.status === 'finished' ? 'FT' : formatGameMinute(match.minute) || 'LIVE'}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--primary)' }}>{match.home_score}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-muted)' }}>-</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--primary)' }}>{match.away_score}</span>
-              </div>
-            </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            {match.events.map((ev, i) => {
+              const isHome = ev.team_id === match.home_team?.id;
 
-            <div className="timeline-container" style={{ display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 16 }}>
-              {match.events.map((ev, i) => {
-                const isHome = ev.team_id === match.home_team?.id;
-
-                const EventIconCircle = ({ type }) => {
-                  if (type === 'goal' || type === 'penalty' || type === 'own_goal')
-                    return <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><circle cx="12" cy="12" r="10" /></svg></div>;
-                  if (type === 'yellow_card') return <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'var(--bg-card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div style={{ width: 10, height: 14, background: '#eab308', borderRadius: 2 }} /></div>;
-                  if (type === 'red_card') return <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'var(--bg-card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div style={{ width: 10, height: 14, background: '#ef4444', borderRadius: 2 }} /></div>;
-                  if (type === 'substitution') return (
-                    <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'var(--bg-card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                        <path d="M9 8h5v3l4-4-4-4v3H9z" fill="#22c55e" />
-                        <path d="M15 16h-5v-3l-4 4 4 4v-3h5z" fill="#ef4444" />
-                      </svg>
-                    </div>
-                  );
-                  return <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#3b82f6' }} />;
-                };
-
-                return (
-                  <div key={i} className="timeline-event" style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
-                    {/* Left Side (Home) */}
-                    <div className="timeline-left" style={{ flex: 1, paddingRight: 16, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 12 }}>
-                      {isHome && (
-                        <>
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
-                            <span
-                              onClick={() => handlePlayerClick(ev.player?.uuid)}
-                              style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,0,0,0.1)' }}
-                            >
-                              {ev.player?.name || 'Pemain'}
-                            </span>
-                            {ev.event_data?.commentary && <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{ev.event_data.commentary}</span>}
-                          </div>
-                          <img
-                            onClick={() => handlePlayerClick(ev.player?.uuid)}
-                            src={getImageUrl(ev.player?.photo_path) || `https://ui-avatars.com/api/?name=${encodeURIComponent(ev.player?.name || 'P')}&size=32&background=e2e8f0&color=1e293b`}
-                            style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', cursor: 'pointer', border: '1px solid var(--border)' }}
-                            alt=""
-                          />
-                          <EventIconCircle type={ev.event_type} />
-                        </>
-                      )}
-                    </div>
-
-                    {/* Center Bubble */}
-                    <div className="timeline-center" style={{
-                      height: 24, padding: '0 10px', borderRadius: 12,
-                      background: 'var(--bg-card)', border: '1px solid var(--border)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      zIndex: 10, flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-                    }}>
-                      <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-primary)' }}>
-                        {ev.minute ? `${formatGameMinute(ev.minute)}'` : `#${ev.sequence}`}
-                      </span>
-                    </div>
-
-                    {/* Right Side (Away) */}
-                    <div className="timeline-right" style={{ flex: 1, paddingLeft: 16, display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: 12 }}>
-                      {!isHome && (
-                        <>
-                          <EventIconCircle type={ev.event_type} />
-                          <img
-                            onClick={() => handlePlayerClick(ev.player?.uuid)}
-                            src={getImageUrl(ev.player?.photo_path) || `https://ui-avatars.com/api/?name=${encodeURIComponent(ev.player?.name || 'P')}&size=32&background=e2e8f0&color=1e293b`}
-                            style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', cursor: 'pointer', border: '1px solid var(--border)' }}
-                            alt=""
-                          />
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
-                            <span
-                              onClick={() => handlePlayerClick(ev.player?.uuid)}
-                              style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,0,0,0.1)' }}
-                            >
-                              {ev.player?.name || 'Pemain'}
-                            </span>
-                            {ev.event_data?.commentary && <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{ev.event_data.commentary}</span>}
-                          </div>
-                        </>
-                      )}
-                    </div>
+              const EventIconCircle = ({ type }) => {
+                if (type === 'goal' || type === 'penalty' || type === 'own_goal')
+                  return <div style={{ width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2"><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="3" /><path d="M12 9l3-3m-3 3L9 6m3 6l3 3m-3-3l-3 3" /></svg></div>;
+                if (type === 'yellow_card') return <div style={{ width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div style={{ width: 14, height: 18, background: '#facc15', borderRadius: 3, border: '1px solid #ca8a04' }} /></div>;
+                if (type === 'red_card') return <div style={{ width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div style={{ width: 14, height: 18, background: '#ef4444', borderRadius: 3, border: '1px solid #b91c1c' }} /></div>;
+                if (type === 'substitution') return (
+                  <div style={{ width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f3f4f6', borderRadius: '50%' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                      <path d="M9 8h5v3l4-4-4-4v3H9z" fill="#10b981" />
+                      <path d="M15 16h-5v-3l-4 4 4 4v-3h5z" fill="#ef4444" />
+                    </svg>
                   </div>
                 );
-              })}
-            </div>
+                return <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#3b82f6' }} />;
+              };
+
+              const MinuteCircle = () => (
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#374151', flexShrink: 0 }}>
+                  {ev.minute ? `${formatGameMinute(ev.minute)}'` : `#${ev.sequence}`}
+                </div>
+              );
+
+              return (
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', minHeight: 36 }}>
+                  {/* Left Side (Home) */}
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', gap: 12, paddingRight: 8 }}>
+                    {isHome ? (
+                      <>
+                        <MinuteCircle />
+                        <EventIconCircle type={ev.event_type} />
+                        <div style={{ flex: 1, textAlign: 'left', paddingTop: 2 }}>
+                          <div style={{ fontSize: 12, fontWeight: 500, color: '#111827' }}>
+                            <span
+                              onClick={() => handlePlayerClick(ev.player?.uuid)}
+                              style={{ cursor: 'pointer' }}
+                            >
+                              {ev.player?.name || 'Pemain'}
+                            </span>
+                          </div>
+                          {ev.event_type === 'own_goal' && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>Own goal</div>}
+                          {ev.event_data?.commentary && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{ev.event_data.commentary}</div>}
+                        </div>
+                      </>
+                    ) : null}
+                  </div>
+
+                  {/* Right Side (Away) */}
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', gap: 12, paddingLeft: 8 }}>
+                    {!isHome ? (
+                      <>
+                        <div style={{ flex: 1, textAlign: 'right', paddingTop: 2 }}>
+                          <div style={{ fontSize: 12, fontWeight: 500, color: '#111827' }}>
+                            <span
+                              onClick={() => handlePlayerClick(ev.player?.uuid)}
+                              style={{ cursor: 'pointer' }}
+                            >
+                              {ev.player?.name || 'Pemain'}
+                            </span>
+                          </div>
+                          {ev.event_type === 'own_goal' && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>Own goal</div>}
+                          {ev.event_data?.commentary && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{ev.event_data.commentary}</div>}
+                        </div>
+                        <EventIconCircle type={ev.event_type} />
+                        <MinuteCircle />
+                      </>
+                    ) : null}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       ) : (
-        <div style={{ padding: '24px 0', textAlign: 'center', fontSize: 12, color: '#555d75', fontWeight: 600 }}>
+        <div style={{ padding: '24px 0', textAlign: 'center', fontSize: 10, color: '#555d75', fontWeight: 600 }}>
           Belum ada kejadian pertandingan.
         </div>
       )}
+      <NextMatchSection match={match} />
+    </div>
+  );
+}
+
+function NextMatchSection({ match }) {
+  const [nextMatches, setNextMatches] = useState({ home: null, away: null });
+
+  useEffect(() => {
+    const generateMockMatch = (team, isHomeFallback = true) => {
+      const nextWeek = new Date(match.match_date || match.scheduled_at || new Date());
+      nextWeek.setDate(nextWeek.getDate() + 7);
+      const mockOpponent = {
+        id: 'tba-' + team.id,
+        name: 'TBA Opponent',
+        logo_path: null
+      };
+      return {
+        id: 'mock-' + team.id,
+        is_mock: true,
+        tournament: match.tournament,
+        home_team: isHomeFallback ? team : mockOpponent,
+        away_team: isHomeFallback ? mockOpponent : team,
+        home_team_id: isHomeFallback ? team.id : mockOpponent.id,
+        away_team_id: isHomeFallback ? mockOpponent.id : team.id,
+        scheduled_at: nextWeek.toISOString(),
+      };
+    };
+
+    setNextMatches({
+      home: match.home_next_match || generateMockMatch(match.home_team, true),
+      away: match.away_next_match || generateMockMatch(match.away_team, false)
+    });
+  }, [match]);
+
+  if (!nextMatches.home && !nextMatches.away) return null;
+
+  const renderMatchRow = (teamMatch, targetTeam) => {
+    if (!teamMatch) return null;
+    const mDate = new Date(teamMatch.match_date || teamMatch.scheduled_at);
+    
+    // Fallback logo handling
+    const avatar = (name, bg = '3b82f6') => `https://ui-avatars.com/api/?name=${encodeURIComponent(name || '?')}&size=40&background=${bg}&color=fff`;
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', padding: '16px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+          <span style={{ fontSize: 11, color: '#6b7280' }}>{teamMatch.tournament?.name || 'Friendly'}</span>
+          <img src={getImageUrl(teamMatch.tournament?.logo_path) || avatar(teamMatch.tournament?.name, 'e5e7eb')} style={{ width: 16, height: 16, borderRadius: '50%', objectFit: 'contain' }} alt="" />
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+            <img src={getImageUrl(teamMatch.home_team?.logo_path) || avatar(teamMatch.home_team?.name)} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'contain' }} alt="" />
+            <span style={{ fontSize: 12, fontWeight: 500, color: '#111827', textAlign: 'center' }}>{teamMatch.home_team?.name}</span>
+          </div>
+
+          <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+            <span style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>
+              {mDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+            </span>
+            <span style={{ fontSize: 11, color: '#6b7280' }}>
+              {mDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+            </span>
+          </div>
+
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+            <img src={getImageUrl(teamMatch.away_team?.logo_path) || avatar(teamMatch.away_team?.name, 'ef4444')} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'contain' }} alt="" />
+            <span style={{ fontSize: 12, fontWeight: 500, color: '#111827', textAlign: 'center' }}>{teamMatch.away_team?.name}</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ background: '#ffffff', borderRadius: 16, padding: '20px 24px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.05)', marginTop: 16 }}>
+      <div style={{ textAlign: 'center', fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 8 }}>
+        Next match
+      </div>
+      {renderMatchRow(nextMatches.home, match.home_team)}
+      {nextMatches.home && nextMatches.away && nextMatches.home.id !== nextMatches.away.id && <div style={{ height: 1, background: 'rgba(0,0,0,0.05)' }} />}
+      {nextMatches.home?.id !== nextMatches.away?.id && renderMatchRow(nextMatches.away, match.away_team)}
     </div>
   );
 }
@@ -787,7 +917,7 @@ function LineupTab({ match }) {
         <div className="empty-state-icon" style={{ width: 48, height: 48, borderRadius: 14 }}>
           <Users style={{ width: 20, height: 20, color: '#555d75' }} />
         </div>
-        <p style={{ fontSize: 12, color: '#8b92a5', fontWeight: 600 }}>Susunan pemain belum tersedia.</p>
+        <p style={{ fontSize: 10, color: '#8b92a5', fontWeight: 600 }}>Susunan pemain belum tersedia.</p>
       </div>
     );
   }
@@ -795,31 +925,21 @@ function LineupTab({ match }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* 1. Pitch Visualizer */}
-      <PitchVisualizer
-        homeTeam={match.home_team}
-        awayTeam={match.away_team}
-        homePlayers={home}
-        awayPlayers={away}
-        homeFormation={match.statistics?.home_formation}
-        awayFormation={match.statistics?.away_formation}
-      />
-
-      {/* 2. Info Bar Formasi */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--bg-subtle)', borderRadius: 12, border: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name, '3b82f6')} style={{ width: 24, height: 24, borderRadius: '50%' }} alt="" />
-          <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: 13 }}>{match.statistics?.home_formation || 'TBD'}</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: 13 }}>{match.statistics?.away_formation || 'TBD'}</span>
-          <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name, 'ef4444')} style={{ width: 24, height: 24, borderRadius: '50%' }} alt="" />
-        </div>
+      <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+        <PitchVisualizer
+          homeTeam={match.home_team}
+          awayTeam={match.away_team}
+          homePlayers={home}
+          awayPlayers={away}
+          homeFormation={match.statistics?.home_formation}
+          awayFormation={match.statistics?.away_formation}
+        />
       </div>
 
       {/* 3. Bangku Cadangan */}
       {(homeSubs.length > 0 || awaySubs.length > 0) && (
         <div style={{ marginTop: 8 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 24, color: 'var(--text-secondary)', fontSize: 12, fontWeight: 700, textTransform: 'uppercase' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 24, color: 'var(--text-secondary)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 10l-5-5-5 5" /><path d="M12 5v14" /></svg>
             BANGKU
           </div>
@@ -851,11 +971,11 @@ function LineupTab({ match }) {
                         <>
                           <span
                             onClick={() => handlePlayerClick(hP.player?.uuid)}
-                            style={{ fontSize: 13, color: 'var(--text-primary)', fontWeight: 500, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,0,0,0.1)' }}
+                            style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 500, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,0,0,0.1)' }}
                           >
                             {hP.player?.name}
                           </span>
-                          <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{hP.player?.jersey_number || '-'}</span>
+                          <span style={{ fontSize: 9, color: 'var(--text-secondary)' }}>{hP.player?.jersey_number || '-'}</span>
                           <img
                             onClick={() => handlePlayerClick(hP.player?.uuid)}
                             src={getImageUrl(hP.player?.photo_path) || avatar(hP.player?.name, '3b82f6')}
@@ -876,10 +996,10 @@ function LineupTab({ match }) {
                             style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', cursor: 'pointer' }}
                             alt=""
                           />
-                          <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{aP.player?.jersey_number || '-'}</span>
+                          <span style={{ fontSize: 9, color: 'var(--text-secondary)' }}>{aP.player?.jersey_number || '-'}</span>
                           <span
                             onClick={() => handlePlayerClick(aP.player?.uuid)}
-                            style={{ fontSize: 13, color: 'var(--text-primary)', fontWeight: 500, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,0,0,0.1)' }}
+                            style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 500, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,0,0,0.1)' }}
                           >
                             {aP.player?.name}
                           </span>
@@ -939,23 +1059,52 @@ function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFor
   const avatar = (name, bg) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name || '?')}&size=24&background=${bg}&color=fff`;
 
   return (
-    <div className="pitch-container" style={{ position: 'relative', width: '100%', height: '640px', background: '#ecfdf5', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border)' }}>
+    <div className="pitch-container" style={{ position: 'relative', width: '100%', height: '1000px', background: '#108c54', overflow: 'hidden', borderRadius: '16px' }}>
       {/* Pitch Lines */}
-      <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '2px', background: '#d1fae5', transform: 'translateY(-50%)' }} />
-      <div style={{ position: 'absolute', top: '50%', left: '50%', width: '100px', height: '100px', border: '2px solid #d1fae5', borderRadius: '50%', transform: 'translate(-50%, -50%)' }} />
-      <div style={{ position: 'absolute', top: '-10px', left: '20%', right: '20%', height: '100px', border: '2px solid #d1fae5' }} />
-      <div style={{ position: 'absolute', bottom: '-10px', left: '20%', right: '20%', height: '100px', border: '2px solid #d1fae5' }} />
-      <div style={{ position: 'absolute', top: '-10px', left: '35%', right: '35%', height: '45px', border: '2px solid #d1fae5' }} />
-      <div style={{ position: 'absolute', bottom: '-10px', left: '35%', right: '35%', height: '45px', border: '2px solid #d1fae5' }} />
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, border: '2px solid rgba(255,255,255,0.2)', margin: '16px' }} />
+      <div style={{ position: 'absolute', top: '50%', left: 16, right: 16, height: '2px', background: 'rgba(255,255,255,0.2)', transform: 'translateY(-50%)' }} />
+      <div style={{ position: 'absolute', top: '50%', left: '50%', width: '120px', height: '120px', border: '2px solid rgba(255,255,255,0.2)', borderRadius: '50%', transform: 'translate(-50%, -50%)' }} />
+      
+      {/* Penalty Boxes */}
+      <div style={{ position: 'absolute', top: '16px', left: '22%', right: '22%', height: '110px', border: '2px solid rgba(255,255,255,0.2)', borderTop: 'none' }} />
+      <div style={{ position: 'absolute', bottom: '16px', left: '22%', right: '22%', height: '110px', border: '2px solid rgba(255,255,255,0.2)', borderBottom: 'none' }} />
+      <div style={{ position: 'absolute', top: '16px', left: '38%', right: '38%', height: '50px', border: '2px solid rgba(255,255,255,0.2)', borderTop: 'none' }} />
+      <div style={{ position: 'absolute', bottom: '16px', left: '38%', right: '38%', height: '50px', border: '2px solid rgba(255,255,255,0.2)', borderBottom: 'none' }} />
+
+      {/* D-Arcs */}
+      <div style={{ position: 'absolute', top: '126px', left: '50%', width: '80px', height: '40px', border: '2px solid rgba(255,255,255,0.2)', borderTop: 'none', borderRadius: '0 0 40px 40px', transform: 'translateX(-50%)' }} />
+      <div style={{ position: 'absolute', bottom: '126px', left: '50%', width: '80px', height: '40px', border: '2px solid rgba(255,255,255,0.2)', borderBottom: 'none', borderRadius: '40px 40px 0 0', transform: 'translateX(-50%)' }} />
+
+      {/* Info Bars */}
+      <div style={{ position: 'absolute', top: '24px', left: '24px', display: 'flex', alignItems: 'center', gap: 12, zIndex: 20 }}>
+        <img src={getImageUrl(awayTeam?.logo_path) || avatar(awayTeam?.name, 'ef4444')} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'contain' }} alt="" />
+        <span style={{ color: '#fff', fontSize: 14, fontWeight: 700, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{awayTeam?.name}</span>
+        <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, fontWeight: 600, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{awayFormation}</span>
+      </div>
+
+      <div style={{ position: 'absolute', bottom: '24px', left: '24px', display: 'flex', alignItems: 'center', gap: 12, zIndex: 20 }}>
+        <img src={getImageUrl(homeTeam?.logo_path) || avatar(homeTeam?.name, '3b82f6')} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'contain' }} alt="" />
+        <span style={{ color: '#fff', fontSize: 14, fontWeight: 700, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{homeTeam?.name}</span>
+        <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, fontWeight: 600, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{homeFormation}</span>
+      </div>
 
       {/* Away Players (Top Half) */}
       {aSorted.map((p, i) => {
         const c = aCoords[i] || { x: 50, y: 50 };
         const top = 50 - (c.y / 100) * 45;
+        // Mock a rating if it exists, otherwise just a clean layout
+        const rating = p.statistics?.rating || null;
         return (
           <div key={p.id} onClick={() => handlePlayerClick(p.player?.uuid)} className="player-dot" style={{ position: 'absolute', left: `${c.x}%`, top: `${top}%`, transform: 'translate(-50%, -50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10, cursor: 'pointer' }}>
-            <img src={getImageUrl(p.player?.photo_path) || avatar(p.player?.name, 'ef4444')} style={{ width: 26, height: 26, borderRadius: '50%', boxShadow: '0 2px 6px rgba(0,0,0,0.1)', objectFit: 'cover', border: '2px solid #fff' }} alt="" />
-            <div style={{ background: '#fff', color: 'var(--text-primary)', fontSize: '9px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px', marginTop: '3px', whiteSpace: 'nowrap', boxShadow: '0 1px 4px rgba(0,0,0,0.1)' }}>
+            <div style={{ position: 'relative' }}>
+              <img src={getImageUrl(p.player?.photo_path) || avatar(p.player?.name, 'ef4444')} style={{ width: 56, height: 56, borderRadius: '50%', boxShadow: '0 4px 10px rgba(0,0,0,0.3)', objectFit: 'cover', border: '3px solid #fff' }} alt="" />
+              {rating && (
+                <div style={{ position: 'absolute', top: -4, right: -12, background: '#10b981', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 6px', borderRadius: 10, border: '1px solid #fff' }}>
+                  {rating}
+                </div>
+              )}
+            </div>
+            <div style={{ color: '#fff', fontSize: '12px', fontWeight: 700, marginTop: '6px', whiteSpace: 'nowrap', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
               {p.player?.jersey_number} {p.player?.name.split(' ').pop()}
             </div>
           </div>
@@ -966,10 +1115,18 @@ function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFor
       {hSorted.map((p, i) => {
         const c = hCoords[i] || { x: 50, y: 50 };
         const top = 50 + (c.y / 100) * 45;
+        const rating = p.statistics?.rating || null;
         return (
           <div key={p.id} onClick={() => handlePlayerClick(p.player?.uuid)} className="player-dot" style={{ position: 'absolute', left: `${c.x}%`, top: `${top}%`, transform: 'translate(-50%, -50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10, cursor: 'pointer' }}>
-            <img src={getImageUrl(p.player?.photo_path) || avatar(p.player?.name, '3b82f6')} style={{ width: 26, height: 26, borderRadius: '50%', boxShadow: '0 2px 6px rgba(0,0,0,0.1)', objectFit: 'cover', border: '2px solid #fff' }} alt="" />
-            <div style={{ background: '#fff', color: 'var(--text-primary)', fontSize: '9px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px', marginTop: '3px', whiteSpace: 'nowrap', boxShadow: '0 1px 4px rgba(0,0,0,0.1)' }}>
+            <div style={{ position: 'relative' }}>
+              <img src={getImageUrl(p.player?.photo_path) || avatar(p.player?.name, '3b82f6')} style={{ width: 56, height: 56, borderRadius: '50%', boxShadow: '0 4px 10px rgba(0,0,0,0.3)', objectFit: 'cover', border: '3px solid #fff' }} alt="" />
+              {rating && (
+                <div style={{ position: 'absolute', top: -4, right: -12, background: '#10b981', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 6px', borderRadius: 10, border: '1px solid #fff' }}>
+                  {rating}
+                </div>
+              )}
+            </div>
+            <div style={{ color: '#fff', fontSize: '12px', fontWeight: 700, marginTop: '6px', whiteSpace: 'nowrap', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
               {p.player?.jersey_number} {p.player?.name.split(' ').pop()}
             </div>
           </div>
@@ -1045,7 +1202,7 @@ function H2HTab({ match }) {
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', background: 'var(--bg-subtle)', borderRadius: 12, border: '1px solid var(--border)' }}>
       <img src={teamLogo} alt="" style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'contain', flexShrink: 0 }} />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{teamName}</div>
+        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{teamName}</div>
         <div style={{ display: 'flex', gap: 6 }}>
           {matches.length > 0 ? matches.map((m, i) => {
             const r = getResult(m, teamId);
@@ -1054,50 +1211,66 @@ function H2HTab({ match }) {
                 width: 26, height: 26, borderRadius: '50%',
                 background: resultBg(r), border: `2px solid ${resultColor(r)}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 10, fontWeight: 800, color: resultColor(r),
+                fontSize: 9, fontWeight: 800, color: resultColor(r),
               }}>
                 {r}
               </div>
             );
-          }) : <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>-</span>}
+          }) : <span style={{ fontSize: 9, color: 'var(--text-muted)' }}>-</span>}
         </div>
       </div>
     </div>
   );
 
   // Match row
-  const MatchRow = ({ m }) => {
+  const MatchRow = ({ m, perspectiveId }) => {
     const d = new Date(m.scheduled_at);
-    const hName = m.home_team_id === homeId ? match.home_team?.name : match.away_team?.name;
-    const aName = m.away_team_id === awayId ? match.away_team?.name : (m.away_team_id === homeId ? match.home_team?.name : match.away_team?.name);
+    // Determine the subject team for color coding
+    const pId = perspectiveId || homeId; 
+    
+    // Original logic for names if we want to bold the winner
+    const hName = m.home_team?.name || (m.home_team_id === homeId ? match.home_team?.name : match.away_team?.name);
+    const aName = m.away_team?.name || (m.away_team_id === awayId ? match.away_team?.name : (m.away_team_id === homeId ? match.home_team?.name : match.away_team?.name));
+    
     const hWin = m.home_score > m.away_score;
     const aWin = m.away_score > m.home_score;
     const isDraw = m.home_score === m.away_score;
-    const accentColor = isDraw ? '#8b92a5' : (hWin && m.home_team_id === homeId) || (aWin && m.away_team_id === homeId) ? '#3b82f6' : '#eab308';
+    
+    const isPerspectiveWin = (m.home_team_id === pId && hWin) || (m.away_team_id === pId && aWin);
+    const accentColor = isDraw ? '#9ca3af' : isPerspectiveWin ? '#3b82f6' : '#eab308';
+
+    const hLogo = m.home_team?.logo_path || (m.home_team_id === homeId ? match.home_team?.logo_path : match.away_team?.logo_path);
+    const aLogo = m.away_team?.logo_path || (m.away_team_id === awayId ? match.away_team?.logo_path : (m.away_team_id === homeId ? match.home_team?.logo_path : match.away_team?.logo_path));
 
     return (
       <div style={{
-        display: 'flex', alignItems: 'center', padding: '10px 14px',
-        background: 'var(--bg-subtle)', borderRadius: 12,
-        border: '1px solid var(--border)',
-        borderLeft: `3px solid ${accentColor}`,
+        display: 'flex', alignItems: 'center', padding: '12px 16px',
+        background: '#ffffff', borderRadius: 12,
+        border: '1px solid rgba(0,0,0,0.05)',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
       }}>
-        <div style={{ fontSize: 10, color: 'var(--text-secondary)', width: 56, flexShrink: 0, fontWeight: 500 }}>
-          {d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: '2-digit' })}
+        <div style={{ fontSize: 10, color: '#4b5563', width: 70, flexShrink: 0, fontWeight: 500 }}>
+          {d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: '2-digit' }).replace(/ /g, ' ')}
         </div>
-        <div style={{ flex: 1, textAlign: 'right', fontSize: 12, fontWeight: hWin ? 700 : 500, color: hWin ? 'var(--text-primary)' : 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {hName}
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
+          <div style={{ textAlign: 'right', fontSize: 12, fontWeight: hWin ? 700 : 500, color: hWin ? '#111827' : '#4b5563', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {hName}
+          </div>
+          <img src={getImageUrl(hLogo) || avatar(hName, '3b82f6')} style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'contain', flexShrink: 0 }} alt="" />
         </div>
         <div style={{
-          margin: '0 10px', fontWeight: 800, fontSize: 13, color: 'var(--text-primary)',
-          background: 'var(--bg-card)', border: `1px solid var(--border)`,
-          padding: '3px 10px', borderRadius: 8, flexShrink: 0,
-          fontVariantNumeric: 'tabular-nums', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+          margin: '0 16px', fontWeight: 700, fontSize: 12, color: '#111827',
+          background: '#ffffff', border: `1px solid #e5e7eb`,
+          padding: '6px 14px', borderRadius: 8, flexShrink: 0,
+          fontVariantNumeric: 'tabular-nums', display: 'flex', alignItems: 'center', justifyContent: 'center'
         }}>
           {m.home_score} - {m.away_score}
         </div>
-        <div style={{ flex: 1, textAlign: 'left', fontSize: 12, fontWeight: aWin ? 700 : 500, color: aWin ? 'var(--text-primary)' : 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {aName}
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
+          <img src={getImageUrl(aLogo) || avatar(aName, 'eab308')} style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'contain', flexShrink: 0 }} alt="" />
+          <div style={{ textAlign: 'left', fontSize: 12, fontWeight: aWin ? 700 : 500, color: aWin ? '#111827' : '#4b5563', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {aName}
+          </div>
         </div>
       </div>
     );
@@ -1118,8 +1291,8 @@ function H2HTab({ match }) {
             <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name, '3b82f6')} alt="" style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'contain' }} />
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)' }}>Menang</span>
-                <span style={{ fontSize: 13, fontWeight: 900, color: '#3b82f6' }}>{homeWins}</span>
+                <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-secondary)' }}>Menang</span>
+                <span style={{ fontSize: 11, fontWeight: 900, color: '#3b82f6' }}>{homeWins}</span>
               </div>
               <div style={{ height: 4, borderRadius: 2, background: 'var(--border)' }}>
                 <div style={{ height: '100%', borderRadius: 2, background: '#3b82f6', width: `${(homeWins / totalH2H) * 100}%`, transition: 'width 0.8s ease' }} />
@@ -1131,8 +1304,8 @@ function H2HTab({ match }) {
             <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'var(--bg-card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 800, color: 'var(--text-secondary)' }}>D</div>
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)' }}>Seri</span>
-                <span style={{ fontSize: 13, fontWeight: 900, color: '#8b92a5' }}>{draws}</span>
+                <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-secondary)' }}>Seri</span>
+                <span style={{ fontSize: 11, fontWeight: 900, color: '#8b92a5' }}>{draws}</span>
               </div>
               <div style={{ height: 4, borderRadius: 2, background: 'var(--border)' }}>
                 <div style={{ height: '100%', borderRadius: 2, background: '#8b92a5', width: `${(draws / totalH2H) * 100}%`, transition: 'width 0.8s ease' }} />
@@ -1144,8 +1317,8 @@ function H2HTab({ match }) {
             <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name, 'eab308')} alt="" style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'contain' }} />
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)' }}>Menang</span>
-                <span style={{ fontSize: 13, fontWeight: 900, color: '#eab308' }}>{awayWins}</span>
+                <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-secondary)' }}>Menang</span>
+                <span style={{ fontSize: 11, fontWeight: 900, color: '#eab308' }}>{awayWins}</span>
               </div>
               <div style={{ height: 4, borderRadius: 2, background: 'var(--border)' }}>
                 <div style={{ height: '100%', borderRadius: 2, background: '#eab308', width: `${(awayWins / totalH2H) * 100}%`, transition: 'width 0.8s ease' }} />
@@ -1157,7 +1330,7 @@ function H2HTab({ match }) {
 
       {/* Form / 5 Laga Terakhir */}
       <div>
-        <div style={{ fontSize: 11, fontWeight: 700, color: '#8b92a5', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Form - 5 Laga Terakhir</div>
+        <div style={{ fontSize: 9, fontWeight: 700, color: '#8b92a5', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Form - 5 Laga Terakhir</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <FormRow
             matches={formHome} teamId={homeId}
@@ -1176,36 +1349,36 @@ function H2HTab({ match }) {
 
       {/* H2H Match History */}
       {h2h.length > 0 && (
-        <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#8b92a5', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Riwayat Pertemuan</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {h2h.map((m, i) => <MatchRow key={i} m={m} />)}
+        <div style={{ marginTop: 8 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>Riwayat Pertemuan</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {h2h.map((m, i) => <MatchRow key={i} m={m} perspectiveId={homeId} />)}
           </div>
         </div>
       )}
 
       {/* Home Form History */}
       {formHome.length > 0 && (
-        <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#8b92a5', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>5 Laga Terakhir: {match.home_team?.name}</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {formHome.map((m, i) => <MatchRow key={i} m={m} />)}
+        <div style={{ marginTop: 8 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>5 Laga Terakhir: {match.home_team?.name}</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {formHome.map((m, i) => <MatchRow key={i} m={m} perspectiveId={homeId} />)}
           </div>
         </div>
       )}
 
       {/* Away Form History */}
       {formAway.length > 0 && (
-        <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#8b92a5', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>5 Laga Terakhir: {match.away_team?.name}</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {formAway.map((m, i) => <MatchRow key={i} m={m} />)}
+        <div style={{ marginTop: 8 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>5 Laga Terakhir: {match.away_team?.name}</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {formAway.map((m, i) => <MatchRow key={i} m={m} perspectiveId={awayId} />)}
           </div>
         </div>
       )}
 
       {h2h.length === 0 && formHome.length === 0 && formAway.length === 0 && (
-        <div style={{ padding: '32px 0', textAlign: 'center', fontSize: 12, color: '#555d75', fontWeight: 600 }}>
+        <div style={{ padding: '32px 0', textAlign: 'center', fontSize: 10, color: '#555d75', fontWeight: 600 }}>
           Belum ada data Head to Head.
         </div>
       )}
@@ -1221,7 +1394,7 @@ function KlasemenTab({ standings, match, sport }) {
         <div className="empty-state-icon" style={{ width: 48, height: 48, borderRadius: 14 }}>
           <Trophy style={{ width: 20, height: 20, color: '#c7c7d1' }} />
         </div>
-        <p style={{ fontSize: 12, color: '#6b7280', fontWeight: 600 }}>Klasemen belum tersedia.</p>
+        <p style={{ fontSize: 10, color: '#6b7280', fontWeight: 600 }}>Klasemen belum tersedia.</p>
       </div>
     );
   }
@@ -1234,7 +1407,7 @@ function KlasemenTab({ standings, match, sport }) {
             <div key={i}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                 <div style={{ width: 4, height: 18, borderRadius: 2, background: '#3b82f6' }} />
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#e8eaed', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{g.group?.name}</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#e8eaed', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{g.group?.name}</span>
               </div>
               <StandingsTable rows={g.standings} match={match} sport={sport} />
             </div>
@@ -1249,7 +1422,7 @@ function KlasemenTab({ standings, match, sport }) {
 
 function StandingsTable({ rows = [], match, sport }) {
   if (!Array.isArray(rows) || rows.length === 0) {
-    return <div style={{ padding: '16px 0', textAlign: 'center', fontSize: 12, color: '#9ca3af' }}>Belum ada data klasemen.</div>;
+    return <div style={{ padding: '16px 0', textAlign: 'center', fontSize: 10, color: '#9ca3af' }}>Belum ada data klasemen.</div>;
   }
 
   const homeId = match?.home_team?.id;
@@ -1301,7 +1474,7 @@ function StandingsTable({ rows = [], match, sport }) {
       <div style={{
         display: 'flex', alignItems: 'center', padding: '12px 16px',
         background: 'var(--bg-subtle)', borderBottom: '1px solid var(--border)',
-        fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em',
+        fontSize: 9, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em',
         minWidth: 580,
       }}>
         <div style={{ width: 44, textAlign: 'left', paddingLeft: 4 }}>#</div>
@@ -1348,7 +1521,7 @@ function StandingsTable({ rows = [], match, sport }) {
                     width: 18, height: 18, borderRadius: 5,
                     background: pc.bg, border: `1px solid ${pc.border}`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 10, fontWeight: 800, color: pc.color,
+                    fontSize: 9, fontWeight: 800, color: pc.color,
                   }}>
                     {pos}
                   </div>
@@ -1370,7 +1543,7 @@ function StandingsTable({ rows = [], match, sport }) {
                     style={{ width: 22, height: 22, borderRadius: '50%', flexShrink: 0, objectFit: 'contain' }} alt=""
                   />
                   <span style={{
-                    fontSize: 12, fontWeight: isHighlighted ? 800 : 600,
+                    fontSize: 10, fontWeight: isHighlighted ? 800 : 600,
                     color: 'var(--text-primary)',
                     whiteSpace: 'nowrap',
                   }}>
@@ -1404,12 +1577,12 @@ function StandingsTable({ rows = [], match, sport }) {
                       width: 16, height: 16, borderRadius: '50%',
                       background: resultBg(f), border: `1.5px solid ${resultColor(f)}`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 8, fontWeight: 800, color: resultColor(f),
+                      fontSize: 9, fontWeight: 800, color: resultColor(f),
                     }}>
                       {f}
                     </div>
                   )) : (
-                    <span style={{ fontSize: 10, color: '#475569' }}>-</span>
+                    <span style={{ fontSize: 9, color: '#475569' }}>-</span>
                   )}
                 </div>
               </motion.div>
@@ -1423,18 +1596,39 @@ function StandingsTable({ rows = [], match, sport }) {
 /* ─── Statistik ─── */
 function StatistikTab({ match }) {
   const [period, setPeriod] = useState('all');
-  const stats = match.statistics;
-  if (!stats) {
+  let stats = match.statistics || {};
+  const pStats = match.player_statistics || [];
+
+  if (pStats.length > 0) {
+    const computed = { ...stats };
+    const homeId = match.home_team?.id;
+    
+    pStats.forEach(ps => {
+      const isHome = ps.player?.team_id === homeId;
+      const suffix = isHome ? '_home' : '_away';
+      if (ps.statistics && typeof ps.statistics === 'object') {
+        Object.entries(ps.statistics).forEach(([key, val]) => {
+          const num = parseFloat(val) || 0;
+          computed[`${key}${suffix}`] = (computed[`${key}${suffix}`] || 0) + num;
+        });
+      }
+    });
+    stats = computed;
+  }
+
+  const isStatsEmpty = !stats || (Array.isArray(stats) && stats.length === 0) || (typeof stats === 'object' && Object.keys(stats).length === 0);
+
+  if (isStatsEmpty) {
     return (
-      <div className="empty-state" style={{ padding: '36px 16px' }}>
-        <p style={{ fontSize: 12, color: '#8b92a5', fontWeight: 600 }}>Statistik pertandingan belum tersedia.</p>
+      <div className="empty-state" style={{ padding: '36px 16px', textAlign: 'center' }}>
+        <p style={{ fontSize: 10, color: '#8b92a5', fontWeight: 600 }}>Statistik pertandingan belum tersedia.</p>
       </div>
     );
   }
 
   const sport = match.tournament?.sport;
   const sportSlug = String(sport?.slug || '').toLowerCase();
-  const isFootballOrFutsal = !sportSlug || sportSlug === 'football' || sportSlug === 'futsal';
+  const isFootballOrFutsal = !sportSlug || ['football', 'futsal', 'soccer', 'sepak-bola', 'sepakbola'].some(s => sportSlug.includes(s));
 
   const prefix = period === 'all' ? '' : period === 'h1' ? 'h1_' : 'h2_';
   const s = (key) => stats[`${prefix}${key}`];
@@ -1443,7 +1637,7 @@ function StatistikTab({ match }) {
     <div style={{
       width: 32, height: 32, borderRadius: '50%',
       border: `2px solid ${color}`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: 13, fontWeight: 800, color: color, flexShrink: 0,
+      fontSize: 11, fontWeight: 800, color: color, flexShrink: 0,
       background: `${color}15`,
     }}>
       {value}
@@ -1465,28 +1659,28 @@ function StatistikTab({ match }) {
     }
 
     return (
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0' }}>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
           {hWin ? (
-            <div style={{ background: '#1e3a8a', color: '#fff', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 14, minWidth: 32, textAlign: 'center' }}>
+            <div style={{ background: '#27345b', color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 14px', borderRadius: 16, textAlign: 'center' }}>
               {hStr}
             </div>
           ) : (
-            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', padding: '4px 12px', minWidth: 32, textAlign: 'center' }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', padding: '4px 14px', textAlign: 'center' }}>
               {hStr}
             </div>
           )}
         </div>
-        <div style={{ flex: 2, textAlign: 'center', fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)' }}>
+        <div style={{ flex: 2, textAlign: 'center', fontSize: 12, fontWeight: 500, color: 'var(--text-primary)' }}>
           {label}
         </div>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
           {aWin ? (
-            <div style={{ background: '#d97706', color: '#fff', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 14, minWidth: 32, textAlign: 'center' }}>
+            <div style={{ background: '#df9a0f', color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 14px', borderRadius: 16, textAlign: 'center' }}>
               {aStr}
             </div>
           ) : (
-            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', padding: '4px 12px', minWidth: 32, textAlign: 'center' }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', padding: '4px 14px', textAlign: 'center' }}>
               {aStr}
             </div>
           )}
@@ -1528,7 +1722,14 @@ function StatistikTab({ match }) {
   ];
 
   const sportFields = sport?.stat_fields || [];
-  const accumFields = sportFields.filter(f => !['goals', 'assists', 'yellow_cards', 'red_cards', 'minutes_played'].includes(f));
+  let accumFields = sportFields.filter(f => !['goals', 'assists', 'yellow_cards', 'red_cards', 'minutes_played'].includes(f));
+
+  if (accumFields.length === 0) {
+    accumFields = Object.keys(stats)
+      .filter(k => k.endsWith('_home'))
+      .map(k => k.replace('_home', ''))
+      .filter(f => !['goals', 'assists', 'yellow_cards', 'red_cards', 'minutes_played'].includes(f));
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -1540,7 +1741,7 @@ function StatistikTab({ match }) {
               key={p.id}
               onClick={() => setPeriod(p.id)}
               style={{
-                flex: 1, padding: '8px 0', fontSize: 12, fontWeight: 700,
+                flex: 1, padding: '8px 0', fontSize: 10, fontWeight: 700,
                 border: 'none', cursor: 'pointer', transition: 'all 0.2s ease',
                 background: period === p.id ? 'var(--primary)' : 'var(--bg-subtle)',
                 color: period === p.id ? 'var(--bg-app)' : 'var(--text-secondary)',
@@ -1554,17 +1755,16 @@ function StatistikTab({ match }) {
 
       {/* ── Penguasaan Bola ── */}
       {isFootballOrFutsal && (
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Penguasaan Bola</div>
-          <div style={{ display: 'flex', alignItems: 'center', borderRadius: 8, overflow: 'hidden', height: 28, background: 'var(--bg-subtle)' }}>
-            <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name, '3b82f6')} style={{ width: 22, height: 22, borderRadius: '50%', marginLeft: 3, flexShrink: 0, zIndex: 2 }} alt="" />
-            <div style={{ flex: possHome, background: '#3b82f6', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 8, transition: 'flex 1s ease' }}>
-              <span style={{ fontSize: 12, fontWeight: 800, color: '#fff' }}>{possHome}%</span>
+        <div style={{ textAlign: 'center', marginBottom: 16 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 20 }}>Top stats</div>
+          <div style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 16 }}>Ball possession</div>
+          <div style={{ display: 'flex', alignItems: 'center', height: 36, gap: 2 }}>
+            <div style={{ flex: possHome, background: '#27345b', height: '100%', borderRadius: '18px 0 0 18px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 16, transition: 'flex 1s ease' }}>
+              <span style={{ fontSize: 11, fontWeight: 600, color: '#fff' }}>{possHome}%</span>
             </div>
-            <div style={{ flex: possAway, background: '#eab308', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 8, transition: 'flex 1s ease' }}>
-              <span style={{ fontSize: 12, fontWeight: 800, color: '#1a1a1a' }}>{possAway}%</span>
+            <div style={{ flex: possAway, background: '#df9a0f', height: '100%', borderRadius: '0 18px 18px 0', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 16, transition: 'flex 1s ease' }}>
+              <span style={{ fontSize: 11, fontWeight: 600, color: '#fff' }}>{possAway}%</span>
             </div>
-            <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name, 'eab308')} style={{ width: 22, height: 22, borderRadius: '50%', marginRight: 3, flexShrink: 0, zIndex: 2 }} alt="" />
           </div>
         </div>
       )}
@@ -1591,7 +1791,7 @@ function StatistikTab({ match }) {
       {/* ── Statistik Akumulasi (Otomatis dari Pemain) ── */}
       {accumFields.length > 0 && (
         <div style={{ marginTop: 16 }}>
-          <div style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-primary)', fontWeight: 600, margin: '24px 0 16px' }}>
+          <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-primary)', fontWeight: 600, margin: '24px 0 16px' }}>
             Statistik Pemain
           </div>
           {accumFields.map(field => (

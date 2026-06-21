@@ -112,7 +112,7 @@ export default function TournamentDetailPage({ params }) {
     return (
       <div style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <div className="loader"></div>
-        <p style={{ marginTop: 14, color: '#9ca3af', fontSize: 13, fontWeight: 500 }}>Memuat detail turnamen...</p>
+        <p style={{ marginTop: 14, color: '#9ca3af', fontSize: 11, fontWeight: 500 }}>Memuat detail turnamen...</p>
       </div>
     );
   }
@@ -121,8 +121,8 @@ export default function TournamentDetailPage({ params }) {
     return (
       <div style={{ maxWidth: 800, margin: '40px auto', textAlign: 'center', padding: '0 16px' }}>
         <Shield size={48} style={{ color: '#ef4444', margin: '0 auto 12px' }} />
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>Turnamen Tidak Ditemukan</h2>
-        <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 6, marginBottom: 18 }}>Maaf, turnamen yang Anda cari tidak tersedia atau telah dihapus.</p>
+        <h2 style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)' }}>Turnamen Tidak Ditemukan</h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 11, marginTop: 6, marginBottom: 18 }}>Maaf, turnamen yang Anda cari tidak tersedia atau telah dihapus.</p>
         <button onClick={() => router.push('/')} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           <ArrowLeft size={16} /> Kembali ke Beranda
         </button>
@@ -149,7 +149,7 @@ export default function TournamentDetailPage({ params }) {
         >
           <ArrowLeft size={20} />
         </button>
-        <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Detail Turnamen</span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>Detail Turnamen</span>
       </div>
 
       {/* Main Bronze/Gold Styled Banner Header */}
@@ -223,19 +223,19 @@ export default function TournamentDetailPage({ params }) {
 
             {/* Title & Meta Info */}
             <div style={{ flex: 1 }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(245, 158, 11, 0.1)', color: '#fbbf24', padding: '3px 8px', borderRadius: 100, fontSize: 10, fontWeight: 700, marginBottom: 8, border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(245, 158, 11, 0.1)', color: '#fbbf24', padding: '3px 8px', borderRadius: 100, fontSize: 9, fontWeight: 700, marginBottom: 8, border: '1px solid rgba(245, 158, 11, 0.2)' }}>
                 <Star size={10} fill="#fbbf24" />
                 {tournament.sport?.name || 'Turnamen Utama'}
               </div>
-              <h1 style={{ fontSize: 24, fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.1, marginBottom: 8, letterSpacing: '-0.02em' }}>
+              <h1 style={{ fontSize: 20, fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.1, marginBottom: 8, letterSpacing: '-0.02em' }}>
                 {tournament.name}
               </h1>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-secondary)', fontWeight: 600 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, color: 'var(--text-secondary)', fontWeight: 600 }}>
                   <MapPin size={14} color="#ef4444" />
                   <span>{tournament.location || 'Bojonegoro'}</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-secondary)', fontWeight: 600 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, color: 'var(--text-secondary)', fontWeight: 600 }}>
                   <Users size={14} color="#10b981" />
                   <span>{tournament.teams?.length || 0} Tim</span>
                 </div>
@@ -252,7 +252,7 @@ export default function TournamentDetailPage({ params }) {
                 border: 'none',
                 borderRadius: 12,
                 padding: '10px 20px',
-                fontSize: 13,
+                fontSize: 11,
                 fontWeight: 800,
                 cursor: 'pointer',
                 boxShadow: '0 8px 12px -3px rgba(245, 158, 11, 0.3)',
@@ -314,7 +314,7 @@ export default function TournamentDetailPage({ params }) {
                 onClick={() => setActiveTab(tab.id)}
                 style={{
                   padding: '6px 14px', 
-                  fontSize: 11, 
+                  fontSize: 9, 
                   fontWeight: 700, 
                   borderRadius: 16,
                   cursor: 'pointer', 
@@ -360,7 +360,7 @@ export default function TournamentDetailPage({ params }) {
                 <button
                   onClick={() => setMatchView('upcoming')}
                   style={{
-                    padding: '7px 16px', fontSize: 12, fontWeight: 700, borderRadius: 16, border: 'none',
+                    padding: '7px 16px', fontSize: 10, fontWeight: 700, borderRadius: 16, border: 'none',
                     cursor: 'pointer', transition: 'all 0.2s',
                     background: matchView === 'upcoming' ? 'rgba(245, 158, 11, 0.25)' : 'transparent',
                     color: matchView === 'upcoming' ? '#f59e0b' : 'var(--text-secondary)'
@@ -371,7 +371,7 @@ export default function TournamentDetailPage({ params }) {
                 <button
                   onClick={() => setMatchView('finished')}
                   style={{
-                    padding: '7px 16px', fontSize: 12, fontWeight: 700, borderRadius: 16, border: 'none',
+                    padding: '7px 16px', fontSize: 10, fontWeight: 700, borderRadius: 16, border: 'none',
                     cursor: 'pointer', transition: 'all 0.2s',
                     background: matchView === 'finished' ? 'rgba(245, 158, 11, 0.25)' : 'transparent',
                     color: matchView === 'finished' ? '#f59e0b' : 'var(--text-secondary)'
@@ -397,7 +397,7 @@ export default function TournamentDetailPage({ params }) {
             {/* Time period header */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '20px 0', position: 'relative' }}>
               <div style={{ height: 1, background: 'var(--border-light)', width: '100%' }} />
-              <div style={{ position: 'absolute', padding: '0 16px', background: 'var(--bg-app)', color: 'var(--text-secondary)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <div style={{ position: 'absolute', padding: '0 16px', background: 'var(--bg-app)', color: 'var(--text-secondary)', fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Mei 2026
               </div>
             </div>
@@ -440,16 +440,16 @@ export default function TournamentDetailPage({ params }) {
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, width: '100%' }}>
                             {isLive ? (
-                              <div style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', fontSize: 10, fontWeight: 800, padding: '4px 12px', borderRadius: 20, display: 'flex', alignItems: 'center', gap: 6, letterSpacing: '0.05em', animation: 'pulseGlow 2s infinite' }}>
+                              <div style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', fontSize: 9, fontWeight: 800, padding: '4px 12px', borderRadius: 20, display: 'flex', alignItems: 'center', gap: 6, letterSpacing: '0.05em', animation: 'pulseGlow 2s infinite' }}>
                                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444' }}></span>
                                 LIVE
                               </div>
                             ) : isFinished ? (
-                              <div style={{ background: 'var(--border-light)', color: 'var(--text-secondary)', border: '1px solid var(--border)', fontSize: 10, fontWeight: 800, padding: '4px 12px', borderRadius: 20, letterSpacing: '0.05em' }}>
+                              <div style={{ background: 'var(--border-light)', color: 'var(--text-secondary)', border: '1px solid var(--border)', fontSize: 9, fontWeight: 800, padding: '4px 12px', borderRadius: 20, letterSpacing: '0.05em' }}>
                                 SELESAI
                               </div>
                             ) : (
-                              <div style={{ background: 'rgba(245, 158, 11, 0.08)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.15)', fontSize: 11, fontWeight: 800, padding: '4px 12px', borderRadius: 20, letterSpacing: '0.05em' }}>
+                              <div style={{ background: 'rgba(245, 158, 11, 0.08)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.15)', fontSize: 9, fontWeight: 800, padding: '4px 12px', borderRadius: 20, letterSpacing: '0.05em' }}>
                                 {time}
                               </div>
                             )}
@@ -460,7 +460,7 @@ export default function TournamentDetailPage({ params }) {
                               <div style={{ width: 56, height: 56, position: 'relative', marginBottom: 12 }}>
                                 <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.05))' }} alt="" />
                               </div>
-                              <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', textAlign: 'center', lineHeight: 1.3 }}>{m.home_team?.name}</span>
+                              <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-primary)', textAlign: 'center', lineHeight: 1.3 }}>{m.home_team?.name}</span>
                             </div>
 
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -476,12 +476,12 @@ export default function TournamentDetailPage({ params }) {
                               }}>
                                 {hasScore ? (
                                   <>
-                                    <span style={{ fontSize: 24, fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1 }}>{m.home_score}</span>
-                                    <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-muted)' }}>-</span>
-                                    <span style={{ fontSize: 24, fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1 }}>{m.away_score}</span>
+                                    <span style={{ fontSize: 20, fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1 }}>{m.home_score}</span>
+                                    <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-muted)' }}>-</span>
+                                    <span style={{ fontSize: 20, fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1 }}>{m.away_score}</span>
                                   </>
                                 ) : (
-                                  <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-secondary)', letterSpacing: '0.1em' }}>VS</span>
+                                  <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-secondary)', letterSpacing: '0.1em' }}>VS</span>
                                 )}
                               </div>
                             </div>
@@ -490,7 +490,7 @@ export default function TournamentDetailPage({ params }) {
                               <div style={{ width: 56, height: 56, position: 'relative', marginBottom: 12 }}>
                                 <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name)} style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.05))' }} alt="" />
                               </div>
-                              <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', textAlign: 'center', lineHeight: 1.3 }}>{m.away_team?.name}</span>
+                              <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-primary)', textAlign: 'center', lineHeight: 1.3 }}>{m.away_team?.name}</span>
                             </div>
                           </div>
                         </div>
@@ -516,14 +516,14 @@ export default function TournamentDetailPage({ params }) {
                       className="hover-card"
                     >
                       {/* Left Side: Date / Time Column */}
-                      <div style={{ width: 64, flexShrink: 0, fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>
+                      <div style={{ width: 64, flexShrink: 0, fontSize: 11, color: 'var(--text-secondary)', fontWeight: 600 }}>
                         {dateShort}
                       </div>
 
                       {/* Center Teams Horizontal Display */}
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, gap: 16 }}>
                         <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'flex-end' }}>
-                          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', textAlign: 'right' }}>{m.home_team?.name}</span>
+                          <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-primary)', textAlign: 'right' }}>{m.home_team?.name}</span>
                           <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} style={{ width: 20, height: 20, borderRadius: '50%' }} alt="" />
                         </div>
 
@@ -531,7 +531,7 @@ export default function TournamentDetailPage({ params }) {
                         <div 
                           style={{ 
                             padding: '4px 10px', borderRadius: 10, background: 'rgba(0,0,0,0.04)', 
-                            border: '1px solid var(--border-light)', fontSize: 11, fontWeight: 800, minWidth: 54, textAlign: 'center',
+                            border: '1px solid var(--border-light)', fontSize: 9, fontWeight: 800, minWidth: 54, textAlign: 'center',
                             color: hasScore ? '#f59e0b' : 'var(--text-secondary)'
                           }}
                         >
@@ -540,7 +540,7 @@ export default function TournamentDetailPage({ params }) {
 
                         <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'flex-start' }}>
                           <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name)} style={{ width: 20, height: 20, borderRadius: '50%' }} alt="" />
-                          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>{m.away_team?.name}</span>
+                          <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-primary)' }}>{m.away_team?.name}</span>
                         </div>
                       </div>
 
@@ -555,7 +555,7 @@ export default function TournamentDetailPage({ params }) {
             ) : (
               <div style={{ padding: '32px 0', textAlign: 'center', color: 'var(--text-secondary)' }}>
                 <Calendar size={32} style={{ margin: '0 auto 10px', opacity: 0.3 }} />
-                <p style={{ fontSize: 13 }}>Belum ada pertandingan.</p>
+                <p style={{ fontSize: 11 }}>Belum ada pertandingan.</p>
               </div>
             )}
           </div>
@@ -579,7 +579,7 @@ export default function TournamentDetailPage({ params }) {
                     <Award size={16} />
                   </div>
                   <div>
-                    <h3 style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em', margin: 0 }}>Pencetak Gol Terbanyak</h3>
+                    <h3 style={{ fontSize: 12, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em', margin: 0 }}>Pencetak Gol Terbanyak</h3>
                   </div>
                 </div>
               </div>
@@ -600,11 +600,11 @@ export default function TournamentDetailPage({ params }) {
                           >
                             <div style={{ position: 'relative' }}>
                               <img src={getImageUrl(top3[1].player?.photo_path) || avatar(top3[1].player?.name)} style={{ width: 56, height: 56, borderRadius: '50%', border: '3px solid var(--border)', objectFit: 'cover', boxShadow: '0 4px 8px rgba(0,0,0,0.05)', background: 'var(--bg-card)' }} alt="" />
-                              <div style={{ position: 'absolute', bottom: -4, right: -4, width: 20, height: 20, borderRadius: '50%', background: '#cbd5e1', color: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 900, border: '2px solid #0f172a' }}>2</div>
+                              <div style={{ position: 'absolute', bottom: -4, right: -4, width: 20, height: 20, borderRadius: '50%', background: '#cbd5e1', color: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 900, border: '2px solid #0f172a' }}>2</div>
                             </div>
-                            <div style={{ marginTop: 12, fontSize: 12, fontWeight: 800, color: 'var(--text-primary)', textAlign: 'center', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{top3[1].player?.name}</div>
-                            <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginBottom: 4, fontWeight: 600 }}>{top3[1].player?.team || '-'}</div>
-                            <div style={{ fontSize: 18, fontWeight: 900, color: '#cbd5e1', textShadow: '0 0 10px rgba(203, 213, 225, 0.3)' }}>{top3[1].goals}</div>
+                            <div style={{ marginTop: 12, fontSize: 10, fontWeight: 800, color: 'var(--text-primary)', textAlign: 'center', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{top3[1].player?.name}</div>
+                            <div style={{ fontSize: 9, color: 'var(--text-secondary)', marginBottom: 4, fontWeight: 600 }}>{top3[1].player?.team || '-'}</div>
+                            <div style={{ fontSize: 15, fontWeight: 900, color: '#cbd5e1', textShadow: '0 0 10px rgba(203, 213, 225, 0.3)' }}>{top3[1].goals}</div>
                             <div style={{ width: '100%', height: 40, background: 'linear-gradient(180deg, rgba(203, 213, 225, 0.1), transparent)', borderTopLeftRadius: 10, borderTopRightRadius: 10, marginTop: 10, borderTop: '1.5px solid rgba(203, 213, 225, 0.2)' }} />
                           </motion.div>
                         )}
@@ -615,13 +615,13 @@ export default function TournamentDetailPage({ params }) {
                             style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '35%', zIndex: 3 }}
                           >
                             <div style={{ position: 'relative' }}>
-                              <div style={{ position: 'absolute', top: -16, left: '50%', transform: 'translateX(-50%)', fontSize: 24, filter: 'drop-shadow(0 4px 8px rgba(234, 179, 8, 0.4))', zIndex: 10 }}>👑</div>
+                              <div style={{ position: 'absolute', top: -16, left: '50%', transform: 'translateX(-50%)', fontSize: 20, filter: 'drop-shadow(0 4px 8px rgba(234, 179, 8, 0.4))', zIndex: 10 }}>👑</div>
                               <img src={getImageUrl(top3[0].player?.photo_path) || avatar(top3[0].player?.name)} style={{ width: 72, height: 72, borderRadius: '50%', border: '4px solid #f59e0b', objectFit: 'cover', boxShadow: '0 8px 16px rgba(245, 158, 11, 0.2)', background: 'var(--bg-card)' }} alt="" />
-                              <div style={{ position: 'absolute', bottom: -4, right: -4, width: 28, height: 28, borderRadius: '50%', background: '#eab308', color: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 900, border: '3px solid #0f172a' }}>1</div>
+                              <div style={{ position: 'absolute', bottom: -4, right: -4, width: 28, height: 28, borderRadius: '50%', background: '#eab308', color: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 900, border: '3px solid #0f172a' }}>1</div>
                             </div>
-                            <div style={{ marginTop: 16, fontSize: 14, fontWeight: 900, color: 'var(--text-primary)', textAlign: 'center', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{top3[0].player?.name}</div>
-                            <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 600 }}>{top3[0].player?.team || '-'}</div>
-                            <div style={{ fontSize: 28, fontWeight: 900, color: '#eab308', textShadow: '0 0 20px rgba(234, 179, 8, 0.4)' }}>{top3[0].goals}</div>
+                            <div style={{ marginTop: 16, fontSize: 12, fontWeight: 900, color: 'var(--text-primary)', textAlign: 'center', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{top3[0].player?.name}</div>
+                            <div style={{ fontSize: 9, color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 600 }}>{top3[0].player?.team || '-'}</div>
+                            <div style={{ fontSize: 24, fontWeight: 900, color: '#eab308', textShadow: '0 0 20px rgba(234, 179, 8, 0.4)' }}>{top3[0].goals}</div>
                             <div style={{ width: '100%', height: 60, background: 'linear-gradient(180deg, rgba(234, 179, 8, 0.15), transparent)', borderTopLeftRadius: 12, borderTopRightRadius: 12, marginTop: 12, borderTop: '2.5px solid rgba(234, 179, 8, 0.3)' }} />
                           </motion.div>
                         )}
@@ -633,11 +633,11 @@ export default function TournamentDetailPage({ params }) {
                           >
                             <div style={{ position: 'relative' }}>
                               <img src={getImageUrl(top3[2].player?.photo_path) || avatar(top3[2].player?.name)} style={{ width: 48, height: 48, borderRadius: '50%', border: '3px solid #d97706', objectFit: 'cover', boxShadow: '0 4px 8px rgba(0,0,0,0.05)', background: 'var(--bg-card)' }} alt="" />
-                              <div style={{ position: 'absolute', bottom: -3, right: -3, width: 18, height: 18, borderRadius: '50%', background: '#b45309', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 900, border: '2px solid #0f172a' }}>3</div>
+                              <div style={{ position: 'absolute', bottom: -3, right: -3, width: 18, height: 18, borderRadius: '50%', background: '#b45309', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 900, border: '2px solid #0f172a' }}>3</div>
                             </div>
-                            <div style={{ marginTop: 10, fontSize: 11, fontWeight: 800, color: 'var(--text-primary)', textAlign: 'center', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{top3[2].player?.name}</div>
+                            <div style={{ marginTop: 10, fontSize: 9, fontWeight: 800, color: 'var(--text-primary)', textAlign: 'center', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{top3[2].player?.name}</div>
                             <div style={{ fontSize: 9, color: 'var(--text-secondary)', marginBottom: 4, fontWeight: 600 }}>{top3[2].player?.team || '-'}</div>
-                            <div style={{ fontSize: 16, fontWeight: 900, color: '#b45309', textShadow: '0 0 10px rgba(180, 83, 9, 0.3)' }}>{top3[2].goals}</div>
+                            <div style={{ fontSize: 14, fontWeight: 900, color: '#b45309', textShadow: '0 0 10px rgba(180, 83, 9, 0.3)' }}>{top3[2].goals}</div>
                             <div style={{ width: '100%', height: 30, background: 'linear-gradient(180deg, rgba(180, 83, 9, 0.1), transparent)', borderTopLeftRadius: 8, borderTopRightRadius: 8, marginTop: 8, borderTop: '1px solid rgba(180, 83, 9, 0.2)' }} />
                           </motion.div>
                         )}
@@ -652,16 +652,16 @@ export default function TournamentDetailPage({ params }) {
                             const pct = (item.goals / maxGoals) * 100;
                             return (
                               <div key={idx} style={{ display: 'flex', alignItems: 'center', padding: '16px 0', borderBottom: idx < rest.length - 1 ? '1px dashed var(--border-light)' : 'none' }}>
-                                <div style={{ width: 28, fontSize: 13, fontWeight: 800, color: 'var(--text-secondary)', textAlign: 'center' }}>{realRank}</div>
+                                <div style={{ width: 28, fontSize: 11, fontWeight: 800, color: 'var(--text-secondary)', textAlign: 'center' }}>{realRank}</div>
                                 <div style={{ margin: '0 16px 0 8px' }}>
                                   <img src={getImageUrl(item.player?.photo_path) || avatar(item.player?.name)} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }} alt="" />
                                 </div>
                                 <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.player?.name}</div>
-                                  <div style={{ fontSize: 11, color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.player?.team || '-'}</div>
+                                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.player?.name}</div>
+                                  <div style={{ fontSize: 9, color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.player?.team || '-'}</div>
                                 </div>
                                 <div style={{ width: '25%', minWidth: 80, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
-                                  <div style={{ fontSize: 16, fontWeight: 900, color: '#f59e0b' }}>{item.goals}</div>
+                                  <div style={{ fontSize: 14, fontWeight: 900, color: '#f59e0b' }}>{item.goals}</div>
                                   <div style={{ width: '100%', height: 4, background: 'var(--border)', borderRadius: 4, overflow: 'hidden' }}>
                                     <div style={{ width: `${pct}%`, height: '100%', background: 'linear-gradient(90deg, #f59e0b, #fbbf24)', borderRadius: 4 }} />
                                   </div>
@@ -673,7 +673,7 @@ export default function TournamentDetailPage({ params }) {
                       )}
                     </>
                   );
-                })() : <div style={{ fontSize: 13, color: 'var(--text-secondary)', padding: '24px 0', textAlign: 'center' }}>Belum ada data gol.</div>}
+                })() : <div style={{ fontSize: 11, color: 'var(--text-secondary)', padding: '24px 0', textAlign: 'center' }}>Belum ada data gol.</div>}
               </div>
             </div>
 
@@ -687,8 +687,8 @@ export default function TournamentDetailPage({ params }) {
                     <Shield size={22} />
                   </div>
                   <div>
-                    <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em', margin: 0 }}>Tanpa Kebobolan</h3>
-                    <div style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 600, marginTop: 2 }}>Statistik Kiper Terbaik</div>
+                    <h3 style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em', margin: 0 }}>Tanpa Kebobolan</h3>
+                    <div style={{ fontSize: 10, color: 'var(--text-secondary)', fontWeight: 600, marginTop: 2 }}>Statistik Kiper Terbaik</div>
                   </div>
                 </div>
               </div>
@@ -709,11 +709,11 @@ export default function TournamentDetailPage({ params }) {
                           >
                             <div style={{ position: 'relative' }}>
                               <img src={getImageUrl(top3[1].player?.photo_path) || avatar(top3[1].player?.name)} style={{ width: 72, height: 72, borderRadius: '50%', border: '4px solid var(--border)', objectFit: 'cover', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', background: 'var(--bg-card)' }} alt="" />
-                              <div style={{ position: 'absolute', bottom: -5, right: -5, width: 28, height: 28, borderRadius: '50%', background: '#cbd5e1', color: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 900, border: '3px solid #0f172a' }}>2</div>
+                              <div style={{ position: 'absolute', bottom: -5, right: -5, width: 28, height: 28, borderRadius: '50%', background: '#cbd5e1', color: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 900, border: '3px solid #0f172a' }}>2</div>
                             </div>
-                            <div style={{ marginTop: 16, fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', textAlign: 'center', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{top3[1].player?.name}</div>
-                            <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 600 }}>{top3[1].player?.team || '-'}</div>
-                            <div style={{ fontSize: 24, fontWeight: 900, color: '#cbd5e1', textShadow: '0 0 10px rgba(203, 213, 225, 0.3)' }}>{top3[1].clean_sheets}</div>
+                            <div style={{ marginTop: 16, fontSize: 11, fontWeight: 800, color: 'var(--text-primary)', textAlign: 'center', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{top3[1].player?.name}</div>
+                            <div style={{ fontSize: 9, color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 600 }}>{top3[1].player?.team || '-'}</div>
+                            <div style={{ fontSize: 20, fontWeight: 900, color: '#cbd5e1', textShadow: '0 0 10px rgba(203, 213, 225, 0.3)' }}>{top3[1].clean_sheets}</div>
                             <div style={{ width: '100%', height: 60, background: 'linear-gradient(180deg, rgba(203, 213, 225, 0.1), transparent)', borderTopLeftRadius: 12, borderTopRightRadius: 12, marginTop: 12, borderTop: '2px solid rgba(203, 213, 225, 0.2)' }} />
                           </motion.div>
                         )}
@@ -724,13 +724,13 @@ export default function TournamentDetailPage({ params }) {
                             style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '35%', zIndex: 3 }}
                           >
                             <div style={{ position: 'relative' }}>
-                              <div style={{ position: 'absolute', top: -20, left: '50%', transform: 'translateX(-50%)', fontSize: 32, filter: 'drop-shadow(0 4px 8px rgba(234, 179, 8, 0.4))', zIndex: 10 }}>👑</div>
+                              <div style={{ position: 'absolute', top: -20, left: '50%', transform: 'translateX(-50%)', fontSize: 27, filter: 'drop-shadow(0 4px 8px rgba(234, 179, 8, 0.4))', zIndex: 10 }}>👑</div>
                               <img src={getImageUrl(top3[0].player?.photo_path) || avatar(top3[0].player?.name)} style={{ width: 96, height: 96, borderRadius: '50%', border: '5px solid #f59e0b', objectFit: 'cover', boxShadow: '0 8px 16px rgba(245, 158, 11, 0.2)', background: 'var(--bg-card)' }} alt="" />
-                              <div style={{ position: 'absolute', bottom: -5, right: -5, width: 36, height: 36, borderRadius: '50%', background: '#eab308', color: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 900, border: '4px solid #0f172a' }}>1</div>
+                              <div style={{ position: 'absolute', bottom: -5, right: -5, width: 36, height: 36, borderRadius: '50%', background: '#eab308', color: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 900, border: '4px solid #0f172a' }}>1</div>
                             </div>
-                            <div style={{ marginTop: 20, fontSize: 15, fontWeight: 900, color: 'var(--text-primary)', textAlign: 'center', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{top3[0].player?.name}</div>
-                            <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 8, fontWeight: 600 }}>{top3[0].player?.team || '-'}</div>
-                            <div style={{ fontSize: 36, fontWeight: 900, color: '#eab308', textShadow: '0 0 20px rgba(234, 179, 8, 0.4)' }}>{top3[0].clean_sheets}</div>
+                            <div style={{ marginTop: 20, fontSize: 13, fontWeight: 900, color: 'var(--text-primary)', textAlign: 'center', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{top3[0].player?.name}</div>
+                            <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginBottom: 8, fontWeight: 600 }}>{top3[0].player?.team || '-'}</div>
+                            <div style={{ fontSize: 31, fontWeight: 900, color: '#eab308', textShadow: '0 0 20px rgba(234, 179, 8, 0.4)' }}>{top3[0].clean_sheets}</div>
                             <div style={{ width: '100%', height: 90, background: 'linear-gradient(180deg, rgba(234, 179, 8, 0.15), transparent)', borderTopLeftRadius: 16, borderTopRightRadius: 16, marginTop: 12, borderTop: '3px solid rgba(234, 179, 8, 0.3)' }} />
                           </motion.div>
                         )}
@@ -742,11 +742,11 @@ export default function TournamentDetailPage({ params }) {
                           >
                             <div style={{ position: 'relative' }}>
                               <img src={getImageUrl(top3[2].player?.photo_path) || avatar(top3[2].player?.name)} style={{ width: 64, height: 64, borderRadius: '50%', border: '4px solid #d97706', objectFit: 'cover', boxShadow: '0 4px 8px rgba(0,0,0,0.05)', background: 'var(--bg-card)' }} alt="" />
-                              <div style={{ position: 'absolute', bottom: -5, right: -5, width: 28, height: 28, borderRadius: '50%', background: '#b45309', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 900, border: '3px solid #0f172a' }}>3</div>
+                              <div style={{ position: 'absolute', bottom: -5, right: -5, width: 28, height: 28, borderRadius: '50%', background: '#b45309', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 900, border: '3px solid #0f172a' }}>3</div>
                             </div>
-                            <div style={{ marginTop: 16, fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', textAlign: 'center', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{top3[2].player?.name}</div>
-                            <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 600 }}>{top3[2].player?.team || '-'}</div>
-                            <div style={{ fontSize: 24, fontWeight: 900, color: '#b45309', textShadow: '0 0 10px rgba(180, 83, 9, 0.3)' }}>{top3[2].clean_sheets}</div>
+                            <div style={{ marginTop: 16, fontSize: 11, fontWeight: 800, color: 'var(--text-primary)', textAlign: 'center', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{top3[2].player?.name}</div>
+                            <div style={{ fontSize: 9, color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 600 }}>{top3[2].player?.team || '-'}</div>
+                            <div style={{ fontSize: 20, fontWeight: 900, color: '#b45309', textShadow: '0 0 10px rgba(180, 83, 9, 0.3)' }}>{top3[2].clean_sheets}</div>
                             <div style={{ width: '100%', height: 40, background: 'linear-gradient(180deg, rgba(180, 83, 9, 0.1), transparent)', borderTopLeftRadius: 12, borderTopRightRadius: 12, marginTop: 12, borderTop: '2px solid rgba(180, 83, 9, 0.2)' }} />
                           </motion.div>
                         )}
@@ -761,16 +761,16 @@ export default function TournamentDetailPage({ params }) {
                             const pct = (item.clean_sheets / maxCS) * 100;
                             return (
                               <div key={idx} style={{ display: 'flex', alignItems: 'center', padding: '16px 0', borderBottom: idx < rest.length - 1 ? '1px dashed var(--border-light)' : 'none' }}>
-                                <div style={{ width: 28, fontSize: 13, fontWeight: 800, color: 'var(--text-secondary)', textAlign: 'center' }}>{realRank}</div>
+                                <div style={{ width: 28, fontSize: 11, fontWeight: 800, color: 'var(--text-secondary)', textAlign: 'center' }}>{realRank}</div>
                                 <div style={{ margin: '0 16px 0 8px' }}>
                                   <img src={getImageUrl(item.player?.photo_path) || avatar(item.player?.name)} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }} alt="" />
                                 </div>
                                 <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.player?.name}</div>
-                                  <div style={{ fontSize: 11, color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.player?.team || '-'}</div>
+                                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.player?.name}</div>
+                                  <div style={{ fontSize: 9, color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.player?.team || '-'}</div>
                                 </div>
                                 <div style={{ width: '25%', minWidth: 80, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
-                                  <div style={{ fontSize: 16, fontWeight: 900, color: '#10b981' }}>{item.clean_sheets}</div>
+                                  <div style={{ fontSize: 14, fontWeight: 900, color: '#10b981' }}>{item.clean_sheets}</div>
                                   <div style={{ width: '100%', height: 4, background: 'var(--border)', borderRadius: 4, overflow: 'hidden' }}>
                                     <div style={{ width: `${pct}%`, height: '100%', background: 'linear-gradient(90deg, #10b981, #34d399)', borderRadius: 4 }} />
                                   </div>
@@ -782,7 +782,7 @@ export default function TournamentDetailPage({ params }) {
                       )}
                     </>
                   );
-                })() : <div style={{ fontSize: 13, color: 'var(--text-secondary)', padding: '24px 0', textAlign: 'center' }}>Belum ada data kiper.</div>}
+                })() : <div style={{ fontSize: 11, color: 'var(--text-secondary)', padding: '24px 0', textAlign: 'center' }}>Belum ada data kiper.</div>}
               </div>
             </div>
           </div>
@@ -821,8 +821,8 @@ export default function TournamentDetailPage({ params }) {
                       <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(245, 158, 11, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fbbf24', marginBottom: 12, border: '1px solid rgba(245, 158, 11, 0.15)' }}>
                         <Calendar size={20} strokeWidth={2.5} />
                       </div>
-                      <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 4, letterSpacing: '-0.02em' }}>{totalMatches}</div>
-                      <div style={{ fontSize: 11, color: 'var(--text-secondary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Laga Selesai</div>
+                      <div style={{ fontSize: 24, fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 4, letterSpacing: '-0.02em' }}>{totalMatches}</div>
+                      <div style={{ fontSize: 9, color: 'var(--text-secondary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Laga Selesai</div>
                     </div>
 
                     <div style={{ position: 'relative', background: 'var(--bg-subtle)', padding: '24px 16px', borderRadius: 20, border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', overflow: 'hidden' }}>
@@ -830,8 +830,8 @@ export default function TournamentDetailPage({ params }) {
                       <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(16, 185, 129, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#34d399', marginBottom: 12, border: '1px solid rgba(16, 185, 129, 0.15)' }}>
                         <Award size={20} strokeWidth={2.5} />
                       </div>
-                      <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 4, letterSpacing: '-0.02em' }}>{totalGoals}</div>
-                      <div style={{ fontSize: 11, color: 'var(--text-secondary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Total Gol</div>
+                      <div style={{ fontSize: 24, fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 4, letterSpacing: '-0.02em' }}>{totalGoals}</div>
+                      <div style={{ fontSize: 9, color: 'var(--text-secondary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Total Gol</div>
                     </div>
 
                     <div style={{ position: 'relative', background: 'var(--bg-subtle)', padding: '24px 16px', borderRadius: 20, border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', overflow: 'hidden' }}>
@@ -839,8 +839,8 @@ export default function TournamentDetailPage({ params }) {
                       <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(245, 158, 11, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fbbf24', marginBottom: 12, border: '1px solid rgba(245, 158, 11, 0.15)' }}>
                         <BarChart2 size={20} strokeWidth={2.5} />
                       </div>
-                      <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 4, letterSpacing: '-0.02em' }}>{avgGoals}</div>
-                      <div style={{ fontSize: 11, color: 'var(--text-secondary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Rata-rata Gol</div>
+                      <div style={{ fontSize: 24, fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 4, letterSpacing: '-0.02em' }}>{avgGoals}</div>
+                      <div style={{ fontSize: 9, color: 'var(--text-secondary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Rata-rata Gol</div>
                     </div>
                   </div>
 
@@ -851,7 +851,7 @@ export default function TournamentDetailPage({ params }) {
                       
                       <div style={{ padding: '24px 32px', background: 'var(--bg-subtle)', borderBottom: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', gap: 16 }}>
                         <Trophy size={20} color="#eab308" />
-                        <h3 style={{ fontSize: 16, fontWeight: 900, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>Kemenangan Terbesar</h3>
+                        <h3 style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>Kemenangan Terbesar</h3>
                       </div>
                       
                       <div style={{ padding: '56px 40px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 48, position: 'relative', zIndex: 1 }}>
@@ -859,21 +859,21 @@ export default function TournamentDetailPage({ params }) {
                           <div style={{ width: 100, height: 100, borderRadius: '50%', background: 'var(--bg-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, border: '1px solid var(--border)' }}>
                             <img src={getImageUrl(biggestWin.home_team?.logo_path) || avatar(biggestWin.home_team?.name)} style={{ width: '100%', height: '100%', objectFit: 'contain' }} alt="" />
                           </div>
-                          <span style={{ fontSize: 20, fontWeight: 900, color: 'var(--text-primary)' }}>{biggestWin.home_team?.name}</span>
+                          <span style={{ fontSize: 17, fontWeight: 900, color: 'var(--text-primary)' }}>{biggestWin.home_team?.name}</span>
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-                          <div style={{ background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.1))', border: '1px solid rgba(245, 158, 11, 0.3)', padding: '24px 48px', borderRadius: 24, fontSize: 56, fontWeight: 900, color: '#fbbf24', letterSpacing: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 15px 35px rgba(0,0,0,0.04)', textShadow: '0 0 20px rgba(96, 165, 250, 0.4)' }}>
+                          <div style={{ background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.1))', border: '1px solid rgba(245, 158, 11, 0.3)', padding: '24px 48px', borderRadius: 24, fontSize: 48, fontWeight: 900, color: '#fbbf24', letterSpacing: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 15px 35px rgba(0,0,0,0.04)', textShadow: '0 0 20px rgba(96, 165, 250, 0.4)' }}>
                             {biggestWin.home_score}-{biggestWin.away_score}
                           </div>
-                          <div style={{ background: 'var(--border-light)', padding: '6px 16px', borderRadius: 100, fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Skor Akhir</div>
+                          <div style={{ background: 'var(--border-light)', padding: '6px 16px', borderRadius: 100, fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Skor Akhir</div>
                         </div>
 
                         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
                           <div style={{ width: 100, height: 100, borderRadius: '50%', background: 'var(--bg-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, border: '1px solid var(--border)' }}>
                             <img src={getImageUrl(biggestWin.away_team?.logo_path) || avatar(biggestWin.away_team?.name)} style={{ width: '100%', height: '100%', objectFit: 'contain' }} alt="" />
                           </div>
-                          <span style={{ fontSize: 20, fontWeight: 900, color: 'var(--text-primary)' }}>{biggestWin.away_team?.name}</span>
+                          <span style={{ fontSize: 17, fontWeight: 900, color: 'var(--text-primary)' }}>{biggestWin.away_team?.name}</span>
                         </div>
                       </div>
                     </div>
@@ -889,19 +889,19 @@ export default function TournamentDetailPage({ params }) {
 
 {activeTab === 'info' && (
           <div className="animate-fade-in" style={{ padding: '0 4px' }}>
-            <h3 style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tentang Turnamen</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.6, marginBottom: 20 }}>
+            <h3 style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tentang Turnamen</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 11, lineHeight: 1.6, marginBottom: 20 }}>
               Turnamen <strong>{tournament.name}</strong> diselenggarakan resmi di Bojonegoro. Turnamen ini merupakan ajang bergengsi yang memfasilitasi persaingan sportif bagi tim-tim di daerah Bojonegoro.
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
               <div style={{ background: 'var(--bg-subtle)', padding: '16px', borderRadius: 16, border: '1px solid var(--border-light)' }}>
-                <span style={{ fontSize: 11, color: 'var(--text-secondary)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Olahraga</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}><Trophy size={14} color="#f59e0b" /> {tournament.sport?.name || 'Multi-Sport'}</span>
+                <span style={{ fontSize: 9, color: 'var(--text-secondary)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Olahraga</span>
+                <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}><Trophy size={14} color="#f59e0b" /> {tournament.sport?.name || 'Multi-Sport'}</span>
               </div>
               <div style={{ background: 'var(--bg-subtle)', padding: '16px', borderRadius: 16, border: '1px solid var(--border-light)' }}>
-                <span style={{ fontSize: 11, color: 'var(--text-secondary)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Status</span>
-                <span style={{ fontSize: 12, fontWeight: 800, color: '#10b981', display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(16, 185, 129, 0.1)', padding: '4px 10px', borderRadius: 8 }}>
+                <span style={{ fontSize: 9, color: 'var(--text-secondary)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Status</span>
+                <span style={{ fontSize: 10, fontWeight: 800, color: '#10b981', display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(16, 185, 129, 0.1)', padding: '4px 10px', borderRadius: 8 }}>
                   {tournament.status === 'upcoming' ? 'Akan Datang' : tournament.status === 'ongoing' ? 'Sedang Berlangsung' : 'Selesai'}
                 </span>
               </div>
@@ -922,7 +922,7 @@ function KlasemenTab({ standings, match, sport }) {
         <div className="empty-state-icon" style={{ width: 48, height: 48, borderRadius: 14 }}>
           <Trophy style={{ width: 20, height: 20, color: '#c7c7d1' }} />
         </div>
-        <p style={{ fontSize: 12, color: '#6b7280', fontWeight: 600 }}>Klasemen belum tersedia.</p>
+        <p style={{ fontSize: 10, color: '#6b7280', fontWeight: 600 }}>Klasemen belum tersedia.</p>
       </div>
     );
   }
@@ -935,7 +935,7 @@ function KlasemenTab({ standings, match, sport }) {
             <div key={i}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                 <div style={{ width: 4, height: 18, borderRadius: 2, background: '#f59e0b' }} />
-                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{g.group?.name}</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{g.group?.name}</span>
               </div>
               <StandingsTable rows={g.standings} match={match} sport={sport} />
             </div>
@@ -950,7 +950,7 @@ function KlasemenTab({ standings, match, sport }) {
 
 function StandingsTable({ rows = [], match, sport }) {
   if (!Array.isArray(rows) || rows.length === 0) {
-    return <div style={{ padding: '16px 0', textAlign: 'center', fontSize: 12, color: '#9ca3af' }}>Belum ada data klasemen.</div>;
+    return <div style={{ padding: '16px 0', textAlign: 'center', fontSize: 10, color: '#9ca3af' }}>Belum ada data klasemen.</div>;
   }
 
   const homeId = match?.home_team?.id;
@@ -1002,7 +1002,7 @@ function StandingsTable({ rows = [], match, sport }) {
       <div style={{
         display: 'flex', alignItems: 'center', padding: '12px 16px',
         background: 'var(--bg-subtle)', borderBottom: '1px solid var(--border-light)',
-        fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em',
+        fontSize: 9, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em',
         minWidth: 580,
       }}>
         <div style={{ width: 44, textAlign: 'left', paddingLeft: 4 }}>#</div>
@@ -1049,7 +1049,7 @@ function StandingsTable({ rows = [], match, sport }) {
                     width: 18, height: 18, borderRadius: 5,
                     background: pc.bg, border: `1px solid ${pc.border}`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 10, fontWeight: 800, color: pc.color,
+                    fontSize: 9, fontWeight: 800, color: pc.color,
                   }}>
                     {pos}
                   </div>
@@ -1071,7 +1071,7 @@ function StandingsTable({ rows = [], match, sport }) {
                     style={{ width: 18, height: 18, borderRadius: '50%', flexShrink: 0, objectFit: 'contain' }} alt=""
                   />
                   <span style={{
-                    fontSize: 11, fontWeight: isHighlighted ? 700 : 500,
+                    fontSize: 9, fontWeight: isHighlighted ? 700 : 500,
                     color: isHighlighted ? 'var(--text-primary)' : 'var(--text-primary)',
                     whiteSpace: 'nowrap',
                   }}>
@@ -1105,12 +1105,12 @@ function StandingsTable({ rows = [], match, sport }) {
                       width: 16, height: 16, borderRadius: '50%',
                       background: resultBg(f), border: `1.5px solid ${resultColor(f)}`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 8, fontWeight: 800, color: resultColor(f),
+                      fontSize: 9, fontWeight: 800, color: resultColor(f),
                     }}>
                       {f}
                     </div>
                   )) : (
-                    <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>-</span>
+                    <span style={{ fontSize: 9, color: 'var(--text-muted)' }}>-</span>
                   )}
                 </div>
               </motion.div>
@@ -1129,7 +1129,7 @@ function StatistikTab({ match }) {
   if (!stats || stats.possession_home === undefined) {
     return (
       <div className="empty-state" style={{ padding: '36px 16px' }}>
-        <p style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 600 }}>Statistik pertandingan belum tersedia.</p>
+        <p style={{ fontSize: 10, color: 'var(--text-secondary)', fontWeight: 600 }}>Statistik pertandingan belum tersedia.</p>
       </div>
     );
   }
@@ -1141,7 +1141,7 @@ function StatistikTab({ match }) {
     <div style={{
       width: 32, height: 32, borderRadius: '50%',
       border: `2px solid ${color}`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: 13, fontWeight: 800, color: color, flexShrink: 0,
+      fontSize: 11, fontWeight: 800, color: color, flexShrink: 0,
       background: `${color}15`,
     }}>
       {value}
@@ -1166,25 +1166,25 @@ function StatistikTab({ match }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0' }}>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
           {hWin ? (
-            <div style={{ background: '#1e3a8a', color: '#fff', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 14, minWidth: 32, textAlign: 'center' }}>
+            <div style={{ background: '#1e3a8a', color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 12px', borderRadius: 14, minWidth: 32, textAlign: 'center' }}>
               {hStr}
             </div>
           ) : (
-            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', padding: '4px 12px', minWidth: 32, textAlign: 'center' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-primary)', padding: '4px 12px', minWidth: 32, textAlign: 'center' }}>
               {hStr}
             </div>
           )}
         </div>
-        <div style={{ flex: 2, textAlign: 'center', fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)' }}>
+        <div style={{ flex: 2, textAlign: 'center', fontSize: 11, fontWeight: 500, color: 'var(--text-secondary)' }}>
           {label}
         </div>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
           {aWin ? (
-            <div style={{ background: '#d97706', color: '#fff', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 14, minWidth: 32, textAlign: 'center' }}>
+            <div style={{ background: '#d97706', color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 12px', borderRadius: 14, minWidth: 32, textAlign: 'center' }}>
               {aStr}
             </div>
           ) : (
-            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', padding: '4px 12px', minWidth: 32, textAlign: 'center' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-primary)', padding: '4px 12px', minWidth: 32, textAlign: 'center' }}>
               {aStr}
             </div>
           )}
@@ -1215,7 +1215,7 @@ function StatistikTab({ match }) {
             key={p.id}
             onClick={() => setPeriod(p.id)}
             style={{
-              flex: 1, padding: '8px 0', fontSize: 12, fontWeight: 700,
+              flex: 1, padding: '8px 0', fontSize: 10, fontWeight: 700,
               border: 'none', cursor: 'pointer', transition: 'all 0.2s ease',
               background: period === p.id ? '#f59e0b' : 'transparent',
               color: period === p.id ? '#fff' : 'var(--text-secondary)',
@@ -1228,18 +1228,18 @@ function StatistikTab({ match }) {
 
       {/* ── Penguasaan Bola ── */}
       <div style={{ padding: '16px 0', marginTop: 8 }}>
-        <div style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-primary)', fontWeight: 600, marginBottom: 16 }}>
+        <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-primary)', fontWeight: 600, marginBottom: 16 }}>
           Persentase Penguasaan Bola
         </div>
 
         <div style={{ display: 'flex', height: 36, borderRadius: 18, overflow: 'hidden' }}>
           {/* Home Bar */}
           <div style={{ flex: possHome, background: '#1e3a8a', display: 'flex', alignItems: 'center', padding: '0 16px' }}>
-            <span style={{ color: '#fff', fontWeight: 700, fontSize: 14 }}>{possHome}%</span>
+            <span style={{ color: '#fff', fontWeight: 700, fontSize: 12 }}>{possHome}%</span>
           </div>
           {/* Away Bar */}
           <div style={{ flex: possAway, background: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 16px' }}>
-            <span style={{ color: '#fff', fontWeight: 700, fontSize: 14 }}>{possAway}%</span>
+            <span style={{ color: '#fff', fontWeight: 700, fontSize: 12 }}>{possAway}%</span>
           </div>
         </div>
       </div>
@@ -1315,7 +1315,7 @@ function TeamBestStats({ data }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 32, marginTop: 40 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 0 }}>
         <div style={{ height: 1, flex: 1, background: 'linear-gradient(90deg, transparent, var(--border-light))' }} />
-        <h2 style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-secondary)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.2em', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <h2 style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-secondary)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.2em', display: 'flex', alignItems: 'center', gap: 8 }}>
           <Shield size={16} color="#f59e0b" />
           Tim Terbaik
         </h2>
@@ -1328,13 +1328,13 @@ function TeamBestStats({ data }) {
             <div style={{ width: 28, height: 28, borderRadius: 8, background: `${cat.color}10`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: cat.color, border: `1px solid ${cat.color}20` }}>
               {React.cloneElement(cat.icon, { size: 14 })}
             </div>
-            <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{cat.title}</span>
+            <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{cat.title}</span>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 16 }}>
             {cat.subStats.map((sub, sIdx) => (
               <div key={sIdx} style={{ background: 'var(--bg-subtle)', borderRadius: 16, border: '1px solid var(--border-light)', overflow: 'hidden' }}>
-                <div style={{ padding: '12px 16px', background: 'var(--bg-subtle)', borderBottom: '1px solid var(--border-light)', fontSize: 11, fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                <div style={{ padding: '12px 16px', background: 'var(--bg-subtle)', borderBottom: '1px solid var(--border-light)', fontSize: 9, fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   {sub.name}
                 </div>
                 <div style={{ padding: '4px 0' }}>
@@ -1344,16 +1344,16 @@ function TeamBestStats({ data }) {
                       whileHover={{ background: 'var(--bg-subtle)' }}
                       style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 16px', borderBottom: tIdx < data[sub.key].length - 1 ? '1px solid var(--bg-subtle)' : 'none' }}
                     >
-                      <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--bg-subtle)', fontSize: 10, fontWeight: 900, color: tIdx === 0 ? '#eab308' : tIdx === 1 ? 'var(--text-secondary)' : tIdx === 2 ? '#b45309' : 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--bg-subtle)', fontSize: 9, fontWeight: 900, color: tIdx === 0 ? '#eab308' : tIdx === 1 ? 'var(--text-secondary)' : tIdx === 2 ? '#b45309' : 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {tIdx + 1}
                       </div>
                       <div style={{ width: 28, height: 28, borderRadius: 6, background: 'var(--bg-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 4, border: '1px solid var(--border-light)' }}>
                         <img src={getImageUrl(item.team?.logo_path) || avatar(item.team?.name)} style={{ width: '100%', height: '100%', objectFit: 'contain' }} alt="" />
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.team?.name}</div>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.team?.name}</div>
                       </div>
-                      <div style={{ fontSize: 14, fontWeight: 900, color: tIdx === 0 ? cat.color : 'var(--text-primary)', opacity: tIdx === 0 ? 1 : 0.8 }}>
+                      <div style={{ fontSize: 12, fontWeight: 900, color: tIdx === 0 ? cat.color : 'var(--text-primary)', opacity: tIdx === 0 ? 1 : 0.8 }}>
                         {item.value}
                       </div>
                     </motion.div>

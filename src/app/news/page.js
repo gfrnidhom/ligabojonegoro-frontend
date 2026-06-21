@@ -72,7 +72,7 @@ export default function NewsPage() {
           >
             <ArrowLeft size={18} color="#0f172a" />
           </button>
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', margin: 0, letterSpacing: '-0.02em' }}>Berita</h1>
+          <h1 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', margin: 0, letterSpacing: '-0.02em' }}>Berita</h1>
         </div>
 
         {/* Categories */}
@@ -84,7 +84,7 @@ export default function NewsPage() {
               style={{
                 padding: '6px 16px',
                 borderRadius: 20,
-                fontSize: 14,
+                fontSize: 12,
                 fontWeight: 600,
                 whiteSpace: 'nowrap',
                 border: activeCategory === cat ? 'none' : '1px solid #e2e8f0',
@@ -103,7 +103,7 @@ export default function NewsPage() {
       {loading ? (
         <div style={{ padding: 40, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div className="loader"></div>
-          <p style={{ marginTop: 12, color: '#64748b', fontSize: 14, fontWeight: 500 }}>Memuat berita terbaru...</p>
+          <p style={{ marginTop: 12, color: '#64748b', fontSize: 12, fontWeight: 500 }}>Memuat berita terbaru...</p>
         </div>
       ) : news.length > 0 ? (
         <motion.div 
@@ -126,15 +126,15 @@ export default function NewsPage() {
                       onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
                       onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                     />
-                    <div style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(239, 68, 68, 0.9)', color: '#fff', padding: '4px 10px', borderRadius: 12, fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 4, backdropFilter: 'blur(4px)' }}>
+                    <div style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(239, 68, 68, 0.9)', color: '#fff', padding: '4px 10px', borderRadius: 12, fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 4, backdropFilter: 'blur(4px)' }}>
                       <Flame size={12} fill="currentColor" /> TRENDING
                     </div>
                   </div>
                   
-                  <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', lineHeight: 1.35, margin: '0 0 12px 0', letterSpacing: '-0.02em' }}>
+                  <h2 style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', lineHeight: 1.35, margin: '0 0 12px 0', letterSpacing: '-0.02em' }}>
                     {item.title}
                   </h2>
-                  <div style={{ display: 'flex', alignItems: 'center', fontSize: 13, color: '#64748b', fontWeight: 600 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', fontSize: 11, color: '#64748b', fontWeight: 600 }}>
                     <span style={{ color: '#3b82f6' }}>{source}</span>
                     <span style={{ margin: '0 6px' }}>•</span>
                     <span>{formatTimeAgo(item.published_at || item.created_at)}</span>
@@ -155,13 +155,13 @@ export default function NewsPage() {
                   />
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#3b82f6', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: '#3b82f6', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     {item.category || 'Berita'}
                   </div>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', lineHeight: 1.4, margin: '0 0 8px 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', letterSpacing: '-0.01em' }}>
+                  <h3 style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', lineHeight: 1.4, margin: '0 0 8px 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', letterSpacing: '-0.01em' }}>
                     {item.title}
                   </h3>
-                  <div style={{ display: 'flex', alignItems: 'center', fontSize: 12, color: '#94a3b8', fontWeight: 500 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', fontSize: 10, color: '#94a3b8', fontWeight: 500 }}>
                     <TrendingUp size={12} style={{ marginRight: 4 }} />
                     {formatTimeAgo(item.published_at || item.created_at)}
                   </div>
@@ -175,8 +175,8 @@ export default function NewsPage() {
           <div style={{ width: 64, height: 64, background: '#f1f5f9', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
              <TrendingUp size={28} color="#94a3b8" />
           </div>
-          <p style={{ fontSize: 16, fontWeight: 600, color: '#0f172a', margin: '0 0 8px 0' }}>Belum ada berita</p>
-          <p style={{ fontSize: 14, margin: 0 }}>Kembali lagi nanti untuk informasi terbaru.</p>
+          <p style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', margin: '0 0 8px 0' }}>Belum ada berita</p>
+          <p style={{ fontSize: 12, margin: 0 }}>Kembali lagi nanti untuk informasi terbaru.</p>
         </div>
       )}
 

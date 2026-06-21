@@ -61,8 +61,8 @@ export default function PlayersPage() {
       }}>
         <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, background: 'radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)' }} />
         <Users size={40} style={{ color: '#3b82f6', marginBottom: 12 }} />
-        <h1 style={{ fontSize: 28, fontWeight: 800, color: '#f1f5f9', marginBottom: 6 }}>Daftar Pemain</h1>
-        <p style={{ fontSize: 14, color: '#94a3b8', maxWidth: 600 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 800, color: '#f1f5f9', marginBottom: 6 }}>Daftar Pemain</h1>
+        <p style={{ fontSize: 12, color: '#94a3b8', maxWidth: 600 }}>
           Temukan profil, statistik, dan informasi lengkap seluruh pemain yang terdaftar di Liga Bojonegoro.
         </p>
       </div>
@@ -83,7 +83,7 @@ export default function PlayersPage() {
             style={{
               width: '100%', padding: '11px 14px 11px 40px',
               background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
-              borderRadius: 12, color: '#f1f5f9', fontSize: 13, fontWeight: 500,
+              borderRadius: 12, color: '#f1f5f9', fontSize: 11, fontWeight: 500,
               outline: 'none', fontFamily: 'inherit',
             }}
           />
@@ -94,7 +94,7 @@ export default function PlayersPage() {
           style={{
             padding: '11px 16px', background: 'rgba(255,255,255,0.04)',
             border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12,
-            color: '#f1f5f9', fontSize: 13, fontWeight: 500, outline: 'none',
+            color: '#f1f5f9', fontSize: 11, fontWeight: 500, outline: 'none',
             fontFamily: 'inherit', minWidth: 180, cursor: 'pointer',
           }}
         >
@@ -107,7 +107,7 @@ export default function PlayersPage() {
           style={{
             padding: '11px 16px', background: 'rgba(255,255,255,0.04)',
             border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12,
-            color: '#f1f5f9', fontSize: 13, fontWeight: 500, outline: 'none',
+            color: '#f1f5f9', fontSize: 11, fontWeight: 500, outline: 'none',
             fontFamily: 'inherit', minWidth: 160, cursor: 'pointer',
           }}
         >
@@ -117,7 +117,7 @@ export default function PlayersPage() {
       </div>
 
       {/* Results count */}
-      <div style={{ fontSize: 13, color: '#64748b', fontWeight: 600, marginBottom: 16 }}>
+      <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600, marginBottom: 16 }}>
         {filtered.length} pemain ditemukan
       </div>
 
@@ -125,7 +125,7 @@ export default function PlayersPage() {
       {loading ? (
         <div style={{ minHeight: 300, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <div className="loader"></div>
-          <p style={{ marginTop: 14, color: '#9ca3af', fontSize: 13, fontWeight: 500 }}>Memuat data pemain...</p>
+          <p style={{ marginTop: 14, color: '#9ca3af', fontSize: 11, fontWeight: 500 }}>Memuat data pemain...</p>
         </div>
       ) : filtered.length > 0 ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 16 }}>
@@ -163,7 +163,7 @@ export default function PlayersPage() {
                         position: 'absolute', bottom: -4, right: -4,
                         background: '#0f172a', border: '2px solid rgba(255,255,255,0.1)',
                         borderRadius: 8, padding: '1px 6px',
-                        fontSize: 11, fontWeight: 800, color: '#f1f5f9',
+                        fontSize: 9, fontWeight: 800, color: '#f1f5f9',
                       }}>
                         {player.jersey_number}
                       </div>
@@ -172,12 +172,12 @@ export default function PlayersPage() {
 
                   {/* Info */}
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <h3 style={{ fontSize: 15, fontWeight: 700, color: '#f1f5f9', marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <h3 style={{ fontSize: 13, fontWeight: 700, color: '#f1f5f9', marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {player.name}
                     </h3>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       {player.team && (
-                        <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 500 }}>
+                        <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 500 }}>
                           {player.team.name}
                         </span>
                       )}
@@ -189,7 +189,7 @@ export default function PlayersPage() {
                     <div style={{
                       padding: '4px 10px', borderRadius: 8,
                       background: `${posColor}15`, border: `1px solid ${posColor}30`,
-                      fontSize: 11, fontWeight: 700, color: posColor,
+                      fontSize: 9, fontWeight: 700, color: posColor,
                       flexShrink: 0,
                     }}>
                       {posLabels[player.position] || player.position}
@@ -203,8 +203,8 @@ export default function PlayersPage() {
       ) : (
         <div style={{ padding: '48px 0', textAlign: 'center', color: '#64748b' }}>
           <Users size={40} style={{ margin: '0 auto 12px', opacity: 0.2 }} />
-          <p style={{ fontSize: 14, fontWeight: 600 }}>Tidak ada pemain ditemukan.</p>
-          <p style={{ fontSize: 12, marginTop: 4 }}>Coba ubah filter pencarian Anda.</p>
+          <p style={{ fontSize: 12, fontWeight: 600 }}>Tidak ada pemain ditemukan.</p>
+          <p style={{ fontSize: 10, marginTop: 4 }}>Coba ubah filter pencarian Anda.</p>
         </div>
       )}
 

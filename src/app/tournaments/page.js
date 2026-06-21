@@ -118,7 +118,7 @@ export default function TournamentsPage() {
         boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
       }}>
         {status === 'ongoing' && <div style={{ width: 6, height: 6, borderRadius: '50%', background: config.color }} className="animate-pulse" />}
-        <span style={{ fontSize: 10, fontWeight: 800, color: config.color, letterSpacing: '0.05em' }}>{config.label}</span>
+        <span style={{ fontSize: 9, fontWeight: 800, color: config.color, letterSpacing: '0.05em' }}>{config.label}</span>
       </div>
     );
   };
@@ -131,7 +131,7 @@ export default function TournamentsPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 100, background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', marginBottom: 20 }}>
             <Zap size={12} color={COLORS.primary} />
-            <span style={{ fontSize: 10, fontWeight: 700, color: COLORS.primary, letterSpacing: '0.1em' }}>KOMPETISI RESMI 2026</span>
+            <span style={{ fontSize: 9, fontWeight: 700, color: COLORS.primary, letterSpacing: '0.1em' }}>KOMPETISI RESMI 2026</span>
           </div>
           <h1 className="main-title" style={{ fontWeight: 900, marginBottom: 16, letterSpacing: '-0.02em', color: '#0f172a' }}>Jelajah Turnamen</h1>
           <p className="sub-title" style={{ maxWidth: 600, margin: '0 auto', color: COLORS.textSecondary, lineHeight: 1.6 }}>Temukan panggung kompetisi terbaik di Kabupaten Bojonegoro.</p>
@@ -152,7 +152,7 @@ export default function TournamentsPage() {
               style={{
                 width: '100%', height: 44, background: '#ffffff', 
                 border: `1px solid ${COLORS.border}`, borderRadius: 14,
-                padding: '0 48px', color: '#0f172a', fontSize: 14, outline: 'none',
+                padding: '0 48px', color: '#0f172a', fontSize: 12, outline: 'none',
                 boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
               }}
             />
@@ -164,7 +164,7 @@ export default function TournamentsPage() {
                 key={f}
                 onClick={() => setActiveFilter(f)}
                 style={{
-                  padding: '8px 16px', borderRadius: 12, fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap',
+                  padding: '8px 16px', borderRadius: 12, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap',
                   background: activeFilter === f ? COLORS.primary : '#ffffff',
                   color: activeFilter === f ? '#fff' : COLORS.textSecondary,
                   border: `1px solid ${activeFilter === f ? COLORS.primary : COLORS.border}`,
@@ -284,15 +284,15 @@ export default function TournamentsPage() {
         .card-status-badge { position: absolute; top: 16px; left: 16px; }
         .card-content { padding: 24px; flex: 1; display: flex; flex-direction: column; }
         .card-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .sport-tag { background: rgba(59,130,246,0.1); color: ${COLORS.primary}; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; }
-        .teams-count { font-size: 11px; font-weight: 600; color: ${COLORS.textSecondary}; display: flex; align-items: center; gap: 4px; }
-        .card-title { font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 16px; line-height: 1.3; }
+        .sport-tag { background: rgba(59,130,246,0.1); color: ${COLORS.primary}; padding: 4px 8px; border-radius: 6px; font-size: 9px; font-weight: 800; }
+        .teams-count { font-size: 9px; font-weight: 600; color: ${COLORS.textSecondary}; display: flex; align-items: center; gap: 4px; }
+        .card-title { font-size: 17px; font-weight: 800; color: #0f172a; margin-bottom: 16px; line-height: 1.3; }
         .card-details { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
-        .detail-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: ${COLORS.textSecondary}; font-weight: 500; }
+        .detail-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: ${COLORS.textSecondary}; font-weight: 500; }
         .card-footer { margin-top: auto; display: flex; align-items: center; justify-content: space-between; padding-top: 16px; border-top: 1px solid ${COLORS.border}; }
         .organizer { display: flex; align-items: center; gap: 10px; }
         .organizer img { width: 28px; height: 28px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(0,0,0,0.05); }
-        .organizer span { font-size: 12px; font-weight: 700; color: #334155; }
+        .organizer span { font-size: 10px; font-weight: 700; color: #334155; }
         .arrow-icon { width: 36px; height: 36px; border-radius: 12px; background: #f8fafc; border: 1px solid ${COLORS.border}; display: flex; align-items: center; justify-content: center; color: ${COLORS.primary}; transition: all 0.3s; }
 
         /* Featured Bento Logic */
@@ -301,7 +301,7 @@ export default function TournamentsPage() {
           .featured-card { flex-direction: row !important; height: 380px !important; }
           .featured-card .card-image-wrapper { width: 50%; height: 100%; }
           .featured-card .card-overlay { background: linear-gradient(to right, rgba(255,255,255,1) 0%, transparent 60%); }
-          .featured-card .card-title { font-size: 28px; }
+          .featured-card .card-title { font-size: 24px; }
         }
 
         /* Hover States */
@@ -320,7 +320,7 @@ export default function TournamentsPage() {
           .filter-sticky { padding: 12px 16px !important; }
           .tournament-grid { grid-template-columns: 1fr; }
           .card-content { padding: 20px; }
-          .card-title { font-size: 18px; }
+          .card-title { font-size: 15px; }
         }
       `}</style>
     </div>

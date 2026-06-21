@@ -17,9 +17,9 @@ export default function Navbar() {
         height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', paddingLeft: 16 }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', fontWeight: 900, fontSize: 22, letterSpacing: '-0.03em', gap: 6, textDecoration: 'none' }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', fontWeight: 900, fontSize: 19, letterSpacing: '-0.03em', gap: 6, textDecoration: 'none' }}>
             <div style={{ width: 32, height: 32, background: '#111827', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-              <span style={{ fontSize: 16, fontWeight: 900, lineHeight: 1 }}>LB</span>
+              <span style={{ fontSize: 14, fontWeight: 900, lineHeight: 1 }}>LB</span>
             </div>
             <span style={{ color: '#111827' }}>Liga Bojonegoro</span>
           </Link>
@@ -57,7 +57,7 @@ export default function Navbar() {
             type="text" 
             placeholder="Cari tim, pemain, atau turnamen..." 
             style={{ 
-              background: 'transparent', border: 'none', color: '#0f172a', fontSize: 14, 
+              background: 'transparent', border: 'none', color: '#0f172a', fontSize: 12, 
               outline: 'none', width: '100%', fontWeight: 500,
             }} 
           />
@@ -74,7 +74,7 @@ export default function Navbar() {
               key={link.href} 
               href={link.href}
               style={{ 
-                padding: '10px 16px', fontSize: 14, fontWeight: 600, 
+                padding: '10px 16px', fontSize: 12, fontWeight: 600, 
                 color: '#475569', borderRadius: 20,
                 transition: 'all 0.2s ease', textDecoration: 'none'
               }}

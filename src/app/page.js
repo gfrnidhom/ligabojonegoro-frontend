@@ -413,7 +413,7 @@ function Home() {
           position: 'sticky', top: 0, zIndex: 60
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontWeight: 900, fontSize: 18, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center' }}>
+            <span style={{ fontWeight: 900, fontSize: 15, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center' }}>
               <span style={{ color: 'var(--primary)' }}>LIGA</span>
               <span style={{ color: '#fbbf24', marginLeft: '1px' }}>BJN</span>
             </span>
@@ -423,7 +423,7 @@ function Home() {
                 display: 'flex', alignItems: 'center', gap: 6,
                 background: 'rgba(0, 0, 0, 0.04)', 
                 padding: '6px 12px', borderRadius: 20,
-                color: 'var(--text-primary)', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                color: 'var(--text-primary)', fontSize: 10, fontWeight: 700, cursor: 'pointer',
                 transition: 'background 0.2s ease',
               }}
             >
@@ -447,7 +447,7 @@ function Home() {
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 4,
                 background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239,68,68,0.15)',
-                padding: '5px 10px', borderRadius: 20, fontSize: 11, fontWeight: 800, color: '#ef4444',
+                padding: '5px 10px', borderRadius: 20, fontSize: 9, fontWeight: 800, color: '#ef4444',
               }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444', animation: 'pulseDot 1.2s infinite' }}></span>
                 {liveCount} Live
@@ -499,7 +499,7 @@ function Home() {
             >
               {/* Top notch */}
               <div style={{ width: 40, height: 4, background: 'rgba(0, 0, 0, 0.1)', borderRadius: 2, margin: '0 auto 20px' }} />
-              <div style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', marginBottom: 16 }}>Pilih Olahraga</div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: '#0f172a', marginBottom: 16 }}>Pilih Olahraga</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <button
                   onClick={() => { setActiveSport(null); setActiveTournament(null); setMobileSportsOpen(false); }}
@@ -512,7 +512,7 @@ function Home() {
                   }}
                 >
                   <Trophy size={20} />
-                  <span style={{ fontSize: 14, fontWeight: 700 }}>Semua Olahraga</span>
+                  <span style={{ fontSize: 12, fontWeight: 700 }}>Semua Olahraga</span>
                 </button>
                 {sports.map(sport => {
                   const isActive = activeSport === sport.id;
@@ -536,7 +536,7 @@ function Home() {
                           <Trophy size={20} />
                         )}
                       </span>
-                      <span style={{ fontSize: 14, fontWeight: 700 }}>{label}</span>
+                      <span style={{ fontSize: 12, fontWeight: 700 }}>{label}</span>
                     </button>
                   );
                 })}
@@ -578,13 +578,13 @@ function Home() {
             >
               {/* Top notch */}
               <div style={{ width: 40, height: 4, background: 'rgba(0, 0, 0, 0.1)', borderRadius: 2, margin: '0 auto 20px' }} />
-              <div style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', marginBottom: 16, textAlign: 'center' }}>Pilih Tanggal</div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: '#0f172a', marginBottom: 16, textAlign: 'center' }}>Pilih Tanggal</div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                 <button onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1))}
                   style={{ color: '#475569', padding: '8px 14px', borderRadius: 12, background: 'rgba(0,0,0,0.04)', cursor: 'pointer' }}>
                   ◀
                 </button>
-                <span style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#0f172a' }}>
                   {calendarMonth.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
                 </span>
                 <button onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1))}
@@ -594,7 +594,7 @@ function Home() {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6, marginBottom: 8, textAlign: 'center' }}>
                 {['Min','Sen','Sel','Rab','Kam','Jum','Sab'].map(d => (
-                  <span key={d} style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8' }}>{d}</span>
+                  <span key={d} style={{ fontSize: 9, fontWeight: 700, color: '#94a3b8' }}>{d}</span>
                 ))}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6 }}>
@@ -615,7 +615,7 @@ function Home() {
                       }}
                       style={{
                         aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 13, fontWeight: isSelected || isTdy ? 700 : 500, borderRadius: 10,
+                        fontSize: 11, fontWeight: isSelected || isTdy ? 700 : 500, borderRadius: 10,
                         color: isSelected ? '#fff' : isTdy ? '#3b82f6' : '#334155',
                         background: isSelected ? 'linear-gradient(135deg, #3b82f6, #60a5fa)' : isTdy ? 'rgba(59,130,246,0.08)' : 'transparent',
                         boxShadow: isSelected ? '0 4px 14px rgba(59,130,246,0.3)' : 'none',
@@ -658,7 +658,7 @@ function Home() {
       {/* ═══ LEFT SIDEBAR ═══ */}
       <aside className={`${mobileTab === 'leagues' ? 'block' : 'hidden'} lg:block w-full lg:w-[260px] flex-shrink-0`}>
         <div style={{ position: 'sticky', top: 76, background: 'var(--bg-card)', borderRadius: 12, border: '1px solid var(--border)', overflow: 'hidden', paddingBottom: 8 }}>
-          <div style={{ padding: '16px 16px 8px', fontSize: 16, fontWeight: 800, color: 'var(--text-primary)' }}>
+          <div style={{ padding: '16px 16px 8px', fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>
             Top leagues
           </div>
           <div style={{ maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' }} className="sidebar-scroll">
@@ -711,7 +711,7 @@ function Home() {
              </button>
              
              <div 
-               style={{ flex: 1, textAlign: 'center', fontSize: 16, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer', color: 'var(--text-primary)' }}
+               style={{ flex: 1, textAlign: 'center', fontSize: 14, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer', color: 'var(--text-primary)' }}
                onClick={() => setShowDatePicker(!showDatePicker)}
              >
                 {isToday(selectedDate || new Date()) ? 'Hari Ini' : (selectedDate || new Date()).toLocaleDateString('id-ID', { month: 'short', day: 'numeric' })} 
@@ -742,7 +742,7 @@ function Home() {
                       style={{ color: 'var(--text-secondary)', padding: 4, borderRadius: 4, background: 'var(--bg-app)', border: 'none', cursor: 'pointer' }}>
                       <ChevronLeft size={14} />
                     </button>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-primary)' }}>
                       {calendarMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                     </span>
                     <button onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1))}
@@ -752,7 +752,7 @@ function Home() {
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3, marginBottom: 8, textAlign: 'center' }}>
                     {['S','M','T','W','T','F','S'].map((d, i) => (
-                      <span key={i} style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)' }}>{d}</span>
+                      <span key={i} style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-muted)' }}>{d}</span>
                     ))}
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
@@ -770,7 +770,7 @@ function Home() {
                           onClick={() => { setSelectedDate(dateObj); setShowDatePicker(false); }}
                           style={{
                             aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 12, fontWeight: isSelected || isTdy ? 800 : 500, borderRadius: 8,
+                            fontSize: 10, fontWeight: isSelected || isTdy ? 800 : 500, borderRadius: 8,
                             color: isSelected ? '#fff' : isTdy ? 'var(--primary)' : 'var(--text-primary)',
                             background: isSelected ? 'var(--primary)' : isTdy ? 'rgba(59,130,246,0.1)' : 'transparent',
                             border: 'none', transition: 'all 0.15s ease', cursor: 'pointer',
@@ -789,25 +789,25 @@ function Home() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, overflowX: 'auto' }} className="hide-scrollbar">
             <button 
               onClick={() => setStatusFilter('live')} 
-              style={{ borderRadius: 20, padding: '6px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', border: '1px solid var(--border)', background: statusFilter === 'live' ? 'var(--text-primary)' : 'transparent', color: statusFilter === 'live' ? 'var(--bg-card)' : 'var(--text-primary)' }}
+              style={{ borderRadius: 20, padding: '6px 16px', fontSize: 11, fontWeight: 700, cursor: 'pointer', border: '1px solid var(--border)', background: statusFilter === 'live' ? 'var(--text-primary)' : 'transparent', color: statusFilter === 'live' ? 'var(--bg-card)' : 'var(--text-primary)' }}
             >
               Berlangsung
             </button>
             <button 
               onClick={() => setStatusFilter('scheduled')}
-              style={{ borderRadius: 20, padding: '6px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', border: '1px solid var(--border)', background: statusFilter === 'scheduled' ? 'var(--text-primary)' : 'transparent', color: statusFilter === 'scheduled' ? 'var(--bg-card)' : 'var(--text-primary)' }}
+              style={{ borderRadius: 20, padding: '6px 16px', fontSize: 11, fontWeight: 700, cursor: 'pointer', border: '1px solid var(--border)', background: statusFilter === 'scheduled' ? 'var(--text-primary)' : 'transparent', color: statusFilter === 'scheduled' ? 'var(--bg-card)' : 'var(--text-primary)' }}
             >
               Mendatang
             </button>
             <button 
               onClick={() => setStatusFilter('finished')} 
-              style={{ borderRadius: 20, padding: '6px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', border: '1px solid var(--border)', background: statusFilter === 'finished' ? 'var(--text-primary)' : 'transparent', color: statusFilter === 'finished' ? 'var(--bg-card)' : 'var(--text-primary)' }}
+              style={{ borderRadius: 20, padding: '6px 16px', fontSize: 11, fontWeight: 700, cursor: 'pointer', border: '1px solid var(--border)', background: statusFilter === 'finished' ? 'var(--text-primary)' : 'transparent', color: statusFilter === 'finished' ? 'var(--bg-card)' : 'var(--text-primary)' }}
             >
               Selesai
             </button>
             
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
-               <div onClick={() => setStatusFilter('all')} style={{ display: 'flex', alignItems: 'center', background: statusFilter === 'all' ? 'var(--text-primary)' : 'transparent', border: '1px solid var(--border)', borderRadius: 20, padding: '6px 16px', color: statusFilter === 'all' ? 'var(--bg-card)' : 'var(--text-muted)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+               <div onClick={() => setStatusFilter('all')} style={{ display: 'flex', alignItems: 'center', background: statusFilter === 'all' ? 'var(--text-primary)' : 'transparent', border: '1px solid var(--border)', borderRadius: 20, padding: '6px 16px', color: statusFilter === 'all' ? 'var(--bg-card)' : 'var(--text-muted)', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
                   <Menu size={14} style={{ marginRight: 6 }} /> Semua
                </div>
                <button onClick={() => setViewMode(viewMode === 'list' ? 'grid' : 'list')} style={{ width: 32, height: 32, borderRadius: '50%', background: 'transparent', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-primary)', cursor: 'pointer' }} title="Toggle List/Grid">
@@ -820,7 +820,7 @@ function Home() {
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '64px 0' }}>
             <div className="loader"></div>
-            <span style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 14 }}>Memuat pertandingan...</span>
+            <span style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 14 }}>Memuat pertandingan...</span>
           </div>
         ) : Object.keys(groupedMatches).length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0, ...(isMounted && typeof window !== 'undefined' && window.innerWidth < 1024 ? { padding: '0 12px' } : {}) }}>
@@ -842,9 +842,9 @@ function Home() {
                     style={{ width: 18, height: 18, borderRadius: 4, objectFit: 'contain' }}
                     alt=""
                   />
-                  <span style={{ fontSize: 14, fontWeight: 800, color: '#0f172a' }}>{name}</span>
+                  <span style={{ fontSize: 12, fontWeight: 800, color: '#0f172a' }}>{name}</span>
                   {group.tournament?.sport && (
-                    <span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 'auto' }}>
+                    <span style={{ fontSize: 10, color: 'var(--text-muted)', marginLeft: 'auto' }}>
                       {SPORT_LABELS[group.tournament.sport?.slug] || ''}
                     </span>
                   )}
@@ -887,21 +887,21 @@ function Home() {
                             <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
                                <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 12, borderBottom: '1px solid #f1f5f9', marginBottom: 12 }}>
                                  {isLive ? (
-                                   <span style={{ color: '#ef4444', fontSize: 15, fontWeight: 700 }}>{formatGameMinute(match.minute)}'</span>
+                                   <span style={{ color: '#ef4444', fontSize: 13, fontWeight: 700 }}>{formatGameMinute(match.minute)}'</span>
                                  ) : isFinished ? (
-                                   <div style={{ background: '#f1f5f9', borderRadius: 16, padding: '4px 12px', fontSize: 13, fontWeight: 700, color: '#64748b' }}>FT</div>
+                                   <div style={{ background: '#f1f5f9', borderRadius: 16, padding: '4px 12px', fontSize: 11, fontWeight: 700, color: '#64748b' }}>FT</div>
                                  ) : (
-                                   <span style={{ fontSize: 15, fontWeight: 700, color: '#64748b' }}>{time}</span>
+                                   <span style={{ fontSize: 13, fontWeight: 700, color: '#64748b' }}>{time}</span>
                                  )}
                                </div>
                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
                                     <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name)} style={{ width: 32, height: 32, objectFit: 'contain' }} alt="" />
-                                    <span style={{ fontSize: 16, fontWeight: 600, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.home_team?.name}</span>
+                                    <span style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.home_team?.name}</span>
                                   </div>
-                                  <span style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', padding: '0 16px' }}>{hasScore ? `${match.home_score} - ${match.away_score}` : '-'}</span>
+                                  <span style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', padding: '0 16px' }}>{hasScore ? `${match.home_score} - ${match.away_score}` : '-'}</span>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0, justifyContent: 'flex-end' }}>
-                                    <span style={{ fontSize: 16, fontWeight: 600, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'right' }}>{match.away_team?.name}</span>
+                                    <span style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'right' }}>{match.away_team?.name}</span>
                                     <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name)} style={{ width: 32, height: 32, objectFit: 'contain' }} alt="" />
                                   </div>
                                </div>
@@ -911,11 +911,11 @@ function Home() {
                               {/* Time / Status */}
                               <div style={{ width: 60, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
                                 {isLive ? (
-                                  <span style={{ color: '#ef4444', fontSize: 13, fontWeight: 700 }}>{formatGameMinute(match.minute)}'</span>
+                                  <span style={{ color: '#ef4444', fontSize: 11, fontWeight: 700 }}>{formatGameMinute(match.minute)}'</span>
                                 ) : isFinished ? (
-                                  <div style={{ background: '#f1f5f9', borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: '#94a3b8' }}>FT</div>
+                                  <div style={{ background: '#f1f5f9', borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#94a3b8' }}>FT</div>
                                 ) : (
-                                  <span style={{ fontSize: 13, fontWeight: 600, color: '#64748b' }}>{time}</span>
+                                  <span style={{ fontSize: 11, fontWeight: 600, color: '#64748b' }}>{time}</span>
                                 )}
                               </div>
 
@@ -924,7 +924,7 @@ function Home() {
                                 
                                 {/* Home Team */}
                                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, minWidth: 0 }}>
-                                  <span style={{ fontSize: 15, fontWeight: 500, color: '#1e293b', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                  <span style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                     {match.home_team?.name || 'Home'}
                                   </span>
                                   <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name)} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} alt="" />
@@ -933,18 +933,18 @@ function Home() {
                                 {/* Score */}
                                 <div style={{ width: 72, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
                                   {hasScore ? (
-                                    <span style={{ fontSize: 16, fontWeight: 700, color: isLive ? '#ef4444' : '#1e293b', whiteSpace: 'nowrap', letterSpacing: '1px' }}>
+                                    <span style={{ fontSize: 14, fontWeight: 700, color: isLive ? '#ef4444' : '#1e293b', whiteSpace: 'nowrap', letterSpacing: '1px' }}>
                                       {match.home_score} - {match.away_score}
                                     </span>
                                   ) : (
-                                    <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-muted)' }}>-</span>
+                                    <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>-</span>
                                   )}
                                 </div>
 
                                 {/* Away Team */}
                                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 12, minWidth: 0 }}>
                                   <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name)} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} alt="" />
-                                  <span style={{ fontSize: 15, fontWeight: 500, color: '#1e293b', textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                  <span style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                     {match.away_team?.name || 'Away'}
                                   </span>
                                 </div>
@@ -964,8 +964,8 @@ function Home() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 20px', textAlign: 'center' }}>
               <Calendar style={{ width: 20, height: 20, color: 'var(--text-muted)', marginBottom: 12 }} />
-              <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>Tidak ada pertandingan.</p>
-              <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Coba ubah filter atau pilih tanggal lain.</p>
+              <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)' }}>Tidak ada pertandingan.</p>
+              <p style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 4 }}>Coba ubah filter atau pilih tanggal lain.</p>
           </div>
         )}
       </main>
@@ -979,7 +979,7 @@ function Home() {
               <div style={{ padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <Award size={18} color="var(--primary)" />
-                  <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>Top Skor</span>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>Top Skor</span>
                 </div>
                 <button 
                   onClick={() => router.push('/stats')}
@@ -1007,7 +1007,7 @@ function Home() {
                     onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                   >
                     <span style={{ 
-                      width: 20, fontSize: 13, fontWeight: 800, textAlign: 'center', flexShrink: 0,
+                      width: 20, fontSize: 11, fontWeight: 800, textAlign: 'center', flexShrink: 0,
                       color: idx < 3 ? 'var(--primary)' : 'var(--text-muted)' 
                     }}>{idx + 1}</span>
                     <img 
@@ -1015,13 +1015,13 @@ function Home() {
                       style={{ width: 36, height: 36, borderRadius: '50%', flexShrink: 0 }} alt="" 
                     />
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {pName}
                       </div>
-                      <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{tName}</div>
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{tName}</div>
                     </div>
                     <div style={{ 
-                      fontSize: 16, fontWeight: 800, color: 'var(--text-primary)',
+                      fontSize: 14, fontWeight: 800, color: 'var(--text-primary)',
                       textAlign: 'right'
                     }}>
                       {goals}
@@ -1037,7 +1037,7 @@ function Home() {
           {/* Latest News Widget */}
           <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e5e7eb', overflow: 'hidden' }}>
             <div style={{ padding: '20px 20px 16px' }}>
-              <span style={{ fontSize: 20, fontWeight: 700, color: '#111827' }}>News</span>
+              <span style={{ fontSize: 17, fontWeight: 700, color: '#111827' }}>News</span>
             </div>
             {latestNews.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -1057,10 +1057,10 @@ function Home() {
                           alt={item.title} 
                           style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: 16, marginBottom: 12 }}
                         />
-                        <h2 style={{ fontSize: 16, fontWeight: 600, color: '#111827', lineHeight: 1.35, margin: '0 0 8px 0', letterSpacing: '-0.01em' }}>
+                        <h2 style={{ fontSize: 14, fontWeight: 600, color: '#111827', lineHeight: 1.35, margin: '0 0 8px 0', letterSpacing: '-0.01em' }}>
                           {item.title}
                         </h2>
-                        <div style={{ fontSize: 13, color: '#6b7280', fontWeight: 500 }}>
+                        <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 500 }}>
                           {source} · {formatTimeAgo(item.published_at || item.created_at)}
                         </div>
                       </div>
@@ -1081,10 +1081,10 @@ function Home() {
                         style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 12, flexShrink: 0 }}
                       />
                       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                        <h4 style={{ fontSize: 15, fontWeight: 600, color: '#111827', lineHeight: 1.35, margin: '0 0 6px 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', letterSpacing: '-0.01em' }}>
+                        <h4 style={{ fontSize: 13, fontWeight: 600, color: '#111827', lineHeight: 1.35, margin: '0 0 6px 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', letterSpacing: '-0.01em' }}>
                           {item.title}
                         </h4>
-                        <span style={{ fontSize: 13, color: '#6b7280', fontWeight: 500 }}>{source} · {formatTimeAgo(item.published_at || item.created_at)}</span>
+                        <span style={{ fontSize: 11, color: '#6b7280', fontWeight: 500 }}>{source} · {formatTimeAgo(item.published_at || item.created_at)}</span>
                       </div>
                     </div>
                   );
@@ -1092,7 +1092,7 @@ function Home() {
               </div>
             ) : (
               <div style={{ padding: '24px 16px', textAlign: 'center' }}>
-                <p style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>Belum ada berita</p>
+                <p style={{ fontSize: 11, fontWeight: 600, color: '#111827' }}>Belum ada berita</p>
               </div>
             )}
           </div>
@@ -1174,7 +1174,7 @@ function Home() {
                   <div style={{
                     position: 'absolute', top: -2, left: -2,
                     background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', color: '#090d16',
-                    fontSize: 12, fontWeight: 900,
+                    fontSize: 10, fontWeight: 900,
                     width: 34, height: 26, borderRadius: 14,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     border: '2px solid #0f172a',
@@ -1185,23 +1185,23 @@ function Home() {
                 </div>
 
                 {/* Player Name */}
-                <h3 style={{ fontSize: 22, fontWeight: 900, color: '#f8fafc', margin: '0 0 4px', letterSpacing: '-0.02em' }}>
+                <h3 style={{ fontSize: 19, fontWeight: 900, color: '#f8fafc', margin: '0 0 4px', letterSpacing: '-0.02em' }}>
                   {playerDetail.player?.name}
                 </h3>
 
                 {/* Player Metadata (Position, Team, Jersey) */}
                 <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', padding: '12px 18px', background: 'linear-gradient(135deg, rgba(245,158,11,0.06), rgba(15,12,8,0.5))', borderRadius: 12, border: 'none', marginTop: 12, boxShadow: 'inset 0 1px 0 rgba(245,158,11,0.06)' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: '#f1f5f9' }}>{playerDetail.player?.position || 'Pemain'}</span>
-                    <span style={{ fontSize: 10, color: '#64748b', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Posisi</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#f1f5f9' }}>{playerDetail.player?.position || 'Pemain'}</span>
+                    <span style={{ fontSize: 9, color: '#64748b', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Posisi</span>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: '#f1f5f9' }}>{playerDetail.player?.team || 'Tim'}</span>
-                    <span style={{ fontSize: 10, color: '#64748b', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Klub</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#f1f5f9' }}>{playerDetail.player?.team || 'Tim'}</span>
+                    <span style={{ fontSize: 9, color: '#64748b', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Klub</span>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: '#f1f5f9' }}>{playerDetail.player?.jersey_number || '-'}</span>
-                    <span style={{ fontSize: 10, color: '#64748b', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.05em' }}>No Baju</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#f1f5f9' }}>{playerDetail.player?.jersey_number || '-'}</span>
+                    <span style={{ fontSize: 9, color: '#64748b', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.05em' }}>No Baju</span>
                   </div>
                 </div>
               </div>
@@ -1210,7 +1210,7 @@ function Home() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 {/* Season Summary Grid */}
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 800, color: 'rgba(245,158,11,0.8)', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 10 }}>Ringkasan Musim</div>
+                  <div style={{ fontSize: 10, fontWeight: 800, color: 'rgba(245,158,11,0.8)', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 10 }}>Ringkasan Musim</div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
                     {[
                       { label: 'Main', value: playerDetail.statistics?.matches_played || 0 },
@@ -1221,8 +1221,8 @@ function Home() {
                       { label: 'Pelanggaran', value: playerDetail.statistics?.fouls || 0 }
                     ].map((sumItem, idx) => (
                       <div key={idx} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: 10, padding: '10px 6px', textAlign: 'center' }}>
-                        <span style={{ display: 'block', fontSize: 16, fontWeight: 900, color: sumItem.color || '#f1f5f9' }}>{sumItem.value}</span>
-                        <span style={{ display: 'block', fontSize: 10, color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginTop: 2 }}>{sumItem.label}</span>
+                        <span style={{ display: 'block', fontSize: 14, fontWeight: 900, color: sumItem.color || '#f1f5f9' }}>{sumItem.value}</span>
+                        <span style={{ display: 'block', fontSize: 9, color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginTop: 2 }}>{sumItem.label}</span>
                       </div>
                     ))}
                   </div>
@@ -1230,15 +1230,15 @@ function Home() {
 
                 {/* Skill Ratings (Sport Specific) */}
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 800, color: 'rgba(245,158,11,0.8)', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 12 }}>Statistik Keahlian</div>
+                  <div style={{ fontSize: 10, fontWeight: 800, color: 'rgba(245,158,11,0.8)', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 12 }}>Statistik Keahlian</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                     {getSportSkills(playerDetail.player?.position?.sport_id).map((skill, idx) => {
                       const val = getSkillValue(playerDetail.player, skill.key);
                       return (
                         <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 600 }}>{skill.label}</span>
-                            <span style={{ fontSize: 14, fontWeight: 900, color: '#f1f5f9' }}>{val}</span>
+                            <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{skill.label}</span>
+                            <span style={{ fontSize: 12, fontWeight: 900, color: '#f1f5f9' }}>{val}</span>
                           </div>
                           <div style={{ width: '100%', height: 6, background: 'rgba(255,255,255,0.03)', borderRadius: 3, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.01)' }}>
                             <motion.div

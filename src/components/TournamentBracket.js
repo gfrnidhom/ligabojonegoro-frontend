@@ -30,7 +30,7 @@ export default function TournamentBracket({ matches }) {
         {roundsData.map((rd, rdIdx) => (
           <div key={rd.round} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20 }}>
             <div style={{ 
-              textAlign: 'center', fontSize: 12, fontWeight: 800, color: '#94a3b8', 
+              textAlign: 'center', fontSize: 10, fontWeight: 800, color: '#94a3b8', 
               textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 
             }}>
               {rd.label}
@@ -50,14 +50,14 @@ export default function TournamentBracket({ matches }) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
                       <img src={getImageUrl(m.home_team?.logo_path)} style={{ width: 20, height: 20, objectFit: 'contain' }} alt="" />
                       <span style={{ 
-                        fontSize: 12, fontWeight: m.home_score > m.away_score ? 800 : 500, 
+                        fontSize: 10, fontWeight: m.home_score > m.away_score ? 800 : 500, 
                         color: m.home_score > m.away_score ? '#f8fafc' : '#94a3b8',
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
                       }}>
                         {m.home_team?.name || 'TBD'}
                       </span>
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: 900, color: '#eab308' }}>
+                    <span style={{ fontSize: 11, fontWeight: 900, color: '#eab308' }}>
                       {m.status === 'finished' ? m.home_score : '-'}
                     </span>
                   </div>
@@ -67,14 +67,14 @@ export default function TournamentBracket({ matches }) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
                       <img src={getImageUrl(m.away_team?.logo_path)} style={{ width: 20, height: 20, objectFit: 'contain' }} alt="" />
                       <span style={{ 
-                        fontSize: 12, fontWeight: m.away_score > m.home_score ? 800 : 500, 
+                        fontSize: 10, fontWeight: m.away_score > m.home_score ? 800 : 500, 
                         color: m.away_score > m.home_score ? '#f8fafc' : '#94a3b8',
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
                       }}>
                         {m.away_team?.name || 'TBD'}
                       </span>
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: 900, color: '#eab308' }}>
+                    <span style={{ fontSize: 11, fontWeight: 900, color: '#eab308' }}>
                       {m.status === 'finished' ? m.away_score : '-'}
                     </span>
                   </div>

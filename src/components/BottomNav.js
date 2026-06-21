@@ -96,7 +96,7 @@ export default function BottomNav() {
               )}
             </div>
             <span style={{ 
-              fontSize: 11, 
+              fontSize: 9, 
               fontWeight: isActive ? 700 : 600, 
               color: color, 
               transition: 'all 0.2s ease'

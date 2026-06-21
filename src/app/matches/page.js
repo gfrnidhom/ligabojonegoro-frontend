@@ -92,8 +92,8 @@ export default function MatchesPage() {
       }}>
         <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, background: 'radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)' }} />
         <CalendarIcon size={40} style={{ color: '#3b82f6', marginBottom: 12 }} />
-        <h1 style={{ fontSize: 28, fontWeight: 800, color: '#f8fafc', marginBottom: 6 }}>Jadwal & Hasil</h1>
-        <p style={{ fontSize: 14, color: '#94a3b8', maxWidth: 600 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 800, color: '#f8fafc', marginBottom: 6 }}>Jadwal & Hasil</h1>
+        <p style={{ fontSize: 12, color: '#94a3b8', maxWidth: 600 }}>
           Lihat seluruh jadwal pertandingan mendatang dan hasil pertandingan yang telah selesai dari berbagai turnamen.
         </p>
       </div>
@@ -132,11 +132,11 @@ export default function MatchesPage() {
             onChange={e => setDateFilter(e.target.value)}
             style={{ 
               background: 'transparent', border: 'none', color: '#f1f5f9', 
-              padding: '11px 0', outline: 'none', fontSize: 13, fontFamily: 'inherit'
+              padding: '11px 0', outline: 'none', fontSize: 11, fontFamily: 'inherit'
             }}
           />
           {dateFilter && (
-            <button onClick={() => setDateFilter('')} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>Batal</button>
+            <button onClick={() => setDateFilter('')} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: 10, fontWeight: 700 }}>Batal</button>
           )}
         </div>
       </div>
@@ -147,20 +147,20 @@ export default function MatchesPage() {
           {loading ? (
             <div style={{ minHeight: 300, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
               <div className="loader"></div>
-              <p style={{ marginTop: 14, color: '#9ca3af', fontSize: 13, fontWeight: 500 }}>Memuat pertandingan...</p>
+              <p style={{ marginTop: 14, color: '#9ca3af', fontSize: 11, fontWeight: 500 }}>Memuat pertandingan...</p>
             </div>
           ) : filteredMatches.length === 0 ? (
             <div style={{ padding: '64px 16px', textAlign: 'center', background: 'rgba(255,255,255,0.01)', borderRadius: 20, border: '1px dashed rgba(255,255,255,0.1)' }}>
               <Filter size={40} style={{ color: '#475569', margin: '0 auto 16px' }} />
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: '#f1f5f9', marginBottom: 8 }}>Tidak Ada Pertandingan</h3>
-              <p style={{ color: '#94a3b8', fontSize: 14 }}>Coba sesuaikan filter Anda untuk melihat hasil lainnya.</p>
+              <h3 style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9', marginBottom: 8 }}>Tidak Ada Pertandingan</h3>
+              <p style={{ color: '#94a3b8', fontSize: 12 }}>Coba sesuaikan filter Anda untuk melihat hasil lainnya.</p>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
               {Object.entries(groupedMatches).map(([dateLabel, dayMatches]) => (
                 <div key={dateLabel}>
                   <h2 style={{ 
-                    fontSize: 14, fontWeight: 700, color: '#94a3b8', marginBottom: 12,
+                    fontSize: 12, fontWeight: 700, color: '#94a3b8', marginBottom: 12,
                     borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 8,
                     display: 'flex', alignItems: 'center', gap: 8
                   }}>
@@ -201,16 +201,16 @@ export default function MatchesPage() {
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, width: '100%' }}>
                             {isLive ? (
-                              <div style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', fontSize: 10, fontWeight: 800, padding: '4px 12px', borderRadius: 20, display: 'flex', alignItems: 'center', gap: 6, letterSpacing: '0.05em', animation: 'pulseGlow 2s infinite' }}>
+                              <div style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', fontSize: 9, fontWeight: 800, padding: '4px 12px', borderRadius: 20, display: 'flex', alignItems: 'center', gap: 6, letterSpacing: '0.05em', animation: 'pulseGlow 2s infinite' }}>
                                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444' }}></span>
                                 LIVE
                               </div>
                             ) : isFinished ? (
-                              <div style={{ background: 'rgba(255,255,255,0.05)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.1)', fontSize: 10, fontWeight: 800, padding: '4px 12px', borderRadius: 20, letterSpacing: '0.05em' }}>
+                              <div style={{ background: 'rgba(255,255,255,0.05)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.1)', fontSize: 9, fontWeight: 800, padding: '4px 12px', borderRadius: 20, letterSpacing: '0.05em' }}>
                                 SELESAI
                               </div>
                             ) : (
-                              <div style={{ background: 'rgba(59, 130, 246, 0.08)', color: '#60a5fa', border: '1px solid rgba(59, 130, 246, 0.15)', fontSize: 11, fontWeight: 800, padding: '4px 12px', borderRadius: 20, letterSpacing: '0.05em' }}>
+                              <div style={{ background: 'rgba(59, 130, 246, 0.08)', color: '#60a5fa', border: '1px solid rgba(59, 130, 246, 0.15)', fontSize: 9, fontWeight: 800, padding: '4px 12px', borderRadius: 20, letterSpacing: '0.05em' }}>
                                 {time}
                               </div>
                             )}
@@ -221,7 +221,7 @@ export default function MatchesPage() {
                               <div style={{ width: 56, height: 56, position: 'relative', marginBottom: 12 }}>
                                 <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }} alt="" />
                               </div>
-                              <span style={{ fontSize: 13, fontWeight: 800, color: '#f8fafc', textAlign: 'center', lineHeight: 1.3 }}>{m.home_team?.name}</span>
+                              <span style={{ fontSize: 11, fontWeight: 800, color: '#f8fafc', textAlign: 'center', lineHeight: 1.3 }}>{m.home_team?.name}</span>
                             </div>
 
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -237,12 +237,12 @@ export default function MatchesPage() {
                               }}>
                                 {hasScore ? (
                                   <>
-                                    <span style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', lineHeight: 1 }}>{m.home_score}</span>
-                                    <span style={{ fontSize: 14, fontWeight: 800, color: '#475569' }}>-</span>
-                                    <span style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', lineHeight: 1 }}>{m.away_score}</span>
+                                    <span style={{ fontSize: 20, fontWeight: 900, color: '#f8fafc', lineHeight: 1 }}>{m.home_score}</span>
+                                    <span style={{ fontSize: 12, fontWeight: 800, color: '#475569' }}>-</span>
+                                    <span style={{ fontSize: 20, fontWeight: 900, color: '#f8fafc', lineHeight: 1 }}>{m.away_score}</span>
                                   </>
                                 ) : (
-                                  <span style={{ fontSize: 14, fontWeight: 800, color: '#64748b', letterSpacing: '0.1em' }}>VS</span>
+                                  <span style={{ fontSize: 12, fontWeight: 800, color: '#64748b', letterSpacing: '0.1em' }}>VS</span>
                                 )}
                               </div>
                             </div>
@@ -251,7 +251,7 @@ export default function MatchesPage() {
                               <div style={{ width: 56, height: 56, position: 'relative', marginBottom: 12 }}>
                                 <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name, 'ef4444')} style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }} alt="" />
                               </div>
-                              <span style={{ fontSize: 13, fontWeight: 800, color: '#f8fafc', textAlign: 'center', lineHeight: 1.3 }}>{m.away_team?.name}</span>
+                              <span style={{ fontSize: 11, fontWeight: 800, color: '#f8fafc', textAlign: 'center', lineHeight: 1.3 }}>{m.away_team?.name}</span>
                             </div>
                           </div>
                         </div>
@@ -274,8 +274,8 @@ export default function MatchesPage() {
             ) : (
               <div className="card" style={{ background: 'rgba(255,255,255,0.01)', border: '1px dashed rgba(255,255,255,0.1)', padding: '40px 24px', textAlign: 'center' }}>
                 <Trophy size={48} style={{ color: '#475569', margin: '0 auto 16px', opacity: 0.5 }} />
-                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#f1f5f9', marginBottom: 8 }}>Pilih Pertandingan</h3>
-                <p style={{ color: '#94a3b8', fontSize: 14 }}>Klik salah satu pertandingan di daftar untuk melihat detail lengkap, statistik, dan susunan pemain di sini.</p>
+                <h3 style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9', marginBottom: 8 }}>Pilih Pertandingan</h3>
+                <p style={{ color: '#94a3b8', fontSize: 12 }}>Klik salah satu pertandingan di daftar untuk melihat detail lengkap, statistik, dan susunan pemain di sini.</p>
               </div>
             )}
           </div>
@@ -286,7 +286,7 @@ export default function MatchesPage() {
         .form-select-dark {
           padding: 11px 16px; background: rgba(255,255,255,0.04);
           border: 1px solid rgba(255,255,255,0.06); border-radius: 12px;
-          color: #f1f5f9; font-size: 13px; font-weight: 500; outline: none;
+          color: #f1f5f9; font-size: 11px; font-weight: 500; outline: none;
           font-family: inherit; min-width: 180px; cursor: pointer;
           flex: 1 1 auto;
         }

@@ -119,7 +119,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .match-row.active { background: var(--bg-hover); }
 
 .match-row .time-col {
-  width: 50px; flex-shrink: 0; text-align: center; font-size: 11px; font-weight: 600;
+  width: 50px; flex-shrink: 0; text-align: center; font-size: 9px; font-weight: 600;
   color: var(--text-secondary); padding-right: 12px; margin-right: 12px; position: relative;
 }
 .match-row .time-col::after {
@@ -138,13 +138,13 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   background: transparent;
 }
 .match-row .score-box.live-score { color: var(--accent); }
-.match-row .score-box .score { font-size: 14px; font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.match-row .score-box .score { font-size: 12px; font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
 .match-row .score-box.live-score .score { color: var(--accent); }
-.match-row .score-box .score-sep { font-size: 12px; color: var(--text-muted); }
+.match-row .score-box .score-sep { font-size: 10px; color: var(--text-muted); }
 
 .match-row .team-logo { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0; }
 .match-row .team-name {
-  font-size: 14px; font-weight: 500; color: var(--text-primary);
+  font-size: 12px; font-weight: 500; color: var(--text-primary);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .match-row .team-name.winner { font-weight: 700; }
@@ -157,7 +157,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 
 /* League Item */
 .league-item {
-  display: flex; align-items: center; gap: 10px; padding: 10px 14px; font-size: 14px; font-weight: 500;
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px; font-size: 12px; font-weight: 500;
   color: var(--text-primary); cursor: pointer; border-radius: var(--radius-sm); margin-bottom: 2px;
 }
 .league-item:hover { background: var(--bg-hover); }
@@ -170,8 +170,8 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   cursor: pointer; border-radius: var(--radius-sm); position: relative; margin: 4px 2px;
 }
 .date-tab:hover { background: var(--bg-hover); }
-.date-tab .day-label { font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); }
-.date-tab .date-num { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.date-tab .day-label { font-size: 9px; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); }
+.date-tab .date-num { font-size: 12px; font-weight: 600; color: var(--text-primary); }
 .date-tab.active {
   background: var(--text-primary) !important;
   color: var(--text-inverse) !important;
@@ -183,7 +183,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 
 /* Filter Pills */
 .filter-pill {
-  padding: 6px 14px; border-radius: var(--radius-full); font-size: 13px; font-weight: 600;
+  padding: 6px 14px; border-radius: var(--radius-full); font-size: 11px; font-weight: 600;
   white-space: nowrap; display: inline-flex; align-items: center; gap: 5px;
   background: transparent; color: var(--text-secondary); border: 1px solid var(--border);
 }
@@ -199,14 +199,14 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   border-color: var(--accent) !important;
 }
 .filter-pill .live-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: blink 1.2s infinite; }
-.filter-pill .count-badge { background: rgba(255,255,255,0.2); padding: 1px 6px; border-radius: var(--radius-full); font-size: 10px; font-weight: 700; }
+.filter-pill .count-badge { background: rgba(255,255,255,0.2); padding: 1px 6px; border-radius: var(--radius-full); font-size: 9px; font-weight: 700; }
 
 @media (max-width: 1024px) {
   .main-content { padding: 0; padding-bottom: 72px; }
   footer { padding-bottom: 72px; }
 }
 @media (max-width: 768px) {
-  .match-row .team-name { font-size: 13px; max-width: 80px; }
+  .match-row .team-name { font-size: 11px; max-width: 80px; }
   .match-row .score-box { width: 46px; margin: 0 6px; }
   .match-row .team-logo { width: 18px; height: 18px; }
 }
