@@ -404,7 +404,7 @@ function Home() {
       {isMounted && typeof window !== 'undefined' && window.innerWidth < 1024 && (
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '12px 16px', 
+          padding: '14px 16px', 
           background: 'rgba(255, 255, 255, 0.85)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
@@ -413,9 +413,8 @@ function Home() {
           position: 'sticky', top: 0, zIndex: 60
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontWeight: 900, fontSize: 15, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center' }}>
-              <span style={{ color: 'var(--primary)' }}>LIGA</span>
-              <span style={{ color: '#fbbf24', marginLeft: '1px' }}>BJN</span>
+            <span style={{ display: 'flex', alignItems: 'center' }}>
+              <img src="/Logo%20Vertical.png" alt="Liga Bojonegoro" style={{ height: 46, width: 'auto' }} />
             </span>
             <button
               onClick={() => setMobileSportsOpen(true)}

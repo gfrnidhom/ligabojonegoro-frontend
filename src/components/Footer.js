@@ -14,14 +14,8 @@ export default function Footer() {
       <div style={{ maxWidth: 1320, margin: '0 auto', padding: '32px 24px 24px' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 40, paddingBottom: 24, borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
           <div style={{ flex: '1 1 260px', minWidth: 200 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-              <div style={{
-                width: 32, height: 32, background: 'linear-gradient(135deg, #3b82f6, #93c5fd)',
-                borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <Trophy size={16} color="white" />
-              </div>
-              <span style={{ fontWeight: 800, fontSize: 14, color: '#0f172a' }}>Liga Bojonegoro</span>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
+              <img src="/Logo%20Horizontal.png" alt="Liga Bojonegoro" style={{ height: 40, width: 'auto' }} />
             </div>
             <p style={{ fontSize: 10.5, color: '#64748b', lineHeight: 1.6, maxWidth: 280 }}>
               Platform resmi skor langsung, jadwal pertandingan, klasemen, dan statistik pemain Liga Bojonegoro.
