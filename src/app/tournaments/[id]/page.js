@@ -45,7 +45,7 @@ export default function TournamentDetailPage({ params }) {
   };
   const [matchView, setMatchView] = useState('upcoming'); // upcoming, finished
   const [viewMode, setViewMode] = useState('list'); // list, grid
-  const [playerStats, setPlayerStats] = useState({ top_scorers: [], top_cards: [], top_clean_sheets: [] });
+  const [playerStats, setPlayerStats] = useState({ top_scorers: [], top_cards: [], top_clean_sheets: [], top_minutes: [] });
   const [teamStats, setTeamStats] = useState(null);
 
   useEffect(() => {
@@ -783,6 +783,120 @@ export default function TournamentDetailPage({ params }) {
                     </>
                   );
                 })() : <div style={{ fontSize: 11, color: 'var(--text-secondary)', padding: '24px 0', textAlign: 'center' }}>Belum ada data kiper.</div>}
+              </div>
+            </div>
+            
+            {/* Top Minutes Played Card */}
+            <div style={{ background: 'var(--bg-subtle)', borderRadius: 24, border: '1px solid var(--border)', overflow: 'hidden', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: -50, right: -50, width: 150, height: 150, background: '#3b82f6', filter: 'blur(80px)', opacity: 0.1 }} />
+              
+              <div style={{ padding: '24px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 14, background: 'linear-gradient(135deg, rgba(59,130,246,0.2), rgba(37,99,235,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#60a5fa', border: '1px solid rgba(59,130,246,0.2)' }}>
+                    <BarChart2 size={22} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em', margin: 0 }}>Menit Bermain Terbanyak</h3>
+                    <div style={{ fontSize: 10, color: 'var(--text-secondary)', fontWeight: 600, marginTop: 2 }}>Statistik Caps & Menit Bermain</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ padding: '0 24px 24px', position: 'relative' }}>
+                {playerStats.top_minutes?.length > 0 ? (() => {
+                  const top3 = playerStats.top_minutes.slice(0, 3);
+                  const rest = playerStats.top_minutes.slice(3);
+                  return (
+                    <>
+                      {/* Premium Podium Layout */}
+                      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 16, padding: '40px 0 0', borderBottom: '1px solid var(--border-light)', perspective: '1000px' }}>
+                        {/* 2nd Place */}
+                        {top3[1] && (
+                          <motion.div 
+                            whileHover={{ scale: 1.05, translateY: -5 }}
+                            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '30%', zIndex: 2 }}
+                          >
+                            <div style={{ position: 'relative' }}>
+                              <img src={getImageUrl(top3[1].player?.photo_path) || avatar(top3[1].player?.name)} style={{ width: 72, height: 72, borderRadius: '50%', border: '4px solid var(--border)', objectFit: 'cover', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', background: 'var(--bg-card)' }} alt="" />
+                              <div style={{ position: 'absolute', bottom: -5, right: -5, width: 28, height: 28, borderRadius: '50%', background: '#cbd5e1', color: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 900, border: '3px solid #0f172a' }}>2</div>
+                            </div>
+                            <div style={{ marginTop: 16, fontSize: 11, fontWeight: 800, color: 'var(--text-primary)', textAlign: 'center', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{top3[1].player?.name}</div>
+                            <div style={{ fontSize: 9, color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 600 }}>{top3[1].player?.team || '-'}</div>
+                            <div style={{ fontSize: 20, fontWeight: 900, color: '#cbd5e1', textShadow: '0 0 10px rgba(203, 213, 225, 0.3)' }}>{top3[1].minutes_played}'</div>
+                            <div style={{ fontSize: 9, color: 'var(--text-secondary)', fontWeight: 600 }}>{top3[1].matches_played} Caps</div>
+                            <div style={{ width: '100%', height: 60, background: 'linear-gradient(180deg, rgba(203, 213, 225, 0.1), transparent)', borderTopLeftRadius: 12, borderTopRightRadius: 12, marginTop: 12, borderTop: '2px solid rgba(203, 213, 225, 0.2)' }} />
+                          </motion.div>
+                        )}
+                        {/* 1st Place */}
+                        {top3[0] && (
+                          <motion.div 
+                            whileHover={{ scale: 1.05, translateY: -8 }}
+                            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '35%', zIndex: 3 }}
+                          >
+                            <div style={{ position: 'relative' }}>
+                              <div style={{ position: 'absolute', top: -20, left: '50%', transform: 'translateX(-50%)', fontSize: 27, filter: 'drop-shadow(0 4px 8px rgba(59, 130, 246, 0.4))', zIndex: 10 }}>👑</div>
+                              <img src={getImageUrl(top3[0].player?.photo_path) || avatar(top3[0].player?.name)} style={{ width: 96, height: 96, borderRadius: '50%', border: '5px solid #3b82f6', objectFit: 'cover', boxShadow: '0 8px 16px rgba(59, 130, 246, 0.2)', background: 'var(--bg-card)' }} alt="" />
+                              <div style={{ position: 'absolute', bottom: -5, right: -5, width: 36, height: 36, borderRadius: '50%', background: '#3b82f6', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 900, border: '4px solid #0f172a' }}>1</div>
+                            </div>
+                            <div style={{ marginTop: 20, fontSize: 13, fontWeight: 900, color: 'var(--text-primary)', textAlign: 'center', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{top3[0].player?.name}</div>
+                            <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginBottom: 8, fontWeight: 600 }}>{top3[0].player?.team || '-'}</div>
+                            <div style={{ fontSize: 24, fontWeight: 900, color: '#3b82f6', textShadow: '0 0 20px rgba(59, 130, 246, 0.4)' }}>{top3[0].minutes_played}'</div>
+                            <div style={{ fontSize: 10, color: 'var(--text-secondary)', fontWeight: 600 }}>{top3[0].matches_played} Caps</div>
+                            <div style={{ width: '100%', height: 90, background: 'linear-gradient(180deg, rgba(59, 130, 246, 0.15), transparent)', borderTopLeftRadius: 16, borderTopRightRadius: 16, marginTop: 12, borderTop: '3px solid rgba(59, 130, 246, 0.3)' }} />
+                          </motion.div>
+                        )}
+                        {/* 3rd Place */}
+                        {top3[2] && (
+                          <motion.div 
+                            whileHover={{ scale: 1.05, translateY: -5 }}
+                            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '30%', zIndex: 1 }}
+                          >
+                            <div style={{ position: 'relative' }}>
+                              <img src={getImageUrl(top3[2].player?.photo_path) || avatar(top3[2].player?.name)} style={{ width: 64, height: 64, borderRadius: '50%', border: '4px solid #2563eb', objectFit: 'cover', boxShadow: '0 4px 8px rgba(0,0,0,0.05)', background: 'var(--bg-card)' }} alt="" />
+                              <div style={{ position: 'absolute', bottom: -5, right: -5, width: 28, height: 28, borderRadius: '50%', background: '#1d4ed8', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 900, border: '3px solid #0f172a' }}>3</div>
+                            </div>
+                            <div style={{ marginTop: 16, fontSize: 11, fontWeight: 800, color: 'var(--text-primary)', textAlign: 'center', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{top3[2].player?.name}</div>
+                            <div style={{ fontSize: 9, color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 600 }}>{top3[2].player?.team || '-'}</div>
+                            <div style={{ fontSize: 20, fontWeight: 900, color: '#2563eb', textShadow: '0 0 10px rgba(37, 99, 235, 0.3)' }}>{top3[2].minutes_played}'</div>
+                            <div style={{ fontSize: 9, color: 'var(--text-secondary)', fontWeight: 600 }}>{top3[2].matches_played} Caps</div>
+                            <div style={{ width: '100%', height: 40, background: 'linear-gradient(180deg, rgba(37, 99, 235, 0.1), transparent)', borderTopLeftRadius: 12, borderTopRightRadius: 12, marginTop: 12, borderTop: '2px solid rgba(37, 99, 235, 0.2)' }} />
+                          </motion.div>
+                        )}
+                      </div>
+
+                      {/* Remaining List */}
+                      {rest.length > 0 && (
+                        <div style={{ marginTop: 16 }}>
+                          {rest.map((item, idx) => {
+                            const realRank = idx + 4;
+                            const maxMin = top3[0].minutes_played || 1;
+                            const pct = (item.minutes_played / maxMin) * 100;
+                            return (
+                              <div key={idx} style={{ display: 'flex', alignItems: 'center', padding: '16px 0', borderBottom: idx < rest.length - 1 ? '1px dashed var(--border-light)' : 'none' }}>
+                                <div style={{ width: 28, fontSize: 11, fontWeight: 800, color: 'var(--text-secondary)', textAlign: 'center' }}>{realRank}</div>
+                                <div style={{ margin: '0 16px 0 8px' }}>
+                                  <img src={getImageUrl(item.player?.photo_path) || avatar(item.player?.name)} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }} alt="" />
+                                </div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.player?.name}</div>
+                                  <div style={{ fontSize: 9, color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.player?.team || '-'}</div>
+                                </div>
+                                <div style={{ width: '25%', minWidth: 80, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                                  <div style={{ fontSize: 14, fontWeight: 900, color: '#3b82f6', display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                                    {item.minutes_played}' <span style={{ fontSize: 9, color: 'var(--text-muted)' }}>({item.matches_played} Caps)</span>
+                                  </div>
+                                  <div style={{ width: '100%', height: 4, background: 'var(--border)', borderRadius: 4, overflow: 'hidden' }}>
+                                    <div style={{ width: `${pct}%`, height: '100%', background: 'linear-gradient(90deg, #3b82f6, #60a5fa)', borderRadius: 4 }} />
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </>
+                  );
+                })() : <div style={{ fontSize: 11, color: 'var(--text-secondary)', padding: '24px 0', textAlign: 'center' }}>Belum ada data menit bermain.</div>}
               </div>
             </div>
           </div>
