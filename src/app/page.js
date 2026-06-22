@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Trophy, Calendar, Star, Zap, CircleDot, Volleyball, Footprints, BadgeCheck, X, Home as HomeIcon, Flame, CheckCircle, Award, Maximize2, ChevronLeft, ChevronRight, ChevronDown, Sliders, Menu, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MatchDetailPanel from '../components/MatchDetailPanel';
+import HeroSlider from '../components/HeroSlider';
 import api, { getImageUrl } from '../api';
 
 // SVG Icons for sports
@@ -636,7 +637,9 @@ function Home() {
 
 
 
-      {/* Hero removed — Sofascore-style: straight to content */}
+      <div style={{ maxWidth: 1340, margin: '0 auto', padding: '24px 24px 0' }}>
+        <HeroSlider />
+      </div>
 
       {/* ═══ MAIN LAYOUT ═══ */}
       <div style={{ display: 'flex', gap: 0, padding: '0' }}>
