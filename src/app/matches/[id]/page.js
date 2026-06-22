@@ -779,20 +779,20 @@ function RincianTab({ match }) {
                 const subtext = ev.event_type === 'own_goal' ? 'Own goal' : ev.event_type === 'penalty' ? 'Penalty' : ev.event_data?.commentary;
 
                 const EventContent = () => (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexDirection: isHome ? 'row' : 'row-reverse' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', textAlign: isHome ? 'right' : 'left' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexDirection: isHome ? 'row' : 'row-reverse' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: isHome ? 'flex-end' : 'flex-start', textAlign: isHome ? 'right' : 'left' }}>
                       {isSub ? (
                         <>
-                          <span style={{ fontSize: 13, fontWeight: 500, color: '#10b981' }}>{ev.event_data?.player_in || ev.player?.name}</span>
-                          <span style={{ fontSize: 13, fontWeight: 500, color: '#ef4444' }}>{ev.event_data?.player_off || 'Pemain Keluar'}</span>
+                          <span style={{ fontSize: 13, fontWeight: 500, color: '#10b981', lineHeight: '18px' }}>{ev.event_data?.player_in || ev.player?.name}</span>
+                          <span style={{ fontSize: 13, fontWeight: 500, color: '#ef4444', lineHeight: '18px' }}>{ev.event_data?.player_out || ev.event_data?.player_off || 'Pemain Keluar'}</span>
                         </>
                       ) : (
                         <>
-                          <div style={{ fontSize: 13, fontWeight: 500, color: '#111827' }}>
+                          <div style={{ fontSize: 14, fontWeight: 500, color: '#111827', display: 'flex', alignItems: 'center', gap: 6, flexDirection: isHome ? 'row' : 'row-reverse' }}>
                             <span onClick={() => handlePlayerClick(ev.player?.uuid)} style={{ cursor: 'pointer' }}>{ev.player?.name || 'Pemain'}</span>
-                            {isGoal && <span style={{ fontWeight: 700, marginLeft: isHome ? 6 : 0, marginRight: !isHome ? 6 : 0, color: '#374151' }}>({runningScore})</span>}
+                            {isGoal && <span style={{ fontWeight: 700, color: '#374151' }}>({runningScore})</span>}
                           </div>
-                          {subtext && <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 2 }}>{subtext}</div>}
+                          {subtext && <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 2 }}>{subtext}</div>}
                         </>
                       )}
                     </div>
@@ -824,6 +824,9 @@ function RincianTab({ match }) {
           Belum ada kejadian pertandingan.
         </div>
       )}
+      
+      <SubstitutesBlock match={match} />
+      
       <NextMatchSection match={match} />
     </div>
   );
@@ -888,6 +891,172 @@ function NextMatchSection({ match }) {
   );
 }
 
+function SubstitutesBlock({ match }) {
+  const stats = match.player_statistics || [];
+  const homeSubs = stats.filter(s => s.player?.team_id === match.home_team?.id && !s.is_starter);
+  const awaySubs = stats.filter(s => s.player?.team_id === match.away_team?.id && !s.is_starter);
+
+  if (homeSubs.length === 0 && awaySubs.length === 0) return null;
+
+  const avatar = (name, bg) =>
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(name || '?')}&size=40&background=${bg}&color=fff`;
+
+  return (
+    <div style={{ marginTop: 16, background: '#ffffff', borderRadius: 16, padding: '24px 16px', border: '1px solid rgba(0,0,0,0.05)' }}>
+      <div style={{ textAlign: 'center', fontSize: 15, fontWeight: 700, color: '#111827', marginBottom: 24 }}>
+        Pemain Cadangan
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+        {/* Home Subs */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {homeSubs.map((hP, i) => {
+            const subEvent = (match.events || []).find(e => e.event_type === 'substitution' && e.team_id === match.home_team?.id && (e.event_data?.player_in === hP.player?.name || e.player?.id === hP.player?.id));
+            const rating = hP.statistics?.rating || (Math.random() * (7.0 - 5.0) + 5.0).toFixed(1);
+            const ratingColor = rating >= 7.0 ? '#10b981' : rating >= 6.0 ? '#f59e0b' : '#ef4444';
+            
+            return (
+              <div key={i} onClick={() => handlePlayerClick(hP.player?.uuid)} style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', padding: '12px 0', borderBottom: i < homeSubs.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
+                 <img src={getImageUrl(hP.player?.photo_path) || avatar(hP.player?.name, '3b82f6')} style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', background: '#f3f4f6', flexShrink: 0 }} alt="" />
+                 
+                 {subEvent && (
+                   <div style={{ background: ratingColor, color: '#fff', fontSize: 13, fontWeight: 700, padding: '4px 10px', borderRadius: 14, marginLeft: 4 }}>
+                     {rating}
+                   </div>
+                 )}
+                 
+                 <div style={{ fontSize: 16, fontWeight: 600, color: '#9ca3af', width: 28, textAlign: 'center', marginLeft: subEvent ? 4 : 12 }}>
+                    {hP.player?.jersey_number}
+                 </div>
+                 
+                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div style={{ fontSize: 15, fontWeight: 500, color: '#111827' }}>{hP.player?.name}</div>
+                    <div style={{ fontSize: 14, color: '#9ca3af', marginTop: 2 }}>{hP.position?.name || 'Substitute'}</div>
+                 </div>
+                 
+                 {subEvent && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#10b981', fontWeight: 600, fontSize: 14 }}>
+                       {subEvent.minute}'
+                       <div style={{ width: 26, height: 26, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                               <path d="M5 12h14M12 5l7 7-7 7" />
+                            </svg>
+                          </div>
+                       </div>
+                    </div>
+                 )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Away Subs */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {awaySubs.map((aP, i) => {
+            const subEvent = (match.events || []).find(e => e.event_type === 'substitution' && e.team_id === match.away_team?.id && (e.event_data?.player_in === aP.player?.name || e.player?.id === aP.player?.id));
+            const rating = aP.statistics?.rating || (Math.random() * (7.0 - 5.0) + 5.0).toFixed(1);
+            const ratingColor = rating >= 7.0 ? '#10b981' : rating >= 6.0 ? '#f59e0b' : '#ef4444';
+
+            return (
+              <div key={i} onClick={() => handlePlayerClick(aP.player?.uuid)} style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', padding: '12px 0', borderBottom: i < awaySubs.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
+                 <img src={getImageUrl(aP.player?.photo_path) || avatar(aP.player?.name, 'ef4444')} style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', background: '#f3f4f6', flexShrink: 0 }} alt="" />
+                 
+                 {subEvent && (
+                   <div style={{ background: ratingColor, color: '#fff', fontSize: 13, fontWeight: 700, padding: '4px 10px', borderRadius: 14, marginLeft: 4 }}>
+                     {rating}
+                   </div>
+                 )}
+                 
+                 <div style={{ fontSize: 16, fontWeight: 600, color: '#9ca3af', width: 28, textAlign: 'center', marginLeft: subEvent ? 4 : 12 }}>
+                    {aP.player?.jersey_number}
+                 </div>
+                 
+                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div style={{ fontSize: 15, fontWeight: 500, color: '#111827' }}>{aP.player?.name}</div>
+                    <div style={{ fontSize: 14, color: '#9ca3af', marginTop: 2 }}>{aP.position?.name || 'Substitute'}</div>
+                 </div>
+                 
+                 {subEvent && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#10b981', fontWeight: 600, fontSize: 14 }}>
+                       {subEvent.minute}'
+                       <div style={{ width: 26, height: 26, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                               <path d="M5 12h14M12 5l7 7-7 7" />
+                            </svg>
+                          </div>
+                       </div>
+                    </div>
+                 )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SubstitutionsTimelineBlock({ match }) {
+  const subEvents = (match.events || []).filter(e => e.event_type === 'substitution').sort((a, b) => (a.minute || 0) - (b.minute || 0));
+  if (subEvents.length === 0) return null;
+
+  return (
+    <div style={{ marginTop: 16, background: '#ffffff', borderRadius: 16, padding: '24px 0', border: '1px solid rgba(0,0,0,0.05)' }}>
+      <div style={{ textAlign: 'center', fontSize: 15, fontWeight: 700, color: '#111827', marginBottom: 24 }}>
+        Substitusi
+      </div>
+      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 20, padding: '10px 0' }}>
+        {/* Center Line */}
+        <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: 1, background: '#f3f4f6', transform: 'translateX(-50%)' }} />
+        
+        {subEvents.map((ev, i) => {
+          const isHome = ev.team_id === match.home_team?.id;
+
+          const MinuteCircle = () => (
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#111827', zIndex: 2 }}>
+              {ev.minute ? `${ev.minute}'` : `#${ev.sequence}`}
+            </div>
+          );
+
+          const SubIcon = () => (
+            <div style={{ width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', borderRadius: '50%', border: '1px solid #e5e7eb' }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                <path d="M9 8h5v3l4-4-4-4v3H9z" fill="#10b981" />
+                <path d="M15 16h-5v-3l-4 4 4 4v-3h5z" fill="#ef4444" />
+              </svg>
+            </div>
+          );
+
+          const EventContent = () => (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexDirection: isHome ? 'row' : 'row-reverse' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: isHome ? 'flex-end' : 'flex-start', textAlign: isHome ? 'right' : 'left' }}>
+                 <span style={{ fontSize: 13, fontWeight: 500, color: '#10b981', lineHeight: '18px' }}>{ev.event_data?.player_in || ev.player?.name}</span>
+                 <span style={{ fontSize: 13, fontWeight: 500, color: '#ef4444', lineHeight: '18px' }}>{ev.event_data?.player_out || ev.event_data?.player_off || 'Pemain Keluar'}</span>
+              </div>
+              <SubIcon />
+            </div>
+          );
+
+          return (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+              <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', paddingRight: 24 }}>
+                {isHome ? <EventContent /> : null}
+              </div>
+              <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', background: '#fff', padding: '4px 0', zIndex: 2 }}>
+                <MinuteCircle />
+              </div>
+              <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start', paddingLeft: 24 }}>
+                {!isHome ? <EventContent /> : null}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 /* ─── Lineup ─── */
 function LineupTab({ match }) {
@@ -895,10 +1064,6 @@ function LineupTab({ match }) {
   const stats = match.player_statistics || [];
   const home = stats.filter(s => s.player?.team_id === match.home_team?.id);
   const away = stats.filter(s => s.player?.team_id === match.away_team?.id);
-
-  const homeSubs = home.filter(p => !p.is_starter);
-  const awaySubs = away.filter(p => !p.is_starter);
-  const maxSubs = Math.max(homeSubs.length, awaySubs.length);
 
   const avatar = (name, bg) =>
     `https://ui-avatars.com/api/?name=${encodeURIComponent(name || '?')}&size=40&background=${bg}&color=fff`;
@@ -934,84 +1099,21 @@ function LineupTab({ match }) {
       </div>
 
       {/* Coach Section */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 16px', background: '#fff', marginTop: 16, borderRadius: 16, border: '1px solid rgba(0,0,0,0.05)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-           <img src={avatar(match.home_team?.pelatih || match.home_team?.name, 'f3f4f6')} style={{ width: 40, height: 40, borderRadius: '50%' }} alt="" />
-           <span style={{ fontSize: 14, fontWeight: 600, color: '#111827' }}>{match.home_team?.pelatih || 'Pelatih Belum Diatur'}</span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 16px', background: '#fff', marginTop: 16, borderRadius: 16, border: '1px solid rgba(0,0,0,0.05)', gap: 8 }}>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12, overflow: 'hidden' }}>
+           <img src={avatar(match.home_team?.pelatih || match.home_team?.name, 'f3f4f6')} style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0 }} alt="" />
+           <span style={{ fontSize: 14, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{match.home_team?.pelatih || 'Pelatih Belum Diatur'}</span>
         </div>
-        <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>Coach</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-           <span style={{ fontSize: 14, fontWeight: 600, color: '#111827' }}>{match.away_team?.pelatih || 'Pelatih Belum Diatur'}</span>
-           <img src={avatar(match.away_team?.pelatih || match.away_team?.name, 'f3f4f6')} style={{ width: 40, height: 40, borderRadius: '50%' }} alt="" />
+        <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', flexShrink: 0, padding: '0 8px' }}>Coach</div>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12, overflow: 'hidden', justifyContent: 'flex-end' }}>
+           <span style={{ fontSize: 14, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>{match.away_team?.pelatih || 'Pelatih Belum Diatur'}</span>
+           <img src={avatar(match.away_team?.pelatih || match.away_team?.name, 'f3f4f6')} style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0 }} alt="" />
         </div>
       </div>
 
-      {/* Substitutes */}
-      {(homeSubs.length > 0 || awaySubs.length > 0) && (
-        <div style={{ marginTop: 16, background: '#ffffff', borderRadius: 16, padding: '24px 16px', border: '1px solid rgba(0,0,0,0.05)' }}>
-          <div style={{ textAlign: 'center', fontSize: 15, fontWeight: 700, color: '#111827', marginBottom: 24 }}>
-            Substitutes
-          </div>
+      <SubstitutionsTimelineBlock match={match} />
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
-            {/* Home Subs */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {homeSubs.map((hP, i) => {
-                const subEvent = (match.events || []).find(e => e.event_type === 'substitution' && e.team_id === match.home_team?.id && (e.event_data?.player_in === hP.player?.name || e.player?.id === hP.player?.id));
-                const rating = hP.statistics?.rating || (Math.random() * (7.0 - 5.0) + 5.0).toFixed(1);
-                
-                return (
-                  <div key={i} onClick={() => handlePlayerClick(hP.player?.uuid)} style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', padding: '4px 0' }}>
-                     <div style={{ position: 'relative' }}>
-                        <img src={getImageUrl(hP.player?.photo_path) || avatar(hP.player?.name, '3b82f6')} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }} alt="" />
-                        <div style={{ position: 'absolute', bottom: -4, right: -4, background: rating >= 7.0 ? '#10b981' : rating >= 6.0 ? '#f59e0b' : '#ef4444', color: '#fff', fontSize: 9, fontWeight: 800, padding: '2px 4px', borderRadius: 6, border: '1px solid #fff' }}>{rating}</div>
-                     </div>
-                     <div style={{ fontSize: 12, fontWeight: 600, color: '#9ca3af', width: 20 }}>{hP.player?.jersey_number}</div>
-                     <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 14, fontWeight: 600, color: '#111827' }}>{hP.player?.name}</div>
-                        <div style={{ fontSize: 12, color: '#9ca3af' }}>{hP.position?.name || 'Substitute'}</div>
-                     </div>
-                     {subEvent && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#10b981', fontWeight: 600, fontSize: 12 }}>
-                           {subEvent.minute}'
-                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10" /><path d="M12 8l4 4-4 4m-4-4h8" /></svg>
-                        </div>
-                     )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Away Subs */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {awaySubs.map((aP, i) => {
-                const subEvent = (match.events || []).find(e => e.event_type === 'substitution' && e.team_id === match.away_team?.id && (e.event_data?.player_in === aP.player?.name || e.player?.id === aP.player?.id));
-                const rating = aP.statistics?.rating || (Math.random() * (7.0 - 5.0) + 5.0).toFixed(1);
-
-                return (
-                  <div key={i} onClick={() => handlePlayerClick(aP.player?.uuid)} style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', padding: '4px 0' }}>
-                     <div style={{ position: 'relative' }}>
-                        <img src={getImageUrl(aP.player?.photo_path) || avatar(aP.player?.name, 'ef4444')} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }} alt="" />
-                        <div style={{ position: 'absolute', bottom: -4, right: -4, background: rating >= 7.0 ? '#10b981' : rating >= 6.0 ? '#f59e0b' : '#ef4444', color: '#fff', fontSize: 9, fontWeight: 800, padding: '2px 4px', borderRadius: 6, border: '1px solid #fff' }}>{rating}</div>
-                     </div>
-                     <div style={{ fontSize: 12, fontWeight: 600, color: '#9ca3af', width: 20 }}>{aP.player?.jersey_number}</div>
-                     <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 14, fontWeight: 600, color: '#111827' }}>{aP.player?.name}</div>
-                        <div style={{ fontSize: 12, color: '#9ca3af' }}>{aP.position?.name || 'Substitute'}</div>
-                     </div>
-                     {subEvent && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#10b981', fontWeight: 600, fontSize: 12 }}>
-                           {subEvent.minute}'
-                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10" /><path d="M12 8l4 4-4 4m-4-4h8" /></svg>
-                        </div>
-                     )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
+      <SubstitutesBlock match={match} />
 
       {/* Player Stats Panel */}
       {selectedPlayer && (
@@ -1099,7 +1201,7 @@ function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFor
   };
 
   const pitchMode = isMobile ? 'pitch-vertical' : 'pitch-horizontal';
-  const pitchHeight = isMobile ? 1200 : 600;
+  const pitchHeight = isMobile ? 1100 : 600;
   const imgSize = isMobile ? 32 : 48;
   const nameFontSize = isMobile ? '9px' : '11px';
   const ratingFontSize = isMobile ? 9 : 11;
