@@ -16,7 +16,7 @@ export async function POST(req) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     // Construct a comprehensive prompt based on match data
     const prompt = `
@@ -49,9 +49,35 @@ export async function POST(req) {
     return NextResponse.json({ summary: text });
   } catch (error) {
     console.error('Error generating summary:', error);
+    
+    // Fallback Generator if Rate Limited / Quota Exceeded
+    const { matchData } = body || {};
+    const home = matchData?.home_team?.name || 'Tuan Rumah';
+    const away = matchData?.away_team?.name || 'Tim Tamu';
+    const hScore = parseInt(matchData?.home_score) || 0;
+    const aScore = parseInt(matchData?.away_score) || 0;
+    const hPoss = parseInt(matchData?.stats?.possession_home) || 50;
+    const aPoss = parseInt(matchData?.stats?.possession_away) || 50;
+    const hShots = parseInt(matchData?.stats?.shots_home) || 0;
+    const aShots = parseInt(matchData?.stats?.shots_away) || 0;
+
+    let resultText = '';
+    if (hScore > aScore) resultText = `${home} sukses menundukkan ${away} dengan kemenangan ${hScore}-${aScore}.`;
+    else if (aScore > hScore) resultText = `${away} berhasil mencuri poin penuh dari kandang ${home} lewat kemenangan ${hScore}-${aScore}.`;
+    else resultText = `Duel sengit antara ${home} dan ${away} harus berakhir sama kuat dengan skor imbang ${hScore}-${aScore}.`;
+    
+    let possText = '';
+    if (hPoss > 55) possText = `Tuan rumah tampil mendikte permainan dengan dominasi penguasaan bola mencapai ${hPoss}%.`;
+    else if (aPoss > 55) possText = `Tim tamu bermain sangat agresif dan menguasai lini tengah dengan ${aPoss}% penguasaan bola.`;
+    else possText = `Pertarungan di lini tengah berlangsung alot dengan penguasaan bola yang relatif berimbang antara kedua kesebelasan.`;
+    
+    let attackText = `Sepanjang laga, ${home} tercatat melepaskan ${hShots} tembakan, berbalas ${aShots} tembakan dari kubu ${away}.`;
+    
+    const fallbackSummary = `${resultText} ${possText} ${attackText}`;
+
     return NextResponse.json({ 
-      error: 'Gagal membuat ringkasan. Terjadi kesalahan pada server AI.',
-      details: error.message 
-    }, { status: 500 });
+      summary: fallbackSummary,
+      isFallback: true 
+    });
   }
 }
