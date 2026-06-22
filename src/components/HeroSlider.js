@@ -56,7 +56,7 @@ export default function HeroSlider() {
   }
 
   return (
-    <section className="relative rounded-2xl overflow-hidden mb-12 shadow-2xl group" style={{ height: '400px' }}>
+    <section className="relative rounded-2xl overflow-hidden mb-0 shadow-xl group" style={{ aspectRatio: '1000 / 300', width: '100%' }}>
       {banners.map((banner, index) => {
         const slideContent = (
           <div 

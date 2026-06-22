@@ -3,7 +3,7 @@ import { use } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { useState, useEffect, useRef } from 'react';
-import { Clock, ArrowLeft, MapPin, Users, User, Trophy, CalendarDays, CloudSun, Target, Activity, Star, ChevronLeft, ChevronRight, FileText, BarChart2, Zap, List, Maximize2, ChevronUp, ChevronDown, Minus } from 'lucide-react';
+import { Clock, ArrowLeft, MapPin, Users, User, Trophy, CalendarDays, CloudSun, Target, Activity, Star, ChevronLeft, ChevronRight, FileText, BarChart2, Zap, List, Maximize2, ChevronUp, ChevronDown, Minus, Shield, ClipboardList } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import api, { getImageUrl } from '../../../api';
@@ -27,6 +27,35 @@ const formatGameMinute = (minute) => {
     return Math.floor(parsed);
   }
   return minute;
+};
+
+const LiveMatchDetailClock = ({ match, lastFetchTime }) => {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const iv = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(iv);
+  }, []);
+
+  if (match.status === 'half_time') return <span>HT</span>;
+  if (match.status === 'finished') return <span>FT</span>;
+
+  let totalSeconds = 0;
+  if (match.started_at) {
+    const start = new Date(match.started_at).getTime();
+    totalSeconds = Math.max(0, Math.floor((now - start) / 1000));
+    if (match.status === 'second_half' && totalSeconds < 45 * 60) {
+      totalSeconds += 45 * 60;
+    }
+  } else if (match.minute != null) {
+    totalSeconds = (Math.floor(match.minute) * 60) + Math.floor((now - lastFetchTime) / 1000);
+  } else {
+    const baseMinute = match.status === 'second_half' ? 45 : 0;
+    totalSeconds = (baseMinute * 60) + Math.floor((now - lastFetchTime) / 1000);
+  }
+
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return <span>{m}:{s.toString().padStart(2, '0')}</span>;
 };
 
 const handlePlayerClick = (playerId) => {
@@ -64,6 +93,7 @@ export default function MatchDetailPage({ params }) {
     }
   };
   const [match, setMatch] = useState(null);
+  const [lastFetchTime, setLastFetchTime] = useState(Date.now());
   const [standings, setStandings] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [tabHovered, setTabHovered] = useState(false);
@@ -92,6 +122,7 @@ export default function MatchDetailPage({ params }) {
         const res = await api.get(`/matches/${matchId}`);
         if (res.data.success && isMounted) {
           setMatch(res.data.data);
+          setLastFetchTime(Date.now());
           // Fetch standings — on failure, keep existing data (don't clear)
           const tournamentSlug = res.data.data.tournament?.uuid || res.data.data.tournament?.id;
           if (tournamentSlug) {
@@ -236,9 +267,9 @@ export default function MatchDetailPage({ params }) {
                   )}
                 </div>
 
-                {isLive && match.minute && (
-                  <span style={{ fontSize: 11, fontWeight: 700, color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '2px 8px', borderRadius: 6, marginTop: 12 }}>
-                    {formatGameMinute(match.minute)}{match.minute !== 'HT' && match.minute !== 'FT' ? "'" : ""}
+                {isLive && (
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '4px 12px', borderRadius: 6, marginTop: 12, fontVariantNumeric: 'tabular-nums' }}>
+                    <LiveMatchDetailClock match={match} lastFetchTime={lastFetchTime} />
                   </span>
                 )}
                 {isFinished && !isLive && (
@@ -1789,7 +1820,7 @@ function PlayerStatsPanel({ playerStat, match, onClose }) {
   const categories = [
     {
       title: 'Statistik Utama',
-      icon: '⭐',
+      icon: <Star size={16} strokeWidth={2.5} />,
       color: '#f59e0b',
       items: [
         { label: 'Menit Bermain', value: g('minutes_played', '-'), show: true },
@@ -1802,7 +1833,7 @@ function PlayerStatsPanel({ playerStat, match, onClose }) {
     },
     {
       title: 'Serangan',
-      icon: '⚔️',
+      icon: <Target size={16} strokeWidth={2.5} />,
       color: '#ef4444',
       items: [
         { label: 'Sentuhan Bola', value: g('touches', g('ball_touches', 0)), show: true },
@@ -1821,7 +1852,7 @@ function PlayerStatsPanel({ playerStat, match, onClose }) {
     },
     {
       title: 'Pertahanan',
-      icon: '🛡️',
+      icon: <Shield size={16} strokeWidth={2.5} />,
       color: '#10b981',
       items: [
         { label: 'Kontribusi Pertahanan', value: g('defensive_contributions', parseInt(g('tackles', 0)) + parseInt(g('interceptions', 0)) + parseInt(g('clearances', 0)) + parseInt(g('blocks', 0))), show: true },
@@ -1842,7 +1873,7 @@ function PlayerStatsPanel({ playerStat, match, onClose }) {
     },
     {
       title: 'Duel',
-      icon: '🤝',
+      icon: <Activity size={16} strokeWidth={2.5} />,
       color: '#8b5cf6',
       items: [
         { label: 'Duel Udara Dimenangkan', value: hasVal('aerial_won') && hasVal('aerial_total') ? ratio('aerial_won', 'aerial_total') : hasVal('aerial_won') ? g('aerial_won', 0) : '-', show: true },
@@ -1854,7 +1885,7 @@ function PlayerStatsPanel({ playerStat, match, onClose }) {
     },
     {
       title: 'Distribusi',
-      icon: '📊',
+      icon: <BarChart2 size={16} strokeWidth={2.5} />,
       color: '#3b82f6',
       items: [
         { label: 'Total Umpan', value: g('total_passes', g('passes', 0)), show: true },
@@ -1867,7 +1898,7 @@ function PlayerStatsPanel({ playerStat, match, onClose }) {
     },
     {
       title: 'Kedisiplinan',
-      icon: '📋',
+      icon: <FileText size={16} strokeWidth={2.5} />,
       color: '#eab308',
       items: [
         { label: 'Kartu Kuning', value: g('yellow_cards', g('yellow_card', 0)), show: true },
@@ -1877,7 +1908,7 @@ function PlayerStatsPanel({ playerStat, match, onClose }) {
     {
       // Sport-specific: Passing / Kontrol / Finishing / Stamina etc
       title: 'Penilaian Pelatih',
-      icon: '📝',
+      icon: <ClipboardList size={16} strokeWidth={2.5} />,
       color: '#06b6d4',
       items: [
         { label: 'Passing', value: g('passing', '-'), show: hasVal('passing') },
@@ -1920,56 +1951,75 @@ function PlayerStatsPanel({ playerStat, match, onClose }) {
           position: 'fixed', inset: 0, zIndex: 1000,
           background: 'rgba(0,0,0,0.5)',
           backdropFilter: 'blur(4px)',
-          display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: 16,
         }}
       >
         <motion.div
-          initial={{ y: '100%' }}
-          animate={{ y: 0 }}
-          exit={{ y: '100%' }}
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
           onClick={(e) => e.stopPropagation()}
           style={{
             width: '100%', maxWidth: 560,
             maxHeight: '90vh',
             background: '#ffffff',
-            borderRadius: '24px 24px 0 0',
+            borderRadius: '24px',
             overflow: 'hidden',
             display: 'flex', flexDirection: 'column',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
           }}
         >
           {/* Header */}
           <div style={{
-            background: `linear-gradient(135deg, ${teamColor}12, ${teamColor}05)`,
-            padding: '20px 20px 16px',
-            borderBottom: '1px solid rgba(0,0,0,0.06)',
+            background: '#ffffff',
+            padding: '32px 24px 24px',
             position: 'relative',
+            borderBottom: '1px solid rgba(0,0,0,0.04)',
           }}>
-            {/* Close Handle */}
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
-              <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(0,0,0,0.12)' }} />
-            </div>
+            {/* Background Blob */}
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 100, background: `linear-gradient(180deg, ${teamColor}15 0%, transparent 100%)`, zIndex: 0 }} />
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            {/* Close Button */}
+            <button
+              onClick={onClose}
+              style={{
+                position: 'absolute', top: 16, right: 16, zIndex: 10,
+                width: 32, height: 32, borderRadius: '50%',
+                background: 'rgba(0,0,0,0.04)', border: 'none',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', color: '#6b7280',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,0,0,0.08)'; e.currentTarget.style.color = '#111827'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(0,0,0,0.04)'; e.currentTarget.style.color = '#6b7280'; }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, position: 'relative', zIndex: 1 }}>
               {/* Photo */}
               <div style={{ position: 'relative', flexShrink: 0 }}>
-                <img
-                  src={getImageUrl(player.photo_path) || avatar(player.name, teamColor.replace('#', ''))}
-                  alt={player.name}
-                  style={{
-                    width: 56, height: 56, borderRadius: 16,
-                    objectFit: 'cover', border: `3px solid ${teamColor}30`,
-                    boxShadow: `0 4px 14px ${teamColor}20`,
-                  }}
-                />
+                <div style={{ width: 76, height: 76, borderRadius: '50%', background: `linear-gradient(135deg, ${teamColor}, ${teamColor}80)`, padding: 3, boxShadow: `0 8px 24px ${teamColor}30` }}>
+                  <img
+                    src={getImageUrl(player.photo_path) || avatar(player.name, teamColor.replace('#', ''))}
+                    alt={player.name}
+                    style={{
+                      width: '100%', height: '100%', borderRadius: '50%',
+                      objectFit: 'cover', border: '3px solid #fff',
+                      background: '#fff'
+                    }}
+                  />
+                </div>
                 {rating && (
                   <div style={{
-                    position: 'absolute', top: -4, right: -8,
+                    position: 'absolute', bottom: -2, right: -4,
                     background: parseFloat(rating) >= 7 ? '#10b981' : parseFloat(rating) >= 6 ? '#f59e0b' : '#ef4444',
-                    color: '#fff', fontSize: 10, fontWeight: 900,
-                    padding: '2px 6px', borderRadius: 8,
+                    color: '#fff', fontSize: 11, fontWeight: 900,
+                    padding: '4px 8px', borderRadius: 12,
                     border: '2px solid #fff',
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                    boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
                   }}>
                     {rating}
                   </div>
@@ -1978,71 +2028,64 @@ function PlayerStatsPanel({ playerStat, match, onClose }) {
 
               {/* Player Info */}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 16, fontWeight: 800, color: '#111827', lineHeight: 1.2 }}>
+                <div style={{ fontSize: 20, fontWeight: 900, color: '#0f172a', lineHeight: 1.2, letterSpacing: '-0.02em' }}>
                   {player.name}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
                   {player.jersey_number && (
                     <span style={{
-                      fontSize: 9, fontWeight: 700, color: teamColor,
-                      background: `${teamColor}12`, border: `1px solid ${teamColor}25`,
+                      fontSize: 10, fontWeight: 800, color: '#ffffff',
+                      background: teamColor,
                       padding: '2px 8px', borderRadius: 6,
+                      boxShadow: `0 2px 8px ${teamColor}40`
                     }}>
                       #{player.jersey_number}
                     </span>
                   )}
                   {playerStat.position && (
                     <span style={{
-                      fontSize: 9, fontWeight: 700, color: '#6b7280',
-                      background: '#f3f4f6', border: '1px solid #e5e7eb',
+                      fontSize: 10, fontWeight: 700, color: '#475569',
+                      background: '#f1f5f9',
                       padding: '2px 8px', borderRadius: 6,
                     }}>
-                      {typeof playerStat.position === 'object' ? (playerStat.position.abbreviation || playerStat.position.name) : playerStat.position}
+                      {(() => {
+                        let pos = playerStat.position;
+                        if (typeof pos === 'string' && pos.startsWith('{')) {
+                          try { pos = JSON.parse(pos); } catch (e) {}
+                        }
+                        return typeof pos === 'object' && pos !== null ? (pos.abbreviation || pos.name) : pos;
+                      })()}
                     </span>
                   )}
-                  <span style={{ fontSize: 9, fontWeight: 600, color: '#9ca3af' }}>
+                  <span style={{ fontSize: 10, fontWeight: 600, color: '#64748b' }}>
                     {teamName}
                   </span>
                 </div>
               </div>
-
-              {/* Close Button */}
-              <button
-                onClick={onClose}
-                style={{
-                  width: 32, height: 32, borderRadius: 10,
-                  background: 'rgba(0,0,0,0.05)', border: 'none',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer', color: '#6b7280',
-                  transition: 'background 0.15s',
-                  flexShrink: 0,
-                }}
-              >
-                ✕
-              </button>
             </div>
 
             {/* Quick stats bar */}
             <div style={{
-              display: 'flex', gap: 0, marginTop: 14,
-              background: '#ffffff', borderRadius: 12,
-              border: '1px solid rgba(0,0,0,0.06)',
-              overflow: 'hidden',
+              display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10,
+              marginTop: 24, position: 'relative', zIndex: 1
             }}>
               {[
-                { label: 'Menit', value: g('minutes_played', '-'), color: '#8b5cf6' },
-                { label: 'Gol', value: g('goals', 0), color: '#ef4444' },
-                { label: 'Assist', value: g('assists', 0), color: '#3b82f6' },
-                { label: 'Sentuhan', value: g('touches', g('ball_touches', '-')), color: '#10b981' },
+                { label: 'Menit', value: g('minutes_played', '-'), color: '#8b5cf6', bg: '#f5f3ff' },
+                { label: 'Gol', value: g('goals', 0), color: '#ef4444', bg: '#fef2f2' },
+                { label: 'Assist', value: g('assists', 0), color: '#3b82f6', bg: '#eff6ff' },
+                { label: 'Sentuhan', value: g('touches', g('ball_touches', '-')), color: '#10b981', bg: '#ecfdf5' },
               ].map((item, i) => (
                 <div key={i} style={{
-                  flex: 1, textAlign: 'center', padding: '10px 4px',
-                  borderRight: i < 3 ? '1px solid rgba(0,0,0,0.06)' : 'none',
+                  background: item.bg, borderRadius: 16, padding: '14px 4px',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                  border: `1px solid ${item.color}15`,
+                  boxShadow: `0 2px 8px ${item.color}10`,
+                  transition: 'transform 0.2s',
                 }}>
-                  <div style={{ fontSize: 16, fontWeight: 900, color: item.color, lineHeight: 1 }}>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: item.color, lineHeight: 1 }}>
                     {item.value}
                   </div>
-                  <div style={{ fontSize: 8, fontWeight: 700, color: '#9ca3af', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <div style={{ fontSize: 9, fontWeight: 800, color: item.color, opacity: 0.8, marginTop: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     {item.label}
                   </div>
                 </div>
@@ -2063,7 +2106,7 @@ function PlayerStatsPanel({ playerStat, match, onClose }) {
                   padding: '16px 0 10px',
                   borderBottom: '1px solid rgba(0,0,0,0.06)',
                 }}>
-                  <span style={{ fontSize: 14 }}>{cat.icon}</span>
+                  <div style={{ color: cat.color, display: 'flex', alignItems: 'center' }}>{cat.icon}</div>
                   <span style={{
                     fontSize: 13, fontWeight: 800, color: '#111827',
                     letterSpacing: '-0.01em',
@@ -2323,22 +2366,6 @@ function StatistikTab({ match }) {
         </div>
       )}
 
-      {/* ── Statistik Akumulasi (Otomatis dari Pemain) ── */}
-      {accumFields.length > 0 && (
-        <div style={{ marginTop: 16 }}>
-          <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-primary)', fontWeight: 600, margin: '24px 0 16px' }}>
-            Statistik Pemain
-          </div>
-          {accumFields.map(field => (
-            <StatRow
-              key={field}
-              label={labelMap[field] || field.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-              homeVal={stats[`${field}_home`]}
-              awayVal={stats[`${field}_away`]}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }

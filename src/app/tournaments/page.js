@@ -204,9 +204,14 @@ export default function TournamentsPage() {
                       <SpotlightCard className={`tournament-card ${isFeatured ? 'featured-card' : ''}`}>
                         <div className="card-image-wrapper">
                           <img 
-                            src={getImageUrl(t.banner_path) || 'https://images.unsplash.com/photo-1518091044184-21f449261c6c?q=80&w=1000&auto=format&fit=crop'} 
+                            src={getImageUrl(t.logo_path) || getImageUrl(t.banner_path) || 'https://images.unsplash.com/photo-1518091044184-21f449261c6c?q=80&w=1000&auto=format&fit=crop'} 
                             alt={t.name}
                             className="card-image"
+                            style={{ objectFit: 'contain', padding: '20px', background: '#f8fafc' }}
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&size=200&background=f1f5f9&color=3b82f6&bold=true`;
+                            }}
                           />
                           <div className="card-overlay" />
                           <div className="card-status-badge">{getStatusBadge(t.status)}</div>
@@ -233,7 +238,14 @@ export default function TournamentsPage() {
 
                           <div className="card-footer">
                             <div className="organizer">
-                              <img src={getImageUrl(t.logo_path) || `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=f1f5f9&color=3b82f6&bold=true`} alt="Logo" />
+                              <img 
+                                src={getImageUrl(t.logo_path) || `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=f1f5f9&color=3b82f6&bold=true`} 
+                                alt="Logo" 
+                                onError={(e) => {
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=f1f5f9&color=3b82f6&bold=true`;
+                                }}
+                              />
                               <span>Lihat Detail</span>
                             </div>
                             <div className="arrow-icon"><ArrowUpRight size={18} /></div>

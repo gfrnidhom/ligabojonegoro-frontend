@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Trophy, Calendar, Star, Zap, CircleDot, Volleyball, Footprints, BadgeCheck, X, Home as HomeIcon, Flame, CheckCircle, Award, Maximize2, ChevronLeft, ChevronRight, ChevronDown, Sliders, Menu, Globe } from 'lucide-react';
+import { Trophy, Calendar, Star, Zap, CircleDot, Volleyball, Footprints, BadgeCheck, X, Home as HomeIcon, Flame, CheckCircle, Award, Maximize2, ChevronLeft, ChevronRight, ChevronDown, Sliders, Menu, Globe, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MatchDetailPanel from '../components/MatchDetailPanel';
 import HeroSlider from '../components/HeroSlider';
@@ -64,6 +64,41 @@ const formatGameMinute = (minute) => {
     return Math.floor(parsed);
   }
   return minute;
+};
+
+const LiveMatchClock = ({ match, lastFetchTime }) => {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const iv = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(iv);
+  }, []);
+
+  if (match.status === 'half_time') return <span>HT</span>;
+  let text = 'Live';
+  if (match.status === 'first_half' || (match.minute > 0 && match.minute <= 45)) text = 'Babak pertama';
+  else if (match.status === 'second_half' || match.minute > 45) text = 'Babak kedua';
+  else if (match.status === 'extra_time_1') text = 'Babak tambahan 1';
+  else if (match.status === 'extra_time_2') text = 'Babak tambahan 2';
+  else if (match.status === 'penalty_shootout') text = 'Adu Penalti';
+
+  let totalSeconds = 0;
+  if (match.started_at) {
+    const start = new Date(match.started_at).getTime();
+    totalSeconds = Math.max(0, Math.floor((now - start) / 1000));
+    if (match.status === 'second_half' && totalSeconds < 45 * 60) {
+      // If started_at was updated at the start of second half, add 45 mins
+      totalSeconds += 45 * 60;
+    }
+  } else if (match.minute != null) {
+    totalSeconds = (Math.floor(match.minute) * 60) + Math.floor((now - lastFetchTime) / 1000);
+  } else {
+    const baseMinute = match.status === 'second_half' ? 45 : 0;
+    totalSeconds = (baseMinute * 60) + Math.floor((now - lastFetchTime) / 1000);
+  }
+
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return <span>{text} | {m}:{s.toString().padStart(2, '0')}</span>;
 };
 
 function getDateRange() {
@@ -143,6 +178,7 @@ const getSportSkills = (sportId) => {
 
 function Home() {
   const [matches, setMatches] = useState([]);
+  const [lastFetchTime, setLastFetchTime] = useState(Date.now());
   const [tournaments, setTournaments] = useState([]);
   const [sports, setSports] = useState([]);
   const [banners, setBanners] = useState([]);
@@ -224,6 +260,7 @@ function Home() {
         ]);
         const mData = mRes.data.success ? (mRes.data.data || []) : [];
         setMatches(mData);
+        setLastFetchTime(Date.now());
         if (tRes.data.success) setTournaments(tRes.data.data || []);
         if (sRes.data.success) setSports(sRes.data.data || []);
         if (nRes?.data?.success) setLatestNews(nRes.data.data || []);
@@ -635,10 +672,19 @@ function Home() {
         )}
       </AnimatePresence>
 
-
-
-      <div style={{ maxWidth: 1340, margin: '0 auto', padding: '24px 24px 0' }}>
-        <HeroSlider />
+      {/* HERO SLIDER (Above all, but matching center column width on desktop) */}
+      <div 
+        style={{
+          width: '100%', display: 'flex', gap: 24, maxWidth: 1340, margin: '0 auto', minWidth: 0,
+          padding: '24px 24px 0'
+        }} 
+        className="flex-col lg:flex-row"
+      >
+        <div className="hidden lg:block lg:w-[260px] flex-shrink-0" />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <HeroSlider />
+        </div>
+        <div style={{ width: 320, flexShrink: 0 }} className="hidden lg:block" />
       </div>
 
       {/* ═══ MAIN LAYOUT ═══ */}
@@ -649,9 +695,9 @@ function Home() {
         style={{
           width: '100%', display: 'flex', gap: 24, maxWidth: 1340, margin: '0 auto', minWidth: 0,
           ...(isMounted && typeof window !== 'undefined' && window.innerWidth >= 1024 ? {
-            padding: '80px 24px 40px 24px'
+            padding: '24px 24px 40px 24px'
           } : {
-            padding: '24px 0px 76px 0px'
+            padding: '16px 0px 76px 0px'
           })
         }} 
         className="flex-col lg:flex-row lg:pb-4"
@@ -812,12 +858,87 @@ function Home() {
                <div onClick={() => setStatusFilter('all')} style={{ display: 'flex', alignItems: 'center', background: statusFilter === 'all' ? 'var(--text-primary)' : 'transparent', border: '1px solid var(--border)', borderRadius: 20, padding: '6px 16px', color: statusFilter === 'all' ? 'var(--bg-card)' : 'var(--text-muted)', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
                   <Menu size={14} style={{ marginRight: 6 }} /> Semua
                </div>
-               <button onClick={() => setViewMode(viewMode === 'list' ? 'grid' : 'list')} style={{ width: 32, height: 32, borderRadius: '50%', background: 'transparent', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-primary)', cursor: 'pointer' }} title="Toggle List/Grid">
-                 <Sliders size={14} />
-               </button>
             </div>
           </div>
         </div>
+
+        {/* ═══ LIVE MATCH CAROUSEL ═══ */}
+        {liveMatches.length > 0 && (
+          <div style={{ 
+            marginBottom: 24, 
+            ...(isMounted && typeof window !== 'undefined' && window.innerWidth < 1024 ? { padding: '0 12px' } : {}) 
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', margin: 0 }}>Live Match</h2>
+              <span 
+                onClick={() => setStatusFilter('live')} 
+                style={{ fontSize: 13, fontWeight: 600, color: '#64748b', cursor: 'pointer' }}
+              >
+                See all
+              </span>
+            </div>
+            <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 16 }} className="hide-scrollbar">
+              {liveMatches.map(match => (
+                <div key={`live-${match.id}`} style={{
+                  minWidth: '100%',
+                  width: '100%',
+                  background: 'linear-gradient(135deg, rgba(249,115,22,0.15) 0%, rgba(14,165,233,0.15) 100%)',
+                  borderRadius: 24,
+                  padding: '24px 20px',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  boxShadow: '0 8px 24px rgba(14, 165, 233, 0.1)',
+                  cursor: 'pointer',
+                  flexShrink: 0
+                }} onClick={() => router.push(`/matches/${match.uuid || match.id}`)}>
+                  
+                  {/* Top Badge */}
+                  <div style={{
+                    position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+                    background: 'linear-gradient(90deg, #f97316 0%, #ea580c 100%)', color: '#fff', fontSize: 11, fontWeight: 700,
+                    padding: '6px 24px', borderBottomLeftRadius: 16, borderBottomRightRadius: 16,
+                    boxShadow: '0 2px 10px rgba(249, 115, 22, 0.3)'
+                  }}>
+                    Live — {match.group?.name || 'Match'}
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 }}>
+                    {/* Home Team */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, width: 110, flex: 1 }}>
+                      <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name)} style={{ width: 60, height: 60, objectFit: 'contain' }} alt="" />
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#1e293b', textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>{match.home_team?.name}</span>
+                    </div>
+
+                    {/* Score */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '0 12px' }}>
+                      <span style={{ fontSize: 28, fontWeight: 900, color: '#0f172a' }}>{match.home_score ?? '-'}</span>
+                      <span style={{ fontSize: 20, fontWeight: 700, color: '#0f172a' }}>-</span>
+                      <span style={{ fontSize: 28, fontWeight: 900, color: '#0f172a' }}>{match.away_score ?? '-'}</span>
+                    </div>
+
+                    {/* Away Team */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, width: 110, flex: 1 }}>
+                      <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name)} style={{ width: 60, height: 60, objectFit: 'contain' }} alt="" />
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#1e293b', textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>{match.away_team?.name}</span>
+                    </div>
+                  </div>
+
+                  {/* Bottom Status Badge */}
+                  <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}>
+                    <div style={{
+                      background: 'linear-gradient(90deg, #0ea5e9 0%, #0284c7 100%)', color: '#fff', fontSize: 12, fontWeight: 600,
+                      padding: '6px 24px', borderRadius: 20,
+                      boxShadow: '0 4px 12px rgba(14, 165, 233, 0.3)',
+                      fontVariantNumeric: 'tabular-nums'
+                    }}>
+                      <LiveMatchClock match={match} lastFetchTime={lastFetchTime} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '64px 0' }}>
@@ -827,38 +948,62 @@ function Home() {
         ) : Object.keys(groupedMatches).length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0, ...(isMounted && typeof window !== 'undefined' && window.innerWidth < 1024 ? { padding: '0 12px' } : {}) }}>
             {Object.entries(groupedMatches).map(([name, group]) => (
-              <div key={name} style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-card)' }}>
+              <div key={name} style={{ 
+                marginBottom: 24, 
+                background: '#ffffff', 
+                borderRadius: 24, 
+                overflow: 'hidden', 
+                border: '1px solid #f1f5f9', 
+                boxShadow: '0 4px 20px rgba(0,0,0,0.03)' 
+              }}>
                 <div 
                   onClick={() => (group.tournament?.uuid || group.tournament?.id) && router.push(`/tournaments/${group.tournament.uuid || group.tournament.id}`)}
                   style={{ 
                     cursor: (group.tournament?.uuid || group.tournament?.id) ? 'pointer' : 'default', 
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    padding: '12px 16px', 
-                    background: 'linear-gradient(90deg, #fdf2f2 0%, #eef2ff 100%)',
-                    borderBottom: '1px solid var(--border)',
-                    borderTopLeftRadius: 8, borderTopRightRadius: 8
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '16px 20px', 
+                    background: 'linear-gradient(90deg, #ffe4e6 0%, #e0e7ff 100%)',
+                    borderBottom: '1px solid #f1f5f9'
                   }}
                 >
                   <img
                     src={getImageUrl(group.tournament?.logo_path || group.tournament?.logo) || avatar(name, '3b82f6')}
-                    style={{ width: 18, height: 18, borderRadius: 4, objectFit: 'contain' }}
+                    style={{ width: 28, height: 28, borderRadius: 6, objectFit: 'cover', background: '#3b82f6' }}
                     alt=""
                   />
-                  <span style={{ fontSize: 12, fontWeight: 800, color: '#0f172a' }}>{name}</span>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: '#0f172a' }}>{name}</span>
                   {group.tournament?.sport && (
-                    <span style={{ fontSize: 10, color: 'var(--text-muted)', marginLeft: 'auto' }}>
+                    <span style={{ fontSize: 10, color: '#6366f1', marginLeft: 'auto', background: '#e0e7ff', padding: '2px 8px', borderRadius: 12, fontWeight: 600 }}>
                       {SPORT_LABELS[group.tournament.sport?.slug] || ''}
                     </span>
                   )}
+                  {/* View Mode Toggle */}
+                  <div style={{ marginLeft: group.tournament?.sport ? 12 : 'auto' }}>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setViewMode(viewMode === 'list' ? 'grid' : 'list');
+                      }} 
+                      style={{ 
+                        width: 32, height: 32, borderRadius: '50%', background: '#ffffff', 
+                        border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', 
+                        justifyContent: 'center', color: '#475569', cursor: 'pointer',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                      }} 
+                      title="Toggle List/Grid"
+                    >
+                      <Sliders size={14} />
+                    </button>
+                  </div>
                 </div>
 
                 <div>
                   <div style={{ 
                     display: viewMode === 'grid' ? 'grid' : 'flex', 
                     flexDirection: 'column',
-                    gridTemplateColumns: viewMode === 'grid' ? 'repeat(auto-fill, minmax(300px, 1fr))' : 'none',
-                    gap: viewMode === 'grid' ? 12 : 0,
-                    padding: viewMode === 'grid' ? 16 : 0,
+                    gridTemplateColumns: viewMode === 'grid' ? 'repeat(auto-fill, minmax(340px, 1fr))' : 'none',
+                    gap: viewMode === 'grid' ? 24 : 0,
+                    padding: viewMode === 'grid' ? '24px 16px' : 0,
                   }}>
                     {group.matches.map(match => {
                       const isLive = ['live', 'first_half', 'half_time', 'second_half', 'extra_time_1', 'extra_time_ht', 'extra_time_2', 'penalty_shootout', 'ongoing'].includes(match.status);
@@ -868,8 +1013,6 @@ function Home() {
                         ? new Date(match.scheduled_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
                         : '-';
                       const isSelected = selectedMatchId === (match.uuid || match.id);
-                      const homeWin = hasScore && match.home_score > match.away_score;
-                      const awayWin = hasScore && match.away_score > match.home_score;
 
                       return (
                         <div
@@ -877,84 +1020,105 @@ function Home() {
                           onClick={() => handleMatchClick(match.uuid || match.id)}
                           style={{
                             display: 'flex', alignItems: 'center',
-                            padding: viewMode === 'grid' ? '16px 20px' : '12px 16px',
-                            background: viewMode === 'grid' ? '#f8fafc' : (isSelected ? 'var(--bg-hover)' : 'var(--bg-card)'),
-                            borderBottom: viewMode === 'grid' ? 'none' : '1px solid var(--border-light)',
-                            border: viewMode === 'grid' ? '1px solid #e2e8f0' : 'none',
-                            borderRadius: viewMode === 'grid' ? 16 : 0,
-                            cursor: 'pointer', transition: 'background 0.2s ease',
+                            padding: viewMode === 'grid' ? '24px 20px 20px 20px' : '16px',
+                            background: viewMode === 'grid' ? '#ffffff' : (isSelected ? 'var(--bg-hover)' : 'var(--bg-card)'),
+                            borderBottom: viewMode === 'grid' ? 'none' : '1px solid #f8fafc',
+                            border: viewMode === 'grid' ? '1px solid #f1f5f9' : 'none',
+                            borderRadius: viewMode === 'grid' ? 20 : 16,
+                            margin: viewMode === 'grid' ? 0 : '0 0 12px 0',
+                            boxShadow: viewMode === 'grid' ? '0 4px 20px rgba(0,0,0,0.03)' : '0 2px 10px rgba(0,0,0,0.02)',
+                            cursor: 'pointer', transition: 'all 0.2s ease',
+                            position: 'relative'
                           }}
                         >
                           {viewMode === 'grid' ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                               <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 12, borderBottom: '1px solid #f1f5f9', marginBottom: 12 }}>
-                                 {isLive ? (
-                                   <span style={{ color: '#ef4444', fontSize: 13, fontWeight: 700 }}>{formatGameMinute(match.minute)}'</span>
-                                 ) : isFinished ? (
-                                   <div style={{ background: '#f1f5f9', borderRadius: 16, padding: '4px 12px', fontSize: 11, fontWeight: 700, color: '#64748b' }}>FT</div>
-                                 ) : (
-                                   <span style={{ fontSize: 13, fontWeight: 700, color: '#64748b' }}>{time}</span>
-                                 )}
+                            <div style={{ display: 'flex', flexDirection: 'column', width: '100%', position: 'relative' }}>
+                               {isLive && (
+                                 <div style={{ position: 'absolute', top: -38, left: '50%', transform: 'translateX(-50%)', background: '#ef4444', color: '#fff', padding: '6px 20px', borderRadius: 24, fontSize: 13, fontWeight: 700, zIndex: 1, boxShadow: '0 4px 10px rgba(239, 68, 68, 0.3)' }}>
+                                   LIVE
+                                 </div>
+                               )}
+                               {!isLive && isFinished && (
+                                 <div style={{ position: 'absolute', top: -38, left: '50%', transform: 'translateX(-50%)', background: '#f1f5f9', color: '#64748b', padding: '6px 20px', borderRadius: 24, fontSize: 13, fontWeight: 700, zIndex: 1 }}>
+                                   FT
+                                 </div>
+                               )}
+                               {!isLive && !isFinished && (
+                                 <div style={{ position: 'absolute', top: -38, left: '50%', transform: 'translateX(-50%)', background: '#ffffff', border: '1px solid #e2e8f0', color: '#64748b', padding: '6px 20px', borderRadius: 24, fontSize: 13, fontWeight: 700, zIndex: 1 }}>
+                                   {time}
+                                 </div>
+                               )}
+                               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, justifyContent: 'flex-end', minWidth: 0 }}>
+                                    <span style={{ fontSize: 16, fontWeight: 500, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.home_team?.name}</span>
+                                    <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name)} style={{ width: 48, height: 48, objectFit: 'contain' }} alt="" />
+                                  </div>
+                                  <div style={{ width: 90, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: '0 8px' }}>
+                                    {hasScore ? (
+                                      <span style={{ fontSize: 18, fontWeight: 700, color: '#ef4444', whiteSpace: 'nowrap' }}>{match.home_score} - {match.away_score}</span>
+                                    ) : (
+                                      <span style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap' }}>-</span>
+                                    )}
+                                    {isLive && (
+                                      <span style={{ fontSize: 14, fontWeight: 500, color: '#94a3b8', marginTop: 4 }}>{formatGameMinute(match.minute)}'</span>
+                                    )}
+                                  </div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, justifyContent: 'flex-start', minWidth: 0 }}>
+                                    <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name)} style={{ width: 48, height: 48, objectFit: 'contain' }} alt="" />
+                                    <span style={{ fontSize: 16, fontWeight: 500, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left' }}>{match.away_team?.name}</span>
+                                  </div>
                                </div>
-                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
-                                    <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name)} style={{ width: 32, height: 32, objectFit: 'contain' }} alt="" />
-                                    <span style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.home_team?.name}</span>
-                                  </div>
-                                  <span style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', padding: '0 16px' }}>{hasScore ? `${match.home_score} - ${match.away_score}` : '-'}</span>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0, justifyContent: 'flex-end' }}>
-                                    <span style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'right' }}>{match.away_team?.name}</span>
-                                    <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name)} style={{ width: 32, height: 32, objectFit: 'contain' }} alt="" />
-                                  </div>
+                               <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
+                                 <span style={{ fontSize: 14, fontWeight: 400, color: '#0f172a' }}>
+                                   {match.venue?.name || 'Emirates Stadium, London'}
+                                 </span>
                                </div>
                             </div>
                           ) : (
-                            <div style={{ display: 'flex', alignItems: 'center', width: '100%', minWidth: 0 }}>
-                              {/* Time / Status */}
-                              <div style={{ width: 60, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', width: '100%', minWidth: 0, padding: '2px 0' }}>
+                              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, minWidth: 0, paddingRight: 16 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
+                                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #f1f5f9' }}>
+                                      <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name)} style={{ width: 22, height: 22, objectFit: 'contain' }} alt="" />
+                                    </div>
+                                    <span style={{ fontSize: 15, fontWeight: 400, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                      {match.home_team?.name || 'Home'}
+                                    </span>
+                                  </div>
+                                  <span style={{ fontSize: 16, fontWeight: hasScore ? 500 : 400, color: '#0f172a', paddingLeft: 12 }}>
+                                    {hasScore ? match.home_score : '-'}
+                                  </span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
+                                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #f1f5f9' }}>
+                                      <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name)} style={{ width: 22, height: 22, objectFit: 'contain' }} alt="" />
+                                    </div>
+                                    <span style={{ fontSize: 15, fontWeight: 400, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                      {match.away_team?.name || 'Away'}
+                                    </span>
+                                  </div>
+                                  <span style={{ fontSize: 16, fontWeight: hasScore ? 500 : 400, color: '#0f172a', paddingLeft: 12 }}>
+                                    {hasScore ? match.away_score : '-'}
+                                  </span>
+                                </div>
+                              </div>
+                              <div style={{ width: 44, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
                                 {isLive ? (
-                                  <span style={{ color: '#ef4444', fontSize: 11, fontWeight: 700 }}>{formatGameMinute(match.minute)}'</span>
+                                  <span style={{ color: '#ef4444', fontSize: 14, fontWeight: 500 }}>{formatGameMinute(match.minute)}'</span>
                                 ) : isFinished ? (
-                                  <div style={{ background: '#f1f5f9', borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#94a3b8' }}>FT</div>
+                                  <span style={{ fontSize: 14, fontWeight: 400, color: '#94a3b8' }}>FT</span>
                                 ) : (
-                                  <span style={{ fontSize: 11, fontWeight: 600, color: '#64748b' }}>{time}</span>
+                                  <span style={{ fontSize: 13, fontWeight: 400, color: '#94a3b8' }}>{time}</span>
                                 )}
                               </div>
-
-                              {/* Teams & Score Container */}
-                              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 0 }}>
-                                
-                                {/* Home Team */}
-                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, minWidth: 0 }}>
-                                  <span style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                    {match.home_team?.name || 'Home'}
-                                  </span>
-                                  <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name)} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} alt="" />
-                                </div>
-
-                                {/* Score */}
-                                <div style={{ width: 72, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
-                                  {hasScore ? (
-                                    <span style={{ fontSize: 14, fontWeight: 700, color: isLive ? '#ef4444' : '#1e293b', whiteSpace: 'nowrap', letterSpacing: '1px' }}>
-                                      {match.home_score} - {match.away_score}
-                                    </span>
-                                  ) : (
-                                    <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>-</span>
-                                  )}
-                                </div>
-
-                                {/* Away Team */}
-                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 12, minWidth: 0 }}>
-                                  <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name)} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} alt="" />
-                                  <span style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                    {match.away_team?.name || 'Away'}
-                                  </span>
-                                </div>
-
+                              <div style={{ width: 1, height: 48, background: '#f1f5f9', margin: '0 12px 0 8px', flexShrink: 0 }}></div>
+                              <div style={{ width: 32, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
+                                <Bell size={20} color={isLive ? '#4f46e5' : '#e2e8f0'} strokeWidth={1.5} />
                               </div>
                             </div>
                           )}
-                          
                         </div>
                       );
                     })}

@@ -216,6 +216,7 @@ export default function TournamentDetailPage({ params }) {
             >
               <img 
                 src={getImageUrl(tournament.logo_path || tournament.logo) || avatar(tournament.name, '3b82f6')} 
+                onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = avatar(tournament.name, '3b82f6'); }}
                 style={{ width: 44, height: 44, objectFit: 'contain' }}
                 alt={tournament.name}
               />
@@ -459,7 +460,7 @@ export default function TournamentDetailPage({ params }) {
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
                             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                               <div style={{ width: 56, height: 56, position: 'relative', marginBottom: 12 }}>
-                                <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.05))' }} alt="" />
+                                <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = avatar(m.home_team?.name); }} style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.05))' }} alt="" />
                               </div>
                               <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-primary)', textAlign: 'center', lineHeight: 1.3 }}>{m.home_team?.name}</span>
                             </div>
@@ -489,7 +490,7 @@ export default function TournamentDetailPage({ params }) {
 
                             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                               <div style={{ width: 56, height: 56, position: 'relative', marginBottom: 12 }}>
-                                <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name)} style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.05))' }} alt="" />
+                                <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name)} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = avatar(m.away_team?.name); }} style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.05))' }} alt="" />
                               </div>
                               <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-primary)', textAlign: 'center', lineHeight: 1.3 }}>{m.away_team?.name}</span>
                             </div>
