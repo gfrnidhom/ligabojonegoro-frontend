@@ -3,13 +3,14 @@ import { use } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { useState, useEffect, useRef } from 'react';
-import { Clock, ArrowLeft, MapPin, Users, User, Trophy, CalendarDays, CloudSun, Target, Activity, Star, ChevronLeft, ChevronRight, FileText, BarChart2, Zap, List, Maximize2, ChevronUp, ChevronDown, Minus, Shield, ClipboardList } from 'lucide-react';
+import { Clock, ArrowLeft, MapPin, Users, User, Trophy, CalendarDays, CloudSun, Target, Activity, Star, ChevronLeft, ChevronRight, FileText, BarChart2, Zap, List, Maximize2, ChevronUp, ChevronDown, Minus, Shield, ClipboardList, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import api, { getImageUrl } from '../../../api';
 import { calculateCoordinates } from '../../../utils/formationCoords';
 
 const TABS = [
+  { id: 'ringkasan', label: 'Ringkasan', icon: Sparkles },
   { id: 'rincian', label: 'Rincian', icon: FileText },
   { id: 'lineup', label: 'Lineup', icon: Users },
   { id: 'statistik', label: 'Statistik', icon: BarChart2 },
@@ -381,6 +382,7 @@ export default function MatchDetailPage({ params }) {
           {/* Content */}
           <div style={{ padding: '24px 0' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {activeTab === 'ringkasan' && <RingkasanTab match={match} />}
               {activeTab === 'rincian' && <RincianTab match={match} />}
               {activeTab === 'lineup' && (
                 <div style={{ background: 'var(--bg-app)', borderRadius: 16, padding: '24px 16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
@@ -2366,6 +2368,81 @@ function StatistikTab({ match }) {
         </div>
       )}
 
+    </div>
+  );
+}
+
+function RingkasanTab({ match }) {
+  const [summary, setSummary] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchSummary = async () => {
+      try {
+        const res = await fetch('/api/generate-summary', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ matchData: match })
+        });
+        const data = await res.json();
+        if (isMounted) {
+          if (res.ok && data.summary) {
+            setSummary(data.summary);
+          } else {
+            setError(data.error || 'Gagal mengambil ringkasan.');
+          }
+        }
+      } catch (err) {
+        if (isMounted) setError('Gagal terhubung ke server AI.');
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    fetchSummary();
+    return () => { isMounted = false; };
+  }, [match]);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ 
+        background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)', 
+        padding: 24, borderRadius: 16, color: '#fff', position: 'relative', overflow: 'hidden',
+        boxShadow: '0 10px 25px rgba(49, 46, 129, 0.2)'
+      }}>
+        <div style={{ position: 'absolute', top: -20, right: -20, opacity: 0.1 }}>
+          <Sparkles size={120} />
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+          <div style={{ background: 'rgba(255,255,255,0.1)', padding: 6, borderRadius: 8 }}>
+            <Sparkles size={18} color="#fbbf24" />
+          </div>
+          <span style={{ fontSize: 16, fontWeight: 800, letterSpacing: '0.02em' }}>Analisis & Ringkasan AI</span>
+        </div>
+
+        {loading ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <div style={{ width: 14, height: 14, border: '2px solid rgba(255,255,255,0.2)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+              <span style={{ fontSize: 12, opacity: 0.8, fontStyle: 'italic' }}>AI sedang membaca jalannya pertandingan...</span>
+            </div>
+            <div style={{ height: 12, background: 'rgba(255,255,255,0.1)', borderRadius: 6, width: '100%', animation: 'pulse 1.5s infinite' }} />
+            <div style={{ height: 12, background: 'rgba(255,255,255,0.1)', borderRadius: 6, width: '90%', animation: 'pulse 1.5s infinite 0.2s' }} />
+            <div style={{ height: 12, background: 'rgba(255,255,255,0.1)', borderRadius: 6, width: '95%', animation: 'pulse 1.5s infinite 0.4s' }} />
+            <div style={{ height: 12, background: 'rgba(255,255,255,0.1)', borderRadius: 6, width: '60%', animation: 'pulse 1.5s infinite 0.6s' }} />
+          </div>
+        ) : error ? (
+          <div style={{ background: 'rgba(239,68,68,0.2)', padding: 12, borderRadius: 8, fontSize: 13, border: '1px solid rgba(239,68,68,0.3)' }}>
+            {error}
+          </div>
+        ) : (
+          <div style={{ fontSize: 14, lineHeight: 1.6, opacity: 0.95, textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>
+            {summary}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
