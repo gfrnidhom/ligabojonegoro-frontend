@@ -1,86 +1,11 @@
 "use client";
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, useMemo, use } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { ArrowLeft, User, Shield, Calendar, Award, TrendingUp, Target, Zap, Clock, Activity, ChevronRight, Shirt, Flame, Users, AlertTriangle } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { HelpCircle, Calendar, ArrowRight } from 'lucide-react';
 import api, { getImageUrl } from '../../../api';
 
-const avatar = (name, bg = 'f59e0b') =>
+const avatar = (name, bg = 'ff1a1a') =>
   `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'P')}&background=${bg}&color=fff&bold=true&size=200`;
-
-const posLabels = { GK: 'Kiper', DF: 'Bek', MF: 'Gelandang', FW: 'Penyerang' };
-const posColors = { GK: '#f59e0b', DF: '#10b981', MF: '#3b82f6', FW: '#ef4444' };
-
-// ─── Stat Card ───
-function StatCard({ icon: Icon, label, value, color, delay }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: delay * 0.06, duration: 0.3 }}
-      className="stat-card"
-    >
-      <div className="stat-card-accent" style={{ background: color }} />
-      <div className="stat-card-icon" style={{ background: `${color}15` }}>
-        <Icon size={18} style={{ color }} />
-      </div>
-      <div className="stat-card-value">{value}</div>
-      <div className="stat-card-label">{label}</div>
-    </motion.div>
-  );
-}
-
-// ─── Match Row ───
-function MatchRow({ m, player, idx, router }) {
-  const isLive = ['live','first_half','half_time','second_half'].includes(m.status);
-  const isFinished = m.status === 'finished';
-  const hasScore = isLive || isFinished;
-  const isHome = String(m.home_team_id) === String(player.team_id);
-  const won = hasScore && ((isHome && m.home_score > m.away_score) || (!isHome && m.away_score > m.home_score));
-  const lost = hasScore && ((isHome && m.home_score < m.away_score) || (!isHome && m.away_score < m.home_score));
-  const draw = hasScore && m.home_score === m.away_score;
-  const rc = won ? '#10b981' : lost ? '#ef4444' : '#8b92a5';
-  const rl = won ? 'M' : lost ? 'K' : draw ? 'S' : '';
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: idx * 0.03 }}
-      onClick={() => router.push(`/matches/${m.uuid || m.id}`)}
-      className="match-row-item"
-    >
-      {hasScore && (
-        <div className="match-result-badge" style={{ background: `${rc}15`, color: rc, border: `1px solid ${rc}40` }}>{rl}</div>
-      )}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div className="match-team-line">
-          <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} className="match-team-logo" alt="" />
-          <span style={{ flex: 1, fontWeight: hasScore && m.home_score > m.away_score ? 700 : 500, color: hasScore && m.home_score > m.away_score ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{m.home_team?.name}</span>
-          <span style={{ fontWeight: 800, color: 'var(--text-primary)', width: 18, textAlign: 'right' }}>{hasScore ? m.home_score : '-'}</span>
-        </div>
-        <div className="match-team-line">
-          <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name)} className="match-team-logo" alt="" />
-          <span style={{ flex: 1, fontWeight: hasScore && m.away_score > m.home_score ? 700 : 500, color: hasScore && m.away_score > m.home_score ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{m.away_team?.name}</span>
-          <span style={{ fontWeight: 800, color: 'var(--text-primary)', width: 18, textAlign: 'right' }}>{hasScore ? m.away_score : '-'}</span>
-        </div>
-      </div>
-      <div style={{ flexShrink: 0, textAlign: 'right', minWidth: 40 }}>
-        {isLive ? (
-          <span className="live-badge"><span className="live-dot-anim" /> LIVE</span>
-        ) : isFinished ? (
-          <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-secondary)' }}>FT</span>
-        ) : (
-          <span style={{ fontSize: 9, fontWeight: 600, color: 'var(--text-secondary)' }}>
-            {m.scheduled_at ? new Date(m.scheduled_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : 'TBA'}
-          </span>
-        )}
-        <div style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 2 }}>
-          {(m.match_date || m.scheduled_at) ? new Date(m.match_date || m.scheduled_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }) : ''}
-        </div>
-      </div>
-      <ChevronRight size={14} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
-    </motion.div>
-  );
-}
 
 const getSkillValue = (player, skillKey) => {
   if (player?.statistics?.[skillKey] !== undefined) return player.statistics[skillKey];
@@ -93,71 +18,172 @@ const getSkillValue = (player, skillKey) => {
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
-  return 70 + (Math.abs(hash) % 26); // 70 to 95
+  return 60 + (Math.abs(hash) % 36); // 60 to 95
 };
 
 const getSportSkills = (sportId, sportSlug) => {
   const slug = String(sportSlug || '').toLowerCase();
   const id = Number(sportId);
 
-  if (id === 2 || slug === 'volleyball') { // Voli
+  if (id === 2 || slug === 'volleyball') {
     return [
-      { key: 'passing', label: 'Passing', color: 'linear-gradient(90deg, #3b82f6, #60a5fa)' },
-      { key: 'service', label: 'Service', color: 'linear-gradient(90deg, #10b981, #34d399)' },
-      { key: 'block', label: 'Block', color: 'linear-gradient(90deg, #a855f7, #c084fc)' },
-      { key: 'smash', label: 'Smash', color: 'linear-gradient(90deg, #ef4444, #f87171)' },
+      { key: 'passing', label: 'Passing' },
+      { key: 'service', label: 'Service' },
+      { key: 'block', label: 'Block' },
+      { key: 'smash', label: 'Smash' },
+      { key: 'dig', label: 'Dig' },
+      { key: 'stamina', label: 'Stamina' },
     ];
   }
-  if (id === 4 || slug === 'badminton') { // Bulu Tangkis
+  if (id === 4 || slug === 'badminton') {
     return [
-      { key: 'footwalk', label: 'Footwalk', color: 'linear-gradient(90deg, #3b82f6, #60a5fa)' },
-      { key: 'penempatan_posisi', label: 'Penempatan Posisi', color: 'linear-gradient(90deg, #10b981, #34d399)' },
-      { key: 'service', label: 'Service', color: 'linear-gradient(90deg, #a855f7, #c084fc)' },
-      { key: 'loop', label: 'Loop', color: 'linear-gradient(90deg, #ef4444, #f87171)' },
-      { key: 'stamina', label: 'Stamina', color: 'linear-gradient(90deg, #eab308, #fbbf24)' },
+      { key: 'footwalk', label: 'Footwalk' },
+      { key: 'penempatan_posisi', label: 'Posisi' },
+      { key: 'service', label: 'Service' },
+      { key: 'loop', label: 'Loop' },
+      { key: 'smash', label: 'Smash' },
+      { key: 'stamina', label: 'Stamina' },
     ];
   }
-  // Default: Sepak Bola / Futsal
   return [
-    { key: 'passing', label: 'Passing', color: 'linear-gradient(90deg, #3b82f6, #60a5fa)' },
-    { key: 'kontrol', label: 'Kontrol', color: 'linear-gradient(90deg, #10b981, #34d399)' },
-    { key: 'dribling', label: 'Dribling', color: 'linear-gradient(90deg, #a855f7, #c084fc)' },
-    { key: 'finishing', label: 'Finishing', color: 'linear-gradient(90deg, #ef4444, #f87171)' },
-    { key: 'stamina', label: 'Stamina', color: 'linear-gradient(90deg, #eab308, #fbbf24)' },
-    { key: 'koordinasi_pemain', label: 'Koordinasi Antar Pemain', color: 'linear-gradient(90deg, #ec4899, #f472b6)' },
+    { key: 'passing', label: 'Passing' },
+    { key: 'kontrol', label: 'Kontrol' },
+    { key: 'dribling', label: 'Dribling' },
+    { key: 'finishing', label: 'Finishing' },
+    { key: 'stamina', label: 'Stamina' },
+    { key: 'tackles', label: 'Tackles' },
   ];
 };
 
-// ─── Main Page ───
+const getSportStatKeys = (sportId, sportSlug) => {
+  const slug = String(sportSlug || '').toLowerCase();
+  const id = Number(sportId);
+
+  if (id === 2 || slug === 'volleyball') {
+    return [
+      { key: 'points', label: 'Points' },
+      { key: 'kills', label: 'Kills' },
+      { key: 'blocks', label: 'Blocks' },
+      { key: 'aces', label: 'Aces' },
+      { key: 'digs', label: 'Digs' },
+      { key: 'assists', label: 'Assists' },
+      { key: 'errors', label: 'Errors' },
+    ];
+  }
+  if (id === 4 || slug === 'badminton') {
+    return [
+      { key: 'matches_played', label: 'Main' },
+      { key: 'wins', label: 'Menang' },
+      { key: 'losses', label: 'Kalah' },
+      { key: 'points_won', label: 'Poin Diraih' },
+      { key: 'points_lost', label: 'Poin Hilang' },
+    ];
+  }
+  return [
+    { key: 'appearances', label: 'Main' },
+    { key: 'goals', label: 'Gol' },
+    { key: 'assists', label: 'Assist' },
+    { key: 'yellow_cards', label: 'Kartu Kuning' },
+    { key: 'red_cards', label: 'Kartu Merah' },
+    { key: 'saves', label: 'Penyelamatan' },
+    { key: 'tackles', label: 'Tekel' },
+    { key: 'interceptions', label: 'Intersep' },
+    { key: 'clearances', label: 'Sapuan' },
+    { key: 'blocks', label: 'Blok' },
+    { key: 'fouls', label: 'Pelanggaran' },
+  ];
+};
+
+const DynamicRadarChart = ({ player }) => {
+  const skills = getSportSkills(player?.team?.sport_id, player?.team?.sport?.slug);
+  // Ensure we have exactly 6 skills for the hexagon radar
+  while (skills.length < 6) skills.push({ key: 'unknown', label: 'Unknown' });
+  const top6 = skills.slice(0, 6);
+  
+  const values = top6.map(s => getSkillValue(player, s.key));
+  
+  // Calculate polygon points based on values (0-100)
+  const calculatePoint = (value, angleIndex) => {
+     const angle = (Math.PI / 3) * angleIndex - Math.PI / 2; // Start at top
+     const r = (value / 100) * 80; // max radius 80
+     return `${100 + r * Math.cos(angle)},${100 + r * Math.sin(angle)}`;
+  };
+  
+  const polyPoints = values.map((v, i) => calculatePoint(v, i)).join(" ");
+
+  return (
+    <div style={{ position: 'relative', width: '100%', height: 220, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '20px 0 10px' }}>
+      <svg viewBox="0 0 200 200" style={{ width: '100%', height: '100%', maxWidth: 220, overflow: 'visible' }}>
+        {[0.2, 0.4, 0.6, 0.8, 1].map((scale, i) => (
+          <polygon
+            key={i}
+            points={`100,${100 - 80*scale} ${100 + 69.28*scale},${100 - 40*scale} ${100 + 69.28*scale},${100 + 40*scale} 100,${100 + 80*scale} ${100 - 69.28*scale},${100 + 40*scale} ${100 - 69.28*scale},${100 - 40*scale}`}
+            fill="none"
+            stroke="#f3f4f6"
+            strokeWidth="1"
+          />
+        ))}
+        <line x1="100" y1="100" x2="100" y2="20" stroke="#f3f4f6" />
+        <line x1="100" y1="100" x2="169.28" y2="60" stroke="#f3f4f6" />
+        <line x1="100" y1="100" x2="169.28" y2="140" stroke="#f3f4f6" />
+        <line x1="100" y1="100" x2="100" y2="180" stroke="#f3f4f6" />
+        <line x1="100" y1="100" x2="30.72" y2="140" stroke="#f3f4f6" />
+        <line x1="100" y1="100" x2="30.72" y2="60" stroke="#f3f4f6" />
+
+        <polygon
+          points={polyPoints}
+          fill="#ff1a1a"
+          fillOpacity="0.8"
+          stroke="#ff1a1a"
+          strokeWidth="1.5"
+        />
+      </svg>
+      {/* Top */}
+      <span style={{ position: 'absolute', top: -15, fontSize: 9, color: '#6b7280', fontWeight: 500, textAlign: 'center', transform: 'translateX(-50%)', left: '50%' }}><span style={{ color: '#111827', fontWeight: 800, display: 'block' }}>{values[0]}%</span>{top6[0].label}</span>
+      {/* Top Right */}
+      <span style={{ position: 'absolute', top: 35, right: -15, fontSize: 9, color: '#6b7280', fontWeight: 500, textAlign: 'center' }}><span style={{ color: '#111827', fontWeight: 800, display: 'block' }}>{values[1]}%</span>{top6[1].label}</span>
+      {/* Bottom Right */}
+      <span style={{ position: 'absolute', bottom: 35, right: -15, fontSize: 9, color: '#6b7280', fontWeight: 500, textAlign: 'center' }}><span style={{ color: '#111827', fontWeight: 800, display: 'block' }}>{values[2]}%</span>{top6[2].label}</span>
+      {/* Bottom */}
+      <span style={{ position: 'absolute', bottom: -15, fontSize: 9, color: '#6b7280', fontWeight: 500, textAlign: 'center', transform: 'translateX(-50%)', left: '50%' }}><span style={{ color: '#111827', fontWeight: 800, display: 'block' }}>{values[3]}%</span>{top6[3].label}</span>
+      {/* Bottom Left */}
+      <span style={{ position: 'absolute', bottom: 35, left: -15, fontSize: 9, color: '#6b7280', fontWeight: 500, textAlign: 'center' }}><span style={{ color: '#111827', fontWeight: 800, display: 'block' }}>{values[4]}%</span>{top6[4].label}</span>
+      {/* Top Left */}
+      <span style={{ position: 'absolute', top: 35, left: -15, fontSize: 9, color: '#6b7280', fontWeight: 500, textAlign: 'center' }}><span style={{ color: '#111827', fontWeight: 800, display: 'block' }}>{values[5]}%</span>{top6[5].label}</span>
+    </div>
+  );
+};
+
+const PositionPitch = ({ posCode }) => {
+   let left = '50%';
+   let bottom = '15%';
+   if (posCode === 'DF') bottom = '25%';
+   if (posCode === 'MF') bottom = '50%';
+   if (posCode === 'FW') bottom = '80%';
+   
+   return (
+      <div className="mini-pitch">
+         <div className="pitch-line" style={{ top: 0, left: 0, right: 0, bottom: 0, margin: 8 }} />
+         <div className="pitch-line" style={{ top: '50%', left: 8, right: 8, height: 0 }} />
+         <div className="pitch-line" style={{ top: '50%', left: '50%', width: 40, height: 40, borderRadius: '50%', transform: 'translate(-50%, -50%)' }} />
+         <div className="pitch-line" style={{ top: 8, left: '20%', right: '20%', height: 30, borderTop: 'none' }} />
+         <div className="pitch-line" style={{ bottom: 8, left: '20%', right: '20%', height: 30, borderBottom: 'none' }} />
+         
+         <div style={{ position: 'absolute', bottom: bottom, left: left, transform: 'translate(-50%, 50%)', background: '#ff1a1a', color: '#fff', fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 10, border: '1px solid #fff' }}>
+            {posCode || 'GK'}
+         </div>
+      </div>
+   );
+}
+
+
+
 export default function PlayerDetailPage({ params }) {
   const { id: playerId } = use(params);
   const router = useRouter();
   const [player, setPlayer] = useState(null);
-  const [stats, setStats] = useState(null);
-  const [matches, setMatches] = useState([]);
+  const [matches, setMatches] = useState({ recent: [], upcoming: [] });
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState('skills'); // Default to skills to showcase user's requested feature
-
-  const TABS = ['skills', 'stats', 'matches', 'bio'];
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const urlTab = params.get('tab');
-      if (urlTab && TABS.includes(urlTab)) {
-        setTab(urlTab);
-      }
-    }
-  }, []);
-
-  const handleTabChange = (tabId) => {
-    setTab(tabId);
-    if (typeof window !== 'undefined') {
-      const url = new URL(window.location);
-      url.searchParams.set('tab', tabId);
-      window.history.replaceState(null, '', url.toString());
-    }
-  };
 
   useEffect(() => {
     (async () => {
@@ -166,316 +192,244 @@ export default function PlayerDetailPage({ params }) {
         const pRes = await api.get(`/players/${playerId}`);
         if (pRes.data.success) {
           setPlayer(pRes.data.data);
-          if (pRes.data.data.aggregated_stats) setStats(pRes.data.data.aggregated_stats);
-        }
-        try {
-          const mRes = await api.get('/matches', { params: { per_page: 100 } });
+          
+          // Get matches
+          const mRes = await api.get('/matches', { params: { per_page: 50 } });
           if (mRes.data.success && pRes.data.data?.team_id) {
-            const tid = String(pRes.data.data.team_id);
-            setMatches(mRes.data.data.filter(m => String(m.home_team_id) === tid || String(m.away_team_id) === tid).slice(0, 10));
+             const tid = String(pRes.data.data.team_id);
+             const teamMatches = mRes.data.data.filter(m => String(m.home_team_id) === tid || String(m.away_team_id) === tid);
+             
+             // Sort by date descending
+             teamMatches.sort((a, b) => new Date(b.scheduled_at) - new Date(a.scheduled_at));
+             const recent = teamMatches.filter(m => m.status === 'finished' || m.status === 'playing' || new Date(m.scheduled_at) <= new Date()).slice(0, 5);
+             
+             // Sort by date ascending for upcoming
+             teamMatches.sort((a, b) => new Date(a.scheduled_at) - new Date(b.scheduled_at));
+             const upcoming = teamMatches.filter(m => m.status === 'scheduled' && new Date(m.scheduled_at) > new Date()).slice(0, 5);
+
+             setMatches({ recent, upcoming });
           }
-        } catch {}
+        }
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
     })();
   }, [playerId]);
 
-  if (loading) return (
-    <div style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-      <div className="loader" /><p style={{ marginTop: 14, color: 'var(--text-secondary)', fontSize: 11, fontWeight: 600 }}>Memuat profil...</p>
-    </div>
-  );
+  const age = useMemo(() => {
+    return player?.date_of_birth ? Math.floor((Date.now() - new Date(player.date_of_birth)) / 31557600000) : null;
+  }, [player?.date_of_birth]);
 
-  if (!player) return (
-    <div style={{ maxWidth: 600, margin: '40px auto', textAlign: 'center', padding: '0 16px' }}>
-      <User size={48} style={{ color: 'var(--text-muted)', margin: '0 auto 12px' }} />
-      <h2 style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)' }}>Pemain Tidak Ditemukan</h2>
-      <button onClick={() => router.back()} style={{ marginTop: 16, background: 'var(--bg-subtle)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 20px', color: 'var(--text-primary)', fontWeight: 700, cursor: 'pointer' }}>
-        <ArrowLeft size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} /> Kembali
-      </button>
-    </div>
-  );
-
-  const positionCode = player.position_text || (player.position && typeof player.position === 'object' ? player.position.abbreviation : player.position);
-  const pc = posColors[positionCode] || '#f59e0b';
-  const age = player.date_of_birth ? Math.floor((Date.now() - new Date(player.date_of_birth)) / 31557600000) : null;
-  const rating = stats?.rating || '7.0';
-
-  const statConfigs = {
-    goals: { label: 'Gol', icon: Target, color: '#ef4444' },
-    assists: { label: 'Assist', icon: TrendingUp, color: '#3b82f6' },
-    matches_played: { label: 'Tampil', icon: Activity, color: '#10b981' },
-    yellow_cards: { label: 'K. Kuning', icon: Award, color: '#eab308' },
-    red_cards: { label: 'K. Merah', icon: Zap, color: '#ef4444' },
-    minutes_played: { label: 'Menit', icon: Clock, color: '#8b5cf6' },
-    passing: { label: 'Passing', icon: Zap, color: '#3b82f6' },
-    kontrol: { label: 'Kontrol', icon: Activity, color: '#8b92a5' },
-    dribling: { label: 'Dribling', icon: Flame, color: '#f59e0b' },
-    finishing: { label: 'Finishing', icon: Target, color: '#ef4444' },
-    stamina: { label: 'Stamina', icon: Shield, color: '#10b981' },
-    koordinasi_pemain: { label: 'Koordinasi', icon: Users, color: '#06b6d4' },
-    service: { label: 'Service', icon: Zap, color: '#3b82f6' },
-    block: { label: 'Block', icon: Shield, color: '#10b981' },
-    smash: { label: 'Smash', icon: Flame, color: '#ef4444' },
-    footwalk: { label: 'Footwalk', icon: Activity, color: '#8b5cf6' },
-    penempatan_posisi: { label: 'Posisi', icon: Target, color: '#f59e0b' },
-    loop: { label: 'Loop', icon: TrendingUp, color: '#06b6d4' },
-    tackles: { label: 'Tackle', icon: Shield, color: '#10b981' },
-    saves: { label: 'Penyelamatan', icon: Shield, color: '#f59e0b' },
-    dig: { label: 'Dig', icon: Activity, color: '#3b82f6' },
-    assist: { label: 'Assist', icon: TrendingUp, color: '#06b6d4' },
-    error: { label: 'Error', icon: AlertTriangle, color: '#ef4444' },
-  };
-
-  const getStatConfig = (field) => {
-    if (statConfigs[field]) return statConfigs[field];
-    return {
-      label: field.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
-      icon: Activity,
-      color: '#64748b'
-    };
-  };
-
-  const statItems = [];
-  if (stats) {
-    if (stats.matches_played !== undefined) {
-      statItems.push({ label: 'Tampil', value: stats.matches_played, icon: Activity, color: '#10b981' });
-    }
-    
-    const sportFields = player.team?.sport?.stat_fields || [];
-    sportFields.forEach(field => {
-      if (field === 'matches_played') return;
-      
-      const val = stats[field] !== undefined ? stats[field] : 0;
-      const config = getStatConfig(field);
-      statItems.push({
-        label: config.label,
-        value: val,
-        icon: config.icon,
-        color: config.color
-      });
-    });
-
-    if (sportFields.length === 0) {
-      if (stats.goals !== undefined) statItems.push({ label: 'Gol', value: stats.goals, icon: Target, color: '#ef4444' });
-      if (stats.assists !== undefined) statItems.push({ label: 'Assist', value: stats.assists, icon: TrendingUp, color: '#3b82f6' });
-      if (stats.yellow_cards !== undefined) statItems.push({ label: 'K. Kuning', value: stats.yellow_cards, icon: Award, color: '#eab308' });
-      if (stats.red_cards !== undefined) statItems.push({ label: 'K. Merah', value: stats.red_cards, icon: Zap, color: '#ef4444' });
-      if (stats.minutes_played !== undefined) statItems.push({ label: 'Menit', value: stats.minutes_played, icon: Clock, color: '#8b5cf6' });
-    }
-  }
-
-  const infoItems = [
-    { label: 'Klub', value: player.team?.name || '-' },
-    ...(age ? [{ label: 'Usia', value: `${age} thn` }] : []),
-    ...(player.date_of_birth ? [{ label: 'Lahir', value: new Date(player.date_of_birth).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) }] : []),
-  ];
+  if (loading) return <div style={{ padding: 40, textAlign: 'center' }}>Memuat...</div>;
+  if (!player) return <div style={{ padding: 40, textAlign: 'center' }}>Pemain tidak ditemukan</div>;
+  const positionCode = player.position_text || (player.position && typeof player.position === 'object' ? player.position.abbreviation : player.position) || 'GK';
+  const posName = player.position && typeof player.position === 'object' ? player.position.name : positionCode;
+  
+  const heroColor = '#ff1a1a';
 
   return (
-    <div className="player-page animate-fade-in">
-      {/* ═══ HERO ═══ */}
-      <div className="player-hero" style={{ '--pc': pc }}>
-        <div className="hero-gradient" />
-        <div className="hero-orb" />
-        {player.jersey_number && <div className="hero-jersey-num">{player.jersey_number}</div>}
-
-        <div className="hero-back">
-          <button onClick={() => router.back()} className="hero-back-btn"><ArrowLeft size={20} /></button>
-        </div>
-
-        <div className="hero-content">
-          <div className="hero-photo-wrap">
-            <img src={getImageUrl(player.photo_path) || avatar(player.name)} alt={player.name} className="hero-photo" />
-            <div className="hero-rating">{rating}</div>
-          </div>
-          <div className="hero-info">
-            <h1 className="hero-name">{player.name}</h1>
-            <div className="hero-badges">
-              {positionCode && <span className="hero-badge" style={{ background: `${pc}15`, color: pc, border: `1px solid ${pc}30` }}>{posLabels[positionCode] || (typeof player.position === 'object' ? player.position.name : player.position)}</span>}
-              {player.jersey_number && <span className="hero-badge hero-badge-num"><Shirt size={11} /> #{player.jersey_number}</span>}
-              {player.team && (
-                <Link href={`/teams/${player.team?.uuid || player.team_id}`} className="hero-badge hero-badge-team">
-                  <img src={getImageUrl(player.team?.logo_path) || avatar(player.team?.name)} className="hero-badge-logo" alt="" />
-                  {player.team.name}
-                </Link>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="hero-info-bar">
-          {infoItems.map((it, i) => (
-            <div key={i} className="hero-info-item" style={{ borderRight: i < infoItems.length - 1 ? '1px solid var(--border)' : 'none' }}>
-              <span className="hero-info-label">{it.label}</span>
-              <span className="hero-info-value">{it.value}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ═══ TABS ═══ */}
-      <div className="player-tabs">
-        {[
-          { id: 'skills', l: 'Keahlian' },
-          { id: 'stats', l: 'Statistik' },
-          { id: 'matches', l: 'Pertandingan' }
-        ].map(s => (
-          <button key={s.id} onClick={() => setTab(s.id)} className={`player-tab ${tab === s.id ? 'active' : ''}`}>{s.l}</button>
-        ))}
-      </div>
-
-      {/* ═══ CONTENT ═══ */}
-      <div className="player-content">
-        {tab === 'skills' && (
-          <div style={{
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border)',
-            borderRadius: '16px',
-            padding: '24px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '20px'
-          }}>
-            {getSportSkills(player.team?.sport_id, player.team?.sport?.slug).map((skill, idx) => {
-              const val = getSkillValue(player, skill.key);
-              return (
-                <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 700 }}>{skill.label}</span>
-                    <span style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-primary)' }}>{val}</span>
-                  </div>
-                  <div style={{ width: '100%', height: 8, background: 'var(--bg-app)', borderRadius: 4, overflow: 'hidden' }}>
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${val}%` }}
-                      transition={{ duration: 0.6, ease: 'easeOut', delay: idx * 0.05 }}
-                      style={{ height: '100%', background: skill.color, borderRadius: 4 }}
-                    />
-                  </div>
+    <div className="player-layout">
+       <div className="hero-banner" style={{ background: heroColor }}>
+          <div className="hero-inner">
+             <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+                <img src={getImageUrl(player.photo_path) || avatar(player.name)} className="hero-photo" alt="" />
+                <div>
+                   <h1 className="hero-name">{player.name}</h1>
+                   <div className="hero-team">
+                     <img src={getImageUrl(player.team?.logo_path) || avatar(player.team?.name)} className="hero-team-logo" alt="" />
+                     {player.team?.name}
+                   </div>
                 </div>
-              );
-            })}
+             </div>
+             <button className="follow-btn">Follow</button>
           </div>
-        )}
-        {tab === 'stats' && (
-          <div className="stats-grid">
-            {statItems.length > 0 ? statItems.map((s, i) => (
-              <StatCard key={i} icon={s.icon} label={s.label} value={s.value} color={s.color} delay={i} />
-            )) : (
-              <div className="empty-card"><Activity size={28} style={{ color: 'var(--text-muted)' }} /><p>Belum ada statistik.</p></div>
-            )}
-          </div>
-        )}
-        {tab === 'matches' && (
-          <div className="matches-list-card">
-            {matches.length > 0 ? matches.map((m, i) => (
-              <MatchRow key={m.id} m={m} player={player} idx={i} router={router} />
-            )) : (
-              <div className="empty-card"><Calendar size={28} style={{ color: 'var(--text-muted)' }} /><p>Belum ada pertandingan.</p></div>
-            )}
-          </div>
-        )}
-      </div>
+       </div>
 
-      <style dangerouslySetInnerHTML={{ __html: `
-        .player-page { max-width: 900px; margin: 0 auto; padding-bottom: 80px; }
+       <div className="grid-layout">
+         <div className="main-col">
+            <div className="card info-grid">
+               <div className="info-item">
+                  <span className="info-val">{player.metadata?.height || player.tinggi_badan || '-'}</span>
+                  <span className="info-lbl">Tinggi Badan</span>
+               </div>
+               <div className="info-item">
+                  <span className="info-val">{player.jersey_number || '-'}</span>
+                  <span className="info-lbl">Nomor Punggung</span>
+               </div>
+               
+               <div className="info-position-box" style={{ gridRow: 'span 3', gridColumn: '3' }}>
+                  <span className="info-lbl" style={{ marginBottom: 12, display: 'block' }}>Posisi</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: heroColor }}>Utama</span><br/>
+                  <span style={{ fontSize: 13, color: '#111827' }}>{posName}</span>
+                  <PositionPitch posCode={positionCode} />
+               </div>
 
-        /* ── Hero ── */
-        .player-hero { position: relative; overflow: hidden; padding-bottom: 24px; }
-        .hero-gradient { position: absolute; inset: 0; background: linear-gradient(180deg, var(--pc, #f59e0b)15 0%, var(--bg-app) 100%); pointer-events: none; }
-        .hero-orb { position: absolute; top: -80px; right: -60px; width: 280px; height: 280px; background: radial-gradient(circle, var(--pc, #f59e0b)10, transparent 60%); pointer-events: none; }
-        .hero-jersey-num { position: absolute; right: 20px; top: 10px; font-size: 85px; font-weight: 900; color: rgba(0,0,0,0.03); line-height: 1; pointer-events: none; }
-        .hero-back { position: relative; z-index: 5; padding: 16px 16px 0; }
-        .hero-back-btn { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; width: 42px; height: 42px; cursor: pointer; color: var(--text-primary); display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-        .hero-back-btn:hover { background: var(--bg-subtle); }
+               <div className="info-item">
+                  <span className="info-val">{age ? `${age} Tahun` : '-'}</span>
+                  <span className="info-lbl">{player.date_of_birth ? new Date(player.date_of_birth).toLocaleDateString('id-ID', { month: 'short', day: 'numeric', year: 'numeric'}) : ''}</span>
+               </div>
+               <div className="info-item">
+                  <span className="info-val">{player.metadata?.preferred_foot || player.kaki_dominan || '-'}</span>
+                  <span className="info-lbl">Kaki Dominan</span>
+               </div>
+               
+               <div className="info-item" style={{ gridColumn: 'span 2' }}>
+                  <span className="info-val" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {player.tempat_lahir || '-'}
+                  </span>
+                  <span className="info-lbl">Tempat Lahir</span>
+               </div>
 
-        .hero-content { position: relative; z-index: 5; padding: 16px 20px 0; display: flex; gap: 18px; align-items: flex-end; }
-        .hero-photo-wrap { position: relative; flex-shrink: 0; }
-        .hero-photo { width: 100px; height: 100px; border-radius: 20px; object-fit: cover; box-shadow: 0 8px 24px rgba(0,0,0,0.08), 0 0 0 4px var(--bg-app); display: block; background: var(--bg-card); }
-        .hero-rating { position: absolute; top: -6px; left: -6px; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; font-size: 11px; font-weight: 900; width: 36px; height: 28px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 3px solid var(--bg-app); box-shadow: 0 4px 14px rgba(245,158,11,0.3); }
-        .hero-info { flex: 1; min-width: 0; padding-bottom: 4px; }
-        .hero-name { font-size: 20px; font-weight: 900; color: var(--text-primary); line-height: 1.1; margin: 0 0 8px; letter-spacing: -0.02em; }
-        .hero-badges { display: flex; flex-wrap: wrap; gap: 6px; }
-        .hero-badge { padding: 4px 10px; border-radius: 8px; font-size: 9px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; transition: all 0.2s; }
-        .hero-badge-num { background: var(--bg-subtle); color: var(--text-secondary); border: 1px solid var(--border); }
-        .hero-badge-team { background: rgba(59,130,246,0.1); color: #3b82f6; text-decoration: none; border: 1px solid rgba(59,130,246,0.2); }
-        .hero-badge-team:hover { background: rgba(59,130,246,0.15); }
-        .hero-badge-logo { width: 14px; height: 14px; border-radius: 3px; object-fit: contain; }
+               <div className="info-item">
+                  <span className="info-val">{player.no_telp || '-'}</span>
+                  <span className="info-lbl">No. Telepon</span>
+               </div>
+               <div className="info-item" style={{ gridColumn: 'span 2' }}>
+                  <span className="info-val">{player.asal_sekolah || '-'}</span>
+                  <span className="info-lbl">Asal Sekolah</span>
+               </div>
+            </div>
 
-        .hero-info-bar { position: relative; z-index: 5; display: flex; margin: 20px 16px 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
-        .hero-info-item { flex: 1; padding: 12px 8px; text-align: center; }
-        .hero-info-label { display: block; font-size: 9px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; }
-        .hero-info-value { display: block; font-size: 11px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            <div className="card mt-4 p-4">
+               <div style={{ display: 'flex', gap: 16, alignItems: 'baseline', marginBottom: 12 }}>
+                 <span style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>Statistik Keseluruhan</span>
+               </div>
+               <div style={{ display: 'flex', flexDirection: 'column' }}>
+                 {getSportStatKeys(player?.team?.sport_id, player?.team?.sport?.slug).map((stat, i) => {
+                   const val = player?.aggregated_stats?.[stat.key] || 0;
+                   return (
+                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 4px', borderBottom: i === getSportStatKeys(player?.team?.sport_id, player?.team?.sport?.slug).length - 1 ? 'none' : '1px solid #f3f4f6' }}>
+                       <span style={{ fontSize: 13, fontWeight: 500, color: '#4b5563' }}>{stat.label}</span>
+                       <span style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{val}</span>
+                     </div>
+                   );
+                 })}
+               </div>
+            </div>
+         </div>
 
-        /* ── Tabs ── */
-        .player-tabs { display: flex; margin: 0 16px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); }
-        .player-tab { flex: 1; padding: 14px 0; font-size: 11px; font-weight: 700; color: var(--text-secondary); background: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s; letter-spacing: 0.02em; }
-        .player-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+         <div className="side-col">
+            <div className="card p-4">
+               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                 <span style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>Karakteristik Pemain</span>
+                 <HelpCircle size={16} color="#9ca3af" />
+               </div>
+               <div style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>Statistik dibandingkan pemain {posName} lainnya</div>
+               <DynamicRadarChart player={player} />
+            </div>
 
-        /* ── Content ── */
-        .player-content { padding: 16px 16px 0; }
+            <div className="card mt-4 p-4">
+               <div style={{ paddingBottom: 16 }}>
+                 <span style={{ fontSize: 15, fontWeight: 700, display: 'block', color: '#111827' }}>Riwayat Pertandingan</span>
+               </div>
+               
+               {matches.upcoming?.length > 0 && (
+                 <>
+                   <div style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', marginBottom: 12, paddingBottom: 8, borderBottom: '1px solid #f3f4f6' }}>Pertandingan Akan Datang</div>
+                   {matches.upcoming.map((m, i) => {
+                      const time = new Date(m.scheduled_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+                      return (
+                      <div key={'up_'+i} onClick={() => router.push(`/matches/${m.uuid}`)} className="match-row-flex" style={{ display: 'flex', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #f3f4f6', cursor: 'pointer' }}>
+                        <div className="match-row-time" style={{ width: 60, flexShrink: 0, fontSize: 11, fontWeight: 600, color: '#64748b' }}>{time}</div>
+                        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 0 }}>
+                          <div className="match-row-flex" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, minWidth: 0 }}>
+                            <span className="match-row-team-name" style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.home_team?.name || 'Home'}</span>
+                            <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} alt="" />
+                          </div>
+                          <div className="match-row-score" style={{ width: 72, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: '#9ca3af' }}>-</span>
+                          </div>
+                          <div className="match-row-flex" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 12, minWidth: 0 }}>
+                            <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name)} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} alt="" />
+                            <span className="match-row-team-name" style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.away_team?.name || 'Away'}</span>
+                          </div>
+                        </div>
+                      </div>
+                      );
+                   })}
+                 </>
+               )}
 
-        /* ── Stats Grid ── */
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .stat-card { position: relative; overflow: hidden; background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 18px 12px 14px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s; }
-        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
-        .stat-card-accent { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 40px; height: 3px; border-radius: 2px; }
-        .stat-card-icon { width: 38px; height: 38px; border-radius: 12px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; }
-        .stat-card-value { font-size: 24px; font-weight: 900; color: var(--text-primary); font-variant-numeric: tabular-nums; line-height: 1; }
-        .stat-card-label { font-size: 9px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 6px; }
+               <div style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', marginBottom: 12, marginTop: matches.upcoming?.length > 0 ? 16 : 0, paddingBottom: 8, borderBottom: '1px solid #f3f4f6' }}>Pertandingan Terbaru</div>
+               {matches.recent?.length > 0 ? matches.recent.map((m, i) => {
+                  const isFinished = m.status === 'finished';
+                  const isLive = ['live', 'first_half', 'half_time', 'second_half', 'extra_time_1', 'extra_time_ht', 'extra_time_2', 'penalty_shootout', 'ongoing'].includes(m.status);
+                  const hasScore = isLive || isFinished;
+                  return (
+                  <div key={'rec_'+i} onClick={() => router.push(`/matches/${m.uuid}`)} className="match-row-flex" style={{ display: 'flex', alignItems: 'center', padding: '12px 0', borderBottom: i === matches.recent.length - 1 ? 'none' : '1px solid #f3f4f6', cursor: 'pointer' }}>
+                     <div className="match-row-time" style={{ width: 60, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+                        {isLive ? (
+                           <span style={{ color: '#ef4444', fontSize: 11, fontWeight: 700 }}>Live</span>
+                        ) : isFinished ? (
+                           <div style={{ background: '#f1f5f9', borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#94a3b8' }}>FT</div>
+                        ) : (
+                           <span style={{ fontSize: 11, fontWeight: 600, color: '#64748b' }}>{new Date(m.scheduled_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}</span>
+                        )}
+                     </div>
+                     <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 0 }}>
+                        <div className="match-row-flex" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, minWidth: 0 }}>
+                           <span className="match-row-team-name" style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.home_team?.name || 'Home'}</span>
+                           <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} alt="" />
+                        </div>
+                        <div className="match-row-score" style={{ width: 72, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
+                           {hasScore ? (
+                              <span style={{ fontSize: 14, fontWeight: 700, color: isLive ? '#ef4444' : '#1e293b', whiteSpace: 'nowrap', letterSpacing: '1px' }}>
+                                 {m.home_score} - {m.away_score}
+                              </span>
+                           ) : (
+                              <span style={{ fontSize: 13, fontWeight: 600, color: '#9ca3af' }}>-</span>
+                           )}
+                        </div>
+                        <div className="match-row-flex" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 12, minWidth: 0 }}>
+                           <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name)} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} alt="" />
+                           <span className="match-row-team-name" style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.away_team?.name || 'Away'}</span>
+                        </div>
+                     </div>
+                  </div>
+                  );
+               }) : (
+                  <div style={{ fontSize: 12, color: '#6b7280' }}>Belum ada pertandingan terbaru</div>
+               )}
+            </div>
+         </div>
+       </div>
 
-        /* ── Matches List ── */
-        .matches-list-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-        .match-row-item { display: flex; align-items: center; gap: 10px; padding: 14px; border-bottom: 1px solid var(--border-light); cursor: pointer; transition: background 0.15s; }
-        .match-row-item:last-child { border-bottom: none; }
-        .match-row-item:hover { background: var(--bg-subtle); }
-        .match-result-badge { width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; }
-        .match-team-line { display: flex; align-items: center; gap: 6px; font-size: 11px; margin-bottom: 3px; }
-        .match-team-line:last-child { margin-bottom: 0; }
-        .match-team-logo { width: 16px; height: 16px; object-fit: contain; border-radius: 3px; flex-shrink: 0; }
-        .live-badge { background: rgba(239,68,68,0.12); border-radius: 6px; padding: 3px 8px; font-size: 9px; font-weight: 800; color: #ef4444; display: inline-flex; align-items: center; gap: 4px; }
-        .live-dot-anim { width: 5px; height: 5px; border-radius: 50%; background: #ef4444; animation: blink 1.2s infinite; }
+       <style dangerouslySetInnerHTML={{ __html: `
+          body { background: #f9fafb; margin: 0; }
+          .player-layout { max-width: 1040px; margin: 0 auto; padding: 24px; }
+          .hero-banner { border-radius: 16px; padding: 24px 32px; color: #fff; margin-bottom: 24px; position: relative; overflow: hidden; box-shadow: 0 4px 12px rgba(255,26,26,0.2); }
+          .hero-inner { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 2; }
+          .hero-photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; background: #fff; }
+          .hero-name { font-size: 28px; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.5px; }
+          .hero-team { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; opacity: 0.9; }
+          .hero-team-logo { width: 16px; height: 16px; border-radius: 50%; background: #fff; padding: 1px; object-fit: contain; }
+          .follow-btn { background: #fff; color: #ff1a1a; border: none; border-radius: 20px; padding: 8px 24px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+          .follow-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 
-        .empty-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 40px 20px; text-align: center; grid-column: 1 / -1; }
-        .empty-card p { font-size: 11px; color: var(--text-secondary); font-weight: 600; margin: 10px 0 0; }
+          .grid-layout { display: grid; grid-template-columns: 1fr; gap: 24px; }
+          @media(min-width: 900px) {
+            .grid-layout { grid-template-columns: 1.2fr 1fr; }
+          }
+          @media(min-width: 1100px) {
+            .grid-layout { grid-template-columns: 1.4fr 1fr; }
+          }
+          
+          .card { background: #fff; border-radius: 16px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+          .p-4 { padding: 24px; }
+          .mt-4 { margin-top: 24px; }
 
-        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+          .info-grid { padding: 24px; display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 28px 16px; align-items: start; }
+          @media(max-width: 600px) {
+             .info-grid { grid-template-columns: 1fr 1fr; gap: 20px 16px; }
+             .info-position-box { grid-column: 1 / -1 !important; grid-row: auto !important; margin-top: 8px; border-top: 1px solid #f3f4f6; border-left: none !important; padding-left: 0 !important; padding-top: 20px; }
+          }
+          .info-item { display: flex; flex-direction: column; gap: 4px; }
+          .info-val { font-size: 14px; font-weight: 700; color: #111827; }
+          .info-lbl { font-size: 12px; font-weight: 500; color: #6b7280; }
 
-        /* ── Desktop ── */
-        @media (min-width: 768px) {
-          .player-page { max-width: 900px; }
-          .hero-content { padding: 20px 32px 0; gap: 24px; }
-          .hero-photo { width: 130px; height: 130px; border-radius: 24px; }
-          .hero-rating { width: 42px; height: 32px; font-size: 13px; top: -8px; left: -8px; }
-          .hero-name { font-size: 27px; }
-          .hero-info-bar { margin: 24px 32px 0; }
-          .hero-info-value { font-size: 12px; }
-          .hero-jersey-num { font-size: 119px; right: 32px; top: 20px; }
-          .player-tabs { margin: 0 32px; }
-          .player-content { padding: 20px 32px 0; }
-          .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 14px; }
-          .stat-card { padding: 24px 16px 18px; }
-          .stat-card-value { font-size: 31px; }
-          .stat-card-icon { width: 44px; height: 44px; }
-        }
-
-        /* ── Mobile ── */
-        @media (max-width: 480px) {
-          .hero-content { gap: 14px; padding: 12px 14px 0; }
-          .hero-photo { width: 80px; height: 80px; border-radius: 16px; }
-          .hero-name { font-size: 17px; }
-          .hero-badge { font-size: 9px; padding: 3px 8px; }
-          .hero-info-bar { margin: 16px 12px 0; }
-          .player-tabs { margin: 0 12px; }
-          .player-content { padding: 12px 12px 0; }
-          .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-          .stat-card { padding: 14px 10px 12px; }
-          .stat-card-value { font-size: 20px; }
-          .stat-card-icon { width: 32px; height: 32px; }
-          .match-row-item { padding: 12px; }
-        }
-      `}} />
+          .info-position-box { border-left: 1px solid #f3f4f6; padding-left: 24px; height: 100%; display: flex; flex-direction: column; }
+          .mini-pitch { flex: 1; min-height: 150px; background: #f3f4f6; border-radius: 8px; margin-top: 16px; position: relative; overflow: hidden; border: 1px solid #e5e7eb; }
+          .pitch-line { position: absolute; border: 1.5px solid #d1d5db; }
+       `}} />
     </div>
   );
 }
