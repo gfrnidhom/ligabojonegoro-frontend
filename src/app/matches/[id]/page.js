@@ -921,7 +921,7 @@ function LineupTab({ match }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* 1. Pitch Visualizer */}
-      <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+      <div style={{ borderRadius: 16, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
         <PitchVisualizer
           homeTeam={match.home_team}
           awayTeam={match.away_team}
@@ -1027,6 +1027,16 @@ function LineupTab({ match }) {
 
 
 function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFormation, awayFormation, onPlayerSelect }) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 768px)');
+    setIsMobile(mql.matches);
+    const handler = (e) => setIsMobile(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
+
   const homeStarters = homePlayers.filter(p => p.is_starter);
   const awayStarters = awayPlayers.filter(p => p.is_starter);
 
@@ -1035,18 +1045,15 @@ function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFor
     const pStr = typeof pos === 'object' ? (pos.abbreviation || pos.name || '') : String(pos);
     const p = pStr.toUpperCase();
     let weight = 0;
-
     if (p.includes('GK')) weight = 100;
     else if (p.endsWith('B')) weight = 200;
     else if (p.endsWith('M')) weight = 300;
     else if (p.includes('W') || p.includes('F') || p.includes('ST') || p.includes('SS')) weight = 400;
     else weight = 900;
-
     if (p.startsWith('L')) weight += 1;
     else if (p.startsWith('C') || p === 'ST' || p === 'SS') weight += 5;
     else if (p.startsWith('R')) weight += 9;
     else weight += 5;
-
     return weight;
   };
 
@@ -1061,91 +1068,127 @@ function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFor
 
   const hSorted = sortPlayers(homeStarters);
   const aSorted = sortPlayers(awayStarters);
-
   const hCoords = calculateCoordinates(homeFormation);
   const aCoords = calculateCoordinates(awayFormation);
 
   const avatar = (name, bg) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name || '?')}&size=24&background=${bg}&color=fff`;
 
+  // ── Coordinate helpers ──
+  // formationCoords gives { x, y } where:
+  //   x = horizontal spread (0 left … 100 right)
+  //   y = depth from midline (0 = near opponent goal, 92 = own goal)
+  //
+  // Horizontal (desktop): home on LEFT, away on RIGHT
+  //   home  → left = 5% + (y/100)*40%   top = x%
+  //   away  → left = 95% - (y/100)*40%  top = x%
+  //
+  // Vertical (mobile): home on TOP, away on BOTTOM
+  //   home  → left = x%   top = 5% + (y/100)*40%
+  //   away  → left = x%   top = 95% - (y/100)*40%
+
+  const getPos = (c, side) => {
+    if (!isMobile) {
+      // Horizontal pitch
+      if (side === 'home') return { left: `${5 + (c.y / 100) * 40}%`, top: `${c.x}%` };
+      else                 return { left: `${95 - (c.y / 100) * 40}%`, top: `${c.x}%` };
+    } else {
+      // Vertical pitch — use wider 46% spread for more spacing
+      if (side === 'home') return { left: `${c.x}%`, top: `${3 + (c.y / 100) * 46}%` };
+      else                 return { left: `${c.x}%`, top: `${97 - (c.y / 100) * 46}%` };
+    }
+  };
+
+  const pitchMode = isMobile ? 'pitch-vertical' : 'pitch-horizontal';
+  const pitchHeight = isMobile ? 1200 : 600;
+  const imgSize = isMobile ? 32 : 48;
+  const nameFontSize = isMobile ? '9px' : '11px';
+  const ratingFontSize = isMobile ? 9 : 11;
+  const ratingPad = isMobile ? '2px 4px' : '2px 6px';
+
+  console.log('[PitchVisualizer] isMobile:', isMobile, 'pitchHeight:', pitchHeight, 'pitchMode:', pitchMode);
+
   return (
-    <div className="pitch-wrapper">
-      <div className="pitch-container">
-        {/* Pitch Lines */}
-        <div className="pitch-border" />
-        <div className="pitch-midline" />
-        <div className="pitch-center-circle" />
-        
-        {/* Penalty Boxes */}
-        <div className="pitch-pen-left" />
-        <div className="pitch-pen-right" />
-        <div className="pitch-goal-left" />
-        <div className="pitch-goal-right" />
+    <div className={`pitch-container ${pitchMode}`} style={{ height: `${pitchHeight}px`, minHeight: `${pitchHeight}px` }}>
+      {/* Field markings */}
+      <div className="pitch-border" />
+      <div className="pitch-midline" />
+      <div className="pitch-center-circle" />
+      <div className="pitch-pen-left" />
+      <div className="pitch-pen-right" />
+      <div className="pitch-goal-left" />
+      <div className="pitch-goal-right" />
+      <div className="pitch-d-left" />
+      <div className="pitch-d-right" />
 
-        {/* D-Arcs */}
-        <div className="pitch-d-left" />
-        <div className="pitch-d-right" />
+      {/* Home team info */}
+      <div style={{
+        position: 'absolute', display: 'flex', alignItems: 'center', gap: 8, zIndex: 20,
+        ...(isMobile
+          ? { top: 12, left: 16, right: 16, justifyContent: 'center' }
+          : { top: 20, left: 20 })
+      }}>
+        <div style={{ background: '#10b981', color: '#fff', fontSize: 11, fontWeight: 800, padding: '3px 7px', borderRadius: 4 }}>7.2</div>
+        <img src={getImageUrl(homeTeam?.logo_path) || avatar(homeTeam?.name, '3b82f6')} style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'contain' }} alt="" />
+        <span style={{ color: '#fff', fontSize: 13, fontWeight: 700, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{homeTeam?.name}</span>
+        <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: 600 }}>{homeFormation}</span>
+      </div>
 
-        {/* Info Bars */}
-        <div className="pitch-info pitch-info-home" style={{ position: 'absolute', display: 'flex', alignItems: 'center', gap: 12, zIndex: 20 }}>
-          <div style={{ background: '#10b981', color: '#fff', fontSize: 12, fontWeight: 800, padding: '4px 8px', borderRadius: 4 }}>7.2</div>
-          <img src={getImageUrl(homeTeam?.logo_path) || avatar(homeTeam?.name, '3b82f6')} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'contain' }} alt="" />
-          <span style={{ color: '#fff', fontSize: 14, fontWeight: 700, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{homeTeam?.name}</span>
-          <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, fontWeight: 600, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{homeFormation}</span>
-        </div>
+      {/* Away team info */}
+      <div style={{
+        position: 'absolute', display: 'flex', alignItems: 'center', gap: 8, zIndex: 20,
+        ...(isMobile
+          ? { bottom: 12, left: 16, right: 16, justifyContent: 'center' }
+          : { top: 20, right: 20, flexDirection: 'row-reverse' })
+      }}>
+        <div style={{ background: '#f59e0b', color: '#fff', fontSize: 11, fontWeight: 800, padding: '3px 7px', borderRadius: 4 }}>6.8</div>
+        <img src={getImageUrl(awayTeam?.logo_path) || avatar(awayTeam?.name, 'ef4444')} style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'contain' }} alt="" />
+        <span style={{ color: '#fff', fontSize: 13, fontWeight: 700, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{awayTeam?.name}</span>
+        <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: 600 }}>{awayFormation}</span>
+      </div>
 
-        <div className="pitch-info pitch-info-away" style={{ position: 'absolute', display: 'flex', alignItems: 'center', gap: 12, zIndex: 20 }}>
-          <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, fontWeight: 600, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{awayFormation}</span>
-          <span style={{ color: '#fff', fontSize: 14, fontWeight: 700, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{awayTeam?.name}</span>
-          <img src={getImageUrl(awayTeam?.logo_path) || avatar(awayTeam?.name, 'ef4444')} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'contain' }} alt="" />
-          <div style={{ background: '#f59e0b', color: '#fff', fontSize: 12, fontWeight: 800, padding: '4px 8px', borderRadius: 4 }}>6.8</div>
-        </div>
-
-      {/* Home Players (Left Half) */}
+      {/* Home Players */}
       {hSorted.map((p, i) => {
         const c = hCoords[i] || { x: 50, y: 50 };
-        const left = 50 - (c.y / 100) * 45;
-        const top = c.x;
+        const pos = getPos(c, 'home');
         const rating = p.statistics?.rating || (Math.random() * (8.5 - 6.0) + 6.0).toFixed(1);
         const ratingColor = rating >= 7.5 ? '#10b981' : rating >= 7.0 ? '#34d399' : '#f59e0b';
-        
         return (
-          <div key={p.id} onClick={() => onPlayerSelect ? onPlayerSelect(p) : handlePlayerClick(p.player?.uuid)} className="player-dot player-home" style={{ position: 'absolute', '--pos-y-home': `${left}%`, '--pos-x': `${top}%`, display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10, cursor: 'pointer' }}>
+          <div key={p.id} onClick={() => onPlayerSelect ? onPlayerSelect(p) : handlePlayerClick(p.player?.uuid)}
+            style={{ position: 'absolute', left: pos.left, top: pos.top, transform: 'translate(-50%,-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10, cursor: 'pointer' }}>
             <div style={{ position: 'relative' }}>
-              <img src={getImageUrl(p.player?.photo_path) || avatar(p.player?.name, '3b82f6')} className="player-avatar" style={{ width: 48, height: 48, borderRadius: '50%', boxShadow: '0 4px 10px rgba(0,0,0,0.3)', objectFit: 'cover', border: '2px solid #fff' }} alt="" />
-              <div className="player-rating" style={{ position: 'absolute', top: -4, right: -12, background: ratingColor, color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 6px', borderRadius: 10, border: '1px solid #fff' }}>
+              <img src={getImageUrl(p.player?.photo_path) || avatar(p.player?.name, '3b82f6')} style={{ width: imgSize, height: imgSize, borderRadius: '50%', boxShadow: '0 4px 10px rgba(0,0,0,0.3)', objectFit: 'cover', border: '2px solid #fff' }} alt="" />
+              <div style={{ position: 'absolute', top: -4, right: -10, background: ratingColor, color: '#fff', fontSize: ratingFontSize, fontWeight: 800, padding: ratingPad, borderRadius: 10, border: '1px solid #fff' }}>
                 {rating}
               </div>
             </div>
-            <div className="player-name" style={{ color: '#fff', fontSize: '11px', fontWeight: 700, marginTop: '4px', whiteSpace: 'nowrap', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
+            <div style={{ color: '#fff', fontSize: nameFontSize, fontWeight: 700, marginTop: 3, whiteSpace: 'nowrap', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
               {p.player?.jersey_number} {p.player?.name.split(' ').pop()}
             </div>
           </div>
         );
       })}
 
-      {/* Away Players (Right Half) */}
+      {/* Away Players */}
       {aSorted.map((p, i) => {
         const c = aCoords[i] || { x: 50, y: 50 };
-        const left = 50 + (c.y / 100) * 45;
-        const top = c.x;
+        const pos = getPos(c, 'away');
         const rating = p.statistics?.rating || (Math.random() * (8.5 - 6.0) + 6.0).toFixed(1);
         const ratingColor = rating >= 7.5 ? '#10b981' : rating >= 7.0 ? '#34d399' : '#f59e0b';
-        
         return (
-          <div key={p.id} onClick={() => onPlayerSelect ? onPlayerSelect(p) : handlePlayerClick(p.player?.uuid)} className="player-dot player-away" style={{ position: 'absolute', '--pos-y-away': `${left}%`, '--pos-x': `${top}%`, display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10, cursor: 'pointer' }}>
+          <div key={p.id} onClick={() => onPlayerSelect ? onPlayerSelect(p) : handlePlayerClick(p.player?.uuid)}
+            style={{ position: 'absolute', left: pos.left, top: pos.top, transform: 'translate(-50%,-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10, cursor: 'pointer' }}>
             <div style={{ position: 'relative' }}>
-              <img src={getImageUrl(p.player?.photo_path) || avatar(p.player?.name, 'ef4444')} className="player-avatar" style={{ width: 48, height: 48, borderRadius: '50%', boxShadow: '0 4px 10px rgba(0,0,0,0.3)', objectFit: 'cover', border: '2px solid #fff' }} alt="" />
-              <div className="player-rating" style={{ position: 'absolute', top: -4, right: -12, background: ratingColor, color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 6px', borderRadius: 10, border: '1px solid #fff' }}>
+              <img src={getImageUrl(p.player?.photo_path) || avatar(p.player?.name, 'ef4444')} style={{ width: imgSize, height: imgSize, borderRadius: '50%', boxShadow: '0 4px 10px rgba(0,0,0,0.3)', objectFit: 'cover', border: '2px solid #fff' }} alt="" />
+              <div style={{ position: 'absolute', top: -4, right: -10, background: ratingColor, color: '#fff', fontSize: ratingFontSize, fontWeight: 800, padding: ratingPad, borderRadius: 10, border: '1px solid #fff' }}>
                 {rating}
               </div>
             </div>
-            <div className="player-name" style={{ color: '#fff', fontSize: '11px', fontWeight: 700, marginTop: '4px', whiteSpace: 'nowrap', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
+            <div style={{ color: '#fff', fontSize: nameFontSize, fontWeight: 700, marginTop: 3, whiteSpace: 'nowrap', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
               {p.player?.jersey_number} {p.player?.name.split(' ').pop()}
             </div>
           </div>
         );
       })}
-      </div>
     </div>
   );
 }

@@ -280,93 +280,40 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   }
 }
 
-/* Pitch Lines & Layout */
+/* ===== Pitch Visualizer ===== */
+/* Container & field lines are CSS; player positions are computed in JS */
 .pitch-container {
   position: relative;
   width: 100%;
-  height: 600px;
   background: #0e8c56;
   overflow: hidden;
   border-radius: 16px;
 }
 
-/* Base Horizontal Pitch Lines */
-.pitch-border { top: 16px; left: 16px; right: 16px; bottom: 16px; border: 2px solid rgba(255,255,255,0.2); position: absolute; }
-.pitch-midline { top: 16px; bottom: 16px; left: 50%; width: 2px; background: rgba(255,255,255,0.2); transform: translateX(-50%); position: absolute; }
-.pitch-center-circle { top: 50%; left: 50%; width: 120px; height: 120px; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; transform: translate(-50%, -50%); position: absolute; }
+/* Desktop: horizontal pitch */
+.pitch-container.pitch-horizontal { height: 600px; }
+/* Mobile: vertical pitch */
+.pitch-container.pitch-vertical   { height: 1800px; }
 
-.pitch-pen-left { top: 22%; bottom: 22%; left: 16px; width: 110px; border: 2px solid rgba(255,255,255,0.2); border-left: none; position: absolute; }
-.pitch-pen-right { top: 22%; bottom: 22%; right: 16px; width: 110px; border: 2px solid rgba(255,255,255,0.2); border-right: none; position: absolute; }
-.pitch-goal-left { top: 38%; bottom: 38%; left: 16px; width: 50px; border: 2px solid rgba(255,255,255,0.2); border-left: none; position: absolute; }
-.pitch-goal-right { top: 38%; bottom: 38%; right: 16px; width: 50px; border: 2px solid rgba(255,255,255,0.2); border-right: none; position: absolute; }
+/* ---------- Shared field-line base ---------- */
+.pitch-border { position: absolute; top: 16px; left: 16px; right: 16px; bottom: 16px; border: 2px solid rgba(255,255,255,0.2); }
+.pitch-center-circle { position: absolute; top: 50%; left: 50%; width: 120px; height: 120px; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; transform: translate(-50%,-50%); }
 
-.pitch-d-left { top: 50%; left: 126px; width: 40px; height: 80px; border: 2px solid rgba(255,255,255,0.2); border-left: none; border-radius: 0 40px 40px 0; transform: translateY(-50%); position: absolute; }
-.pitch-d-right { top: 50%; right: 126px; width: 40px; height: 80px; border: 2px solid rgba(255,255,255,0.2); border-right: none; border-radius: 40px 0 0 40px; transform: translateY(-50%); position: absolute; }
+/* ---------- Horizontal field lines ---------- */
+.pitch-horizontal .pitch-midline   { position: absolute; top: 16px; bottom: 16px; left: 50%; width: 2px; background: rgba(255,255,255,0.2); transform: translateX(-50%); }
+.pitch-horizontal .pitch-pen-left  { position: absolute; top: 22%; bottom: 22%; left: 16px; width: 110px; border: 2px solid rgba(255,255,255,0.2); border-left: none; }
+.pitch-horizontal .pitch-pen-right { position: absolute; top: 22%; bottom: 22%; right: 16px; width: 110px; border: 2px solid rgba(255,255,255,0.2); border-right: none; }
+.pitch-horizontal .pitch-goal-left { position: absolute; top: 38%; bottom: 38%; left: 16px; width: 50px; border: 2px solid rgba(255,255,255,0.2); border-left: none; }
+.pitch-horizontal .pitch-goal-right{ position: absolute; top: 38%; bottom: 38%; right: 16px; width: 50px; border: 2px solid rgba(255,255,255,0.2); border-right: none; }
+.pitch-horizontal .pitch-d-left    { position: absolute; top: 50%; left: 126px; width: 40px; height: 80px; border: 2px solid rgba(255,255,255,0.2); border-left: none; border-radius: 0 40px 40px 0; transform: translateY(-50%); }
+.pitch-horizontal .pitch-d-right   { position: absolute; top: 50%; right: 126px; width: 40px; height: 80px; border: 2px solid rgba(255,255,255,0.2); border-right: none; border-radius: 40px 0 0 40px; transform: translateY(-50%); }
 
-.player-home { left: var(--pos-y-home); top: var(--pos-x); }
-.player-away { left: var(--pos-y-away); top: var(--pos-x); }
+/* ---------- Vertical field lines ---------- */
+.pitch-vertical .pitch-midline   { position: absolute; left: 16px; right: 16px; top: 50%; height: 2px; background: rgba(255,255,255,0.2); transform: translateY(-50%); }
+.pitch-vertical .pitch-pen-left  { position: absolute; left: 22%; right: 22%; top: 16px; height: 110px; border: 2px solid rgba(255,255,255,0.2); border-top: none; }
+.pitch-vertical .pitch-pen-right { position: absolute; left: 22%; right: 22%; bottom: 16px; height: 110px; border: 2px solid rgba(255,255,255,0.2); border-bottom: none; }
+.pitch-vertical .pitch-goal-left { position: absolute; left: 38%; right: 38%; top: 16px; height: 50px; border: 2px solid rgba(255,255,255,0.2); border-top: none; }
+.pitch-vertical .pitch-goal-right{ position: absolute; left: 38%; right: 38%; bottom: 16px; height: 50px; border: 2px solid rgba(255,255,255,0.2); border-bottom: none; }
+.pitch-vertical .pitch-d-left    { position: absolute; left: 50%; top: 126px; height: 40px; width: 80px; border: 2px solid rgba(255,255,255,0.2); border-top: none; border-radius: 0 0 40px 40px; transform: translateX(-50%); }
+.pitch-vertical .pitch-d-right   { position: absolute; left: 50%; bottom: 126px; height: 40px; width: 80px; border: 2px solid rgba(255,255,255,0.2); border-bottom: none; border-radius: 40px 40px 0 0; transform: translateX(-50%); }
 
-.pitch-info-home { top: 24px; left: 24px; flex-direction: row; }
-.pitch-info-away { top: 24px; right: 24px; flex-direction: row-reverse; }
-
-@media (max-width: 768px) {
-  .pitch-container { height: 800px; }
-  
-  /* Vertical Pitch Lines */
-  .pitch-midline { left: 16px; right: 16px; top: 50%; height: 2px; width: auto; background: rgba(255,255,255,0.2); transform: translateY(-50%); }
-  
-  .pitch-pen-left { left: 22%; right: 22%; top: 16px; height: 110px; width: auto; border: 2px solid rgba(255,255,255,0.2); border-top: none; }
-  .pitch-pen-right { left: 22%; right: 22%; bottom: 16px; height: 110px; width: auto; border: 2px solid rgba(255,255,255,0.2); border-bottom: none; top: auto; }
-  .pitch-goal-left { left: 38%; right: 38%; top: 16px; height: 50px; width: auto; border: 2px solid rgba(255,255,255,0.2); border-top: none; }
-  .pitch-goal-right { left: 38%; right: 38%; bottom: 16px; height: 50px; width: auto; border: 2px solid rgba(255,255,255,0.2); border-bottom: none; top: auto; }
-
-  .pitch-d-left { left: 50%; top: 126px; height: 40px; width: 80px; border: 2px solid rgba(255,255,255,0.2); border-top: none; border-radius: 0 0 40px 40px; transform: translateX(-50%); }
-  .pitch-d-right { left: 50%; bottom: 126px; height: 40px; width: 80px; border: 2px solid rgba(255,255,255,0.2); border-bottom: none; border-radius: 40px 40px 0 0; transform: translateX(-50%); top: auto; right: auto; }
-
-  .player-home { left: var(--pos-x); top: var(--pos-y-home); }
-  .player-away { left: var(--pos-x); top: var(--pos-y-away); }
-
-  .pitch-info-home { top: 24px; left: 16px; right: 16px; flex-direction: row; justify-content: center; }
-  .pitch-info-away { bottom: 24px; left: 16px; right: 16px; top: auto; flex-direction: row; justify-content: center; }
-}
-
-@media (max-width: 768px) {
-  /* Spread players out horizontally and vertically */
-  .player-home { 
-    left: calc(50% + (var(--pos-x) - 50%) * 1.5); 
-    top: calc(50% + (var(--pos-y-home) - 50%) * 1.25); 
-  }
-  .player-away { 
-    left: calc(50% + (var(--pos-x) - 50%) * 1.5); 
-    top: calc(50% + (var(--pos-y-away) - 50%) * 1.25); 
-  }
-
-  /* Make player dots slightly smaller */
-  .player-avatar {
-    width: 38px !important;
-    height: 38px !important;
-  }
-  .player-rating {
-    font-size: 9px !important;
-    padding: 2px 4px !important;
-    right: -8px !important;
-    top: -2px !important;
-  }
-  .player-name {
-    font-size: 9px !important;
-    margin-top: 2px !important;
-  }
-
-  /* Fix info bars so they don't float incorrectly */
-  .pitch-info-home {
-    top: 16px !important;
-    left: 16px !important;
-    right: 16px !important;
-  }
-  .pitch-info-away {
-    bottom: 16px !important;
-    top: auto !important;
-    left: 16px !important;
-    right: 16px !important;
-  }
-}
