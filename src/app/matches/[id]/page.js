@@ -2311,15 +2311,50 @@ function StatistikTab({ match }) {
     { id: 'h2', label: 'Babak 2' },
   ];
 
-  const sportFields = sport?.stat_fields || [];
-  let accumFields = sportFields.filter(f => !['goals', 'assists', 'yellow_cards', 'red_cards', 'minutes_played'].includes(f));
+  const SPORT_STATS = {
+    football: [
+      { key: 'possession', label: 'Penguasaan Bola', type: 'percentage' },
+      { key: 'shots', label: 'Total Tembakan' },
+      { key: 'shots_on_target', label: 'Tembakan Tepat Sasaran' },
+      { key: 'corners', label: 'Tendangan Sudut' },
+      { key: 'fouls', label: 'Pelanggaran', lowerIsBetter: true },
+      { key: 'offsides', label: 'Offside', lowerIsBetter: true },
+      { key: 'yellow_cards', label: 'Kartu Kuning', lowerIsBetter: true },
+      { key: 'red_cards', label: 'Kartu Merah', lowerIsBetter: true },
+    ],
+    futsal: [
+      { key: 'possession', label: 'Penguasaan Bola', type: 'percentage' },
+      { key: 'shots', label: 'Total Tembakan' },
+      { key: 'shots_on_target', label: 'Tembakan Tepat Sasaran' },
+      { key: 'corners', label: 'Tendangan Sudut' },
+      { key: 'fouls', label: 'Pelanggaran', lowerIsBetter: true },
+      { key: 'yellow_cards', label: 'Kartu Kuning', lowerIsBetter: true },
+      { key: 'red_cards', label: 'Kartu Merah', lowerIsBetter: true },
+    ],
+    basketball: [
+      { key: 'points', label: 'Poin' },
+      { key: 'rebounds', label: 'Rebounds' },
+      { key: 'assists', label: 'Assists' },
+      { key: 'steals', label: 'Steals' },
+      { key: 'blocks', label: 'Blocks' },
+      { key: 'turnovers', label: 'Turnovers', lowerIsBetter: true },
+      { key: 'fouls', label: 'Pelanggaran', lowerIsBetter: true },
+    ],
+    volleyball: [
+      { key: 'aces', label: 'Service Aces' },
+      { key: 'blocks', label: 'Blocks' },
+      { key: 'kills', label: 'Smashes / Kills' },
+      { key: 'errors', label: 'Errors', lowerIsBetter: true },
+    ],
+    badminton: [
+      { key: 'aces', label: 'Service Aces' },
+      { key: 'smashes', label: 'Smashes' },
+      { key: 'net_wins', label: 'Net Play Wins' },
+      { key: 'errors', label: 'Unforced Errors', lowerIsBetter: true },
+    ]
+  };
 
-  if (accumFields.length === 0) {
-    accumFields = Object.keys(stats)
-      .filter(k => k.endsWith('_home'))
-      .map(k => k.replace('_home', ''))
-      .filter(f => !['goals', 'assists', 'yellow_cards', 'red_cards', 'minutes_played'].includes(f));
-  }
+  const statConfig = SPORT_STATS[sportSlug] || SPORT_STATS.football;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -2343,40 +2378,37 @@ function StatistikTab({ match }) {
         </div>
       )}
 
-      {/* ── Penguasaan Bola ── */}
-      {isFootballOrFutsal && (
-        <div style={{ textAlign: 'center', marginBottom: 16 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 20 }}>Statistik Utama</div>
-          <div style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 16 }}>Penguasaan Bola</div>
-          <div style={{ display: 'flex', alignItems: 'center', height: 36, gap: 2 }}>
-            <div style={{ flex: possHome, background: '#27345b', height: '100%', borderRadius: '18px 0 0 18px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 16, transition: 'flex 1s ease' }}>
-              <span style={{ fontSize: 11, fontWeight: 600, color: '#fff' }}>{possHome}%</span>
-            </div>
-            <div style={{ flex: possAway, background: '#df9a0f', height: '100%', borderRadius: '0 18px 18px 0', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 16, transition: 'flex 1s ease' }}>
-              <span style={{ fontSize: 11, fontWeight: 600, color: '#fff' }}>{possAway}%</span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Tembakan ── */}
-      {isFootballOrFutsal && (
-        <div style={{ marginTop: 16 }}>
-          <StatRow label="Total Tembakan" homeVal={s('shots_home')} awayVal={s('shots_away')} />
-          <StatRow label="Tembakan Tepat Sasaran" homeVal={s('shots_on_target_home')} awayVal={s('shots_on_target_away')} />
-        </div>
-      )}
-
-      {/* ── Umum ── */}
-      {isFootballOrFutsal && (
-        <div style={{ marginTop: 16 }}>
-          <StatRow label="Tendangan Sudut" homeVal={s('corners_home')} awayVal={s('corners_away')} />
-          <StatRow label="Pelanggaran" homeVal={s('fouls_home')} awayVal={s('fouls_away')} lowerIsBetter />
-          <StatRow label="Offside" homeVal={s('offsides_home')} awayVal={s('offsides_away')} lowerIsBetter />
-          <StatRow label="Kartu Kuning" homeVal={s('yellow_cards_home')} awayVal={s('yellow_cards_away')} lowerIsBetter />
-          <StatRow label="Kartu Merah" homeVal={s('red_cards_home')} awayVal={s('red_cards_away')} lowerIsBetter />
-        </div>
-      )}
+      <div style={{ marginTop: 16 }}>
+        {statConfig.map(config => {
+          if (config.type === 'percentage') {
+            const hVal = parseInt(s(`${config.key}_home`)) || 50;
+            const aVal = parseInt(s(`${config.key}_away`)) || 50;
+            return (
+              <div key={config.key} style={{ textAlign: 'center', marginBottom: 16 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 20 }}>Statistik Utama</div>
+                <div style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 16 }}>Persentase {config.label}</div>
+                <div style={{ display: 'flex', alignItems: 'center', height: 36, gap: 2 }}>
+                  <div style={{ flex: hVal, background: '#27345b', height: '100%', borderRadius: '18px 0 0 18px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 16, transition: 'flex 1s ease' }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: '#fff' }}>{hVal}%</span>
+                  </div>
+                  <div style={{ flex: aVal, background: '#df9a0f', height: '100%', borderRadius: '0 18px 18px 0', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 16, transition: 'flex 1s ease' }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: '#fff' }}>{aVal}%</span>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+          return (
+            <StatRow 
+              key={config.key} 
+              label={config.label} 
+              homeVal={s(`${config.key}_home`)} 
+              awayVal={s(`${config.key}_away`)} 
+              lowerIsBetter={config.lowerIsBetter} 
+            />
+          );
+        })}
+      </div>
 
     </div>
   );
