@@ -2344,6 +2344,10 @@ function StatistikTab({ match }) {
       { key: 'aces', label: 'Service Aces' },
       { key: 'blocks', label: 'Blocks' },
       { key: 'kills', label: 'Smashes / Kills' },
+      { key: 'digs', label: 'Digs / Penyelamatan' },
+      { key: 'assists', label: 'Assists / Umpan' },
+      { key: 'receptions', label: 'Penerimaan Bola' },
+      { key: 'serve_errors', label: 'Service Errors', lowerIsBetter: true },
       { key: 'errors', label: 'Errors', lowerIsBetter: true },
     ],
     badminton: [

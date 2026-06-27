@@ -1338,7 +1338,7 @@ function StandingsTable({ rows = [], match, sport }) {
 function StatistikTab({ match }) {
   const [period, setPeriod] = useState('all');
   const stats = match.statistics;
-  if (!stats || stats.possession_home === undefined) {
+  if (!stats || Object.keys(stats).length === 0) {
     return (
       <div className="empty-state" style={{ padding: '36px 16px' }}>
         <p style={{ fontSize: 10, color: '#8b92a5', fontWeight: 600 }}>Statistik pertandingan belum tersedia.</p>
@@ -1441,6 +1441,10 @@ function StatistikTab({ match }) {
       { key: 'aces', label: 'Service Aces' },
       { key: 'blocks', label: 'Blocks' },
       { key: 'kills', label: 'Smashes / Kills' },
+      { key: 'digs', label: 'Digs / Penyelamatan' },
+      { key: 'assists', label: 'Assists / Umpan' },
+      { key: 'receptions', label: 'Penerimaan Bola' },
+      { key: 'serve_errors', label: 'Service Errors', lowerIsBetter: true },
       { key: 'errors', label: 'Errors', lowerIsBetter: true },
     ],
     badminton: [
