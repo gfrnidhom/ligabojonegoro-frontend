@@ -19,10 +19,16 @@ const TABS = [
 
 export const formatGameMinute = (minute) => {
   if (minute === null || minute === undefined) return '';
-  if (typeof minute === 'number') return Math.floor(minute);
+  if (typeof minute === 'number') {
+    const m = Math.floor(minute);
+    const s = Math.floor((minute - m) * 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  }
   const parsed = parseFloat(minute);
   if (!isNaN(parsed) && String(minute).includes('.')) {
-    return Math.floor(parsed);
+    const m = Math.floor(parsed);
+    const s = Math.floor((parsed - m) * 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
   }
   return minute;
 };
@@ -705,6 +711,7 @@ function LineupTab({ match }) {
         awayPlayers={away}
         homeFormation={match.statistics?.home_formation}
         awayFormation={match.statistics?.away_formation}
+        sportSlug={match.tournament?.sport?.slug}
       />
 
       {/* 2. Info Bar Formasi */}
@@ -800,9 +807,10 @@ function LineupTab({ match }) {
   );
 }
 
-function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFormation, awayFormation }) {
+function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFormation, awayFormation, sportSlug }) {
   const homeStarters = homePlayers.filter(p => p.is_starter);
   const awayStarters = awayPlayers.filter(p => p.is_starter);
+  const sportClass = sportSlug ? `sport-${sportSlug.toLowerCase()}` : 'sport-football';
 
   const getPosWeight = (pos) => {
     if (!pos) return 990;
@@ -842,14 +850,16 @@ function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFor
   const avatar = (name, bg) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name || '?')}&size=24&background=${bg}&color=fff`;
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '640px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)' }}>
-      {/* Pitch Lines */}
-      <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '2px', background: 'rgba(255,255,255,0.2)', transform: 'translateY(-50%)' }} />
-      <div style={{ position: 'absolute', top: '50%', left: '50%', width: '100px', height: '100px', border: '2px solid rgba(255,255,255,0.2)', borderRadius: '50%', transform: 'translate(-50%, -50%)' }} />
-      <div style={{ position: 'absolute', top: '-10px', left: '20%', right: '20%', height: '100px', border: '2px solid rgba(255,255,255,0.2)' }} />
-      <div style={{ position: 'absolute', bottom: '-10px', left: '20%', right: '20%', height: '100px', border: '2px solid rgba(255,255,255,0.2)' }} />
-      <div style={{ position: 'absolute', top: '-10px', left: '35%', right: '35%', height: '45px', border: '2px solid rgba(255,255,255,0.2)' }} />
-      <div style={{ position: 'absolute', bottom: '-10px', left: '35%', right: '35%', height: '45px', border: '2px solid rgba(255,255,255,0.2)' }} />
+    <div className={`pitch-container pitch-vertical ${sportClass}`} style={{ height: '640px' }}>
+      <div className="pitch-border" />
+      <div className="pitch-midline" />
+      <div className="pitch-center-circle" />
+      <div className="pitch-pen-left" />
+      <div className="pitch-pen-right" />
+      <div className="pitch-goal-left" />
+      <div className="pitch-goal-right" />
+      <div className="pitch-d-left" />
+      <div className="pitch-d-right" />
 
       {/* Away Players (Top Half) */}
       {aSorted.map((p, i) => {
@@ -1398,6 +1408,52 @@ function StatistikTab({ match }) {
   const possHome = parseInt(s('possession_home')) || 50;
   const possAway = parseInt(s('possession_away')) || 50;
 
+  const SPORT_STATS = {
+    football: [
+      { key: 'possession', label: 'Penguasaan Bola', type: 'percentage' },
+      { key: 'shots', label: 'Total Tembakan' },
+      { key: 'shots_on_target', label: 'Tembakan Tepat Sasaran' },
+      { key: 'corners', label: 'Tendangan Sudut' },
+      { key: 'fouls', label: 'Pelanggaran', lowerIsBetter: true },
+      { key: 'offsides', label: 'Offside', lowerIsBetter: true },
+      { key: 'yellow_cards', label: 'Kartu Kuning', lowerIsBetter: true },
+      { key: 'red_cards', label: 'Kartu Merah', lowerIsBetter: true },
+    ],
+    futsal: [
+      { key: 'possession', label: 'Penguasaan Bola', type: 'percentage' },
+      { key: 'shots', label: 'Total Tembakan' },
+      { key: 'shots_on_target', label: 'Tembakan Tepat Sasaran' },
+      { key: 'corners', label: 'Tendangan Sudut' },
+      { key: 'fouls', label: 'Pelanggaran', lowerIsBetter: true },
+      { key: 'yellow_cards', label: 'Kartu Kuning', lowerIsBetter: true },
+      { key: 'red_cards', label: 'Kartu Merah', lowerIsBetter: true },
+    ],
+    basketball: [
+      { key: 'points', label: 'Poin' },
+      { key: 'rebounds', label: 'Rebounds' },
+      { key: 'assists', label: 'Assists' },
+      { key: 'steals', label: 'Steals' },
+      { key: 'blocks', label: 'Blocks' },
+      { key: 'turnovers', label: 'Turnovers', lowerIsBetter: true },
+      { key: 'fouls', label: 'Pelanggaran', lowerIsBetter: true },
+    ],
+    volleyball: [
+      { key: 'aces', label: 'Service Aces' },
+      { key: 'blocks', label: 'Blocks' },
+      { key: 'kills', label: 'Smashes / Kills' },
+      { key: 'errors', label: 'Errors', lowerIsBetter: true },
+    ],
+    badminton: [
+      { key: 'aces', label: 'Service Aces' },
+      { key: 'smashes', label: 'Smashes' },
+      { key: 'net_wins', label: 'Net Play Wins' },
+      { key: 'errors', label: 'Unforced Errors', lowerIsBetter: true },
+    ]
+  };
+
+  const sportSlug = match.tournament?.sport?.slug?.toLowerCase() || 'football';
+  const statConfig = SPORT_STATS[sportSlug] || SPORT_STATS.football;
+
   const avatar = (name, bg) =>
     `https://ui-avatars.com/api/?name=${encodeURIComponent(name || '?')}&size=24&background=${bg}&color=fff`;
 
@@ -1428,37 +1484,37 @@ function StatistikTab({ match }) {
         ))}
       </div>
 
-      {/* ── Penguasaan Bola ── */}
-      <div style={{ padding: '16px 0', marginTop: 8 }}>
-        <div style={{ textAlign: 'center', fontSize: 11, color: '#e8eaed', fontWeight: 600, marginBottom: 16 }}>
-          Persentase Penguasaan Bola
-        </div>
-
-        <div style={{ display: 'flex', height: 36, borderRadius: 18, overflow: 'hidden' }}>
-          {/* Home Bar */}
-          <div style={{ flex: possHome, background: '#1e3a8a', display: 'flex', alignItems: 'center', padding: '0 16px' }}>
-            <span style={{ color: '#fff', fontWeight: 700, fontSize: 12 }}>{possHome}%</span>
-          </div>
-          {/* Away Bar */}
-          <div style={{ flex: possAway, background: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 16px' }}>
-            <span style={{ color: '#fff', fontWeight: 700, fontSize: 12 }}>{possAway}%</span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Tembakan ── */}
       <div style={{ marginTop: 16 }}>
-        <StatRow label="Total Tembakan" homeVal={s('shots_home')} awayVal={s('shots_away')} />
-        <StatRow label="Tembakan Tepat Sasaran" homeVal={s('shots_on_target_home')} awayVal={s('shots_on_target_away')} />
-      </div>
-
-      {/* ── Umum ── */}
-      <div style={{ marginTop: 16 }}>
-        <StatRow label="Tendangan Sudut" homeVal={s('corners_home')} awayVal={s('corners_away')} />
-        <StatRow label="Pelanggaran" homeVal={s('fouls_home')} awayVal={s('fouls_away')} lowerIsBetter />
-        <StatRow label="Offside" homeVal={s('offsides_home')} awayVal={s('offsides_away')} lowerIsBetter />
-        <StatRow label="Kartu Kuning" homeVal={s('yellow_cards_home')} awayVal={s('yellow_cards_away')} lowerIsBetter />
-        <StatRow label="Kartu Merah" homeVal={s('red_cards_home')} awayVal={s('red_cards_away')} lowerIsBetter />
+        {statConfig.map(config => {
+          if (config.type === 'percentage') {
+            const hVal = parseInt(s(`${config.key}_home`)) || 50;
+            const aVal = parseInt(s(`${config.key}_away`)) || 50;
+            return (
+              <div key={config.key} style={{ padding: '16px 0', marginTop: 8 }}>
+                <div style={{ textAlign: 'center', fontSize: 11, color: '#e8eaed', fontWeight: 600, marginBottom: 16 }}>
+                  Persentase {config.label}
+                </div>
+                <div style={{ display: 'flex', height: 36, borderRadius: 18, overflow: 'hidden' }}>
+                  <div style={{ flex: hVal, background: '#1e3a8a', display: 'flex', alignItems: 'center', padding: '0 16px' }}>
+                    <span style={{ color: '#fff', fontWeight: 700, fontSize: 12 }}>{hVal}%</span>
+                  </div>
+                  <div style={{ flex: aVal, background: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 16px' }}>
+                    <span style={{ color: '#fff', fontWeight: 700, fontSize: 12 }}>{aVal}%</span>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+          return (
+            <StatRow 
+              key={config.key} 
+              label={config.label} 
+              homeVal={s(`${config.key}_home`)} 
+              awayVal={s(`${config.key}_away`)} 
+              lowerIsBetter={config.lowerIsBetter} 
+            />
+          );
+        })}
       </div>
     </div>
   );

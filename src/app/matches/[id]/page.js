@@ -22,10 +22,16 @@ const TABS = [
 
 const formatGameMinute = (minute) => {
   if (minute === null || minute === undefined) return '';
-  if (typeof minute === 'number') return Math.floor(minute);
+  if (typeof minute === 'number') {
+    const m = Math.floor(minute);
+    const s = Math.floor((minute - m) * 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  }
   const parsed = parseFloat(minute);
   if (!isNaN(parsed) && String(minute).includes('.')) {
-    return Math.floor(parsed);
+    const m = Math.floor(parsed);
+    const s = Math.floor((parsed - m) * 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
   }
   return minute;
 };
@@ -1128,6 +1134,7 @@ function LineupTab({ match }) {
           awayPlayers={away}
           homeFormation={match.statistics?.home_formation}
           awayFormation={match.statistics?.away_formation}
+          sportSlug={match.tournament?.sport?.slug}
           onPlayerSelect={handlePlayerSelect}
         />
       </div>
@@ -1162,7 +1169,7 @@ function LineupTab({ match }) {
 }
 
 
-function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFormation, awayFormation, onPlayerSelect }) {
+function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFormation, awayFormation, sportSlug, onPlayerSelect }) {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -1243,8 +1250,10 @@ function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFor
 
   console.log('[PitchVisualizer] isMobile:', isMobile, 'pitchHeight:', pitchHeight, 'pitchMode:', pitchMode);
 
+  const sportClass = sportSlug ? `sport-${sportSlug.toLowerCase()}` : 'sport-football';
+
   return (
-    <div className={`pitch-container ${pitchMode}`} style={{ height: `${pitchHeight}px`, minHeight: `${pitchHeight}px` }}>
+    <div className={`pitch-container ${pitchMode} ${sportClass}`} style={{ height: `${pitchHeight}px`, minHeight: `${pitchHeight}px` }}>
       {/* Field markings */}
       <div className="pitch-border" />
       <div className="pitch-midline" />

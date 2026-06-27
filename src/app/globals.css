@@ -317,3 +317,42 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .pitch-vertical .pitch-d-left    { position: absolute; left: 50%; top: 126px; height: 40px; width: 80px; border: 2px solid rgba(255,255,255,0.2); border-top: none; border-radius: 0 0 40px 40px; transform: translateX(-50%); }
 .pitch-vertical .pitch-d-right   { position: absolute; left: 50%; bottom: 126px; height: 40px; width: 80px; border: 2px solid rgba(255,255,255,0.2); border-bottom: none; border-radius: 40px 40px 0 0; transform: translateX(-50%); }
 
+/* ---------- Multi-sport Backgrounds ---------- */
+.pitch-container.sport-football { background: #0e8c56; }
+.pitch-container.sport-futsal { background: #0e8c56; }
+.pitch-container.sport-basketball { background: #d97706; } /* Orange wood color */
+.pitch-container.sport-volleyball { background: #0284c7; } /* Blue/Orange court */
+.pitch-container.sport-badminton { background: #16a34a; } /* Brighter green */
+
+/* ---------- Basketball specifics (Horizontal) ---------- */
+.sport-basketball.pitch-horizontal .pitch-pen-left { border-radius: 0 50% 50% 0; width: 140px; }
+.sport-basketball.pitch-horizontal .pitch-pen-right { border-radius: 50% 0 0 50%; width: 140px; }
+.sport-basketball.pitch-horizontal .pitch-goal-left, .sport-basketball.pitch-horizontal .pitch-goal-right, .sport-basketball.pitch-horizontal .pitch-d-left, .sport-basketball.pitch-horizontal .pitch-d-right { display: none; }
+.sport-basketball .pitch-center-circle { border-radius: 50%; }
+
+/* ---------- Basketball specifics (Vertical) ---------- */
+.sport-basketball.pitch-vertical .pitch-pen-left { border-radius: 0 0 50% 50%; height: 140px; }
+.sport-basketball.pitch-vertical .pitch-pen-right { border-radius: 50% 50% 0 0; height: 140px; }
+.sport-basketball.pitch-vertical .pitch-goal-left, .sport-basketball.pitch-vertical .pitch-goal-right, .sport-basketball.pitch-vertical .pitch-d-left, .sport-basketball.pitch-vertical .pitch-d-right { display: none; }
+
+/* ---------- Volleyball specifics (Horizontal) ---------- */
+.sport-volleyball.pitch-horizontal .pitch-pen-left { width: 33%; border-right: 2px solid rgba(255,255,255,0.2); border-left: none; border-top: none; border-bottom: none; }
+.sport-volleyball.pitch-horizontal .pitch-pen-right { width: 33%; border-left: 2px solid rgba(255,255,255,0.2); border-right: none; border-top: none; border-bottom: none; }
+.sport-volleyball.pitch-horizontal .pitch-goal-left, .sport-volleyball.pitch-horizontal .pitch-goal-right, .sport-volleyball.pitch-horizontal .pitch-d-left, .sport-volleyball.pitch-horizontal .pitch-d-right, .sport-volleyball .pitch-center-circle { display: none; }
+
+/* ---------- Volleyball specifics (Vertical) ---------- */
+.sport-volleyball.pitch-vertical .pitch-pen-left { height: 33%; border-bottom: 2px solid rgba(255,255,255,0.2); border-top: none; border-left: none; border-right: none; }
+.sport-volleyball.pitch-vertical .pitch-pen-right { height: 33%; border-top: 2px solid rgba(255,255,255,0.2); border-bottom: none; border-left: none; border-right: none; }
+.sport-volleyball.pitch-vertical .pitch-goal-left, .sport-volleyball.pitch-vertical .pitch-goal-right, .sport-volleyball.pitch-vertical .pitch-d-left, .sport-volleyball.pitch-vertical .pitch-d-right { display: none; }
+
+/* ---------- Badminton specifics (Horizontal) ---------- */
+.sport-badminton.pitch-horizontal .pitch-pen-left { width: 25%; top: 16px; bottom: 16px; border-right: 2px solid rgba(255,255,255,0.2); border-left: none; border-top: none; border-bottom: none; }
+.sport-badminton.pitch-horizontal .pitch-pen-right { width: 25%; top: 16px; bottom: 16px; border-left: 2px solid rgba(255,255,255,0.2); border-right: none; border-top: none; border-bottom: none; }
+.sport-badminton.pitch-horizontal .pitch-goal-left, .sport-badminton.pitch-horizontal .pitch-goal-right, .sport-badminton.pitch-horizontal .pitch-d-left, .sport-badminton.pitch-horizontal .pitch-d-right, .sport-badminton .pitch-center-circle { display: none; }
+.sport-badminton.pitch-horizontal::after { content: ''; position: absolute; left: 16px; right: 16px; top: 50%; height: 2px; background: rgba(255,255,255,0.2); transform: translateY(-50%); }
+
+/* ---------- Badminton specifics (Vertical) ---------- */
+.sport-badminton.pitch-vertical .pitch-pen-left { height: 25%; left: 16px; right: 16px; border-bottom: 2px solid rgba(255,255,255,0.2); border-top: none; border-left: none; border-right: none; }
+.sport-badminton.pitch-vertical .pitch-pen-right { height: 25%; left: 16px; right: 16px; border-top: 2px solid rgba(255,255,255,0.2); border-bottom: none; border-left: none; border-right: none; }
+.sport-badminton.pitch-vertical .pitch-goal-left, .sport-badminton.pitch-vertical .pitch-goal-right, .sport-badminton.pitch-vertical .pitch-d-left, .sport-badminton.pitch-vertical .pitch-d-right, .sport-badminton .pitch-center-circle { display: none; }
+.sport-badminton.pitch-vertical::after { content: ''; position: absolute; top: 16px; bottom: 16px; left: 50%; width: 2px; background: rgba(255,255,255,0.2); transform: translateX(-50%); }

@@ -58,10 +58,16 @@ const SPORT_LABELS = {
 
 const formatGameMinute = (minute) => {
   if (minute === null || minute === undefined) return '';
-  if (typeof minute === 'number') return Math.floor(minute);
+  if (typeof minute === 'number') {
+    const m = Math.floor(minute);
+    const s = Math.floor((minute - m) * 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  }
   const parsed = parseFloat(minute);
   if (!isNaN(parsed) && String(minute).includes('.')) {
-    return Math.floor(parsed);
+    const m = Math.floor(parsed);
+    const s = Math.floor((parsed - m) * 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
   }
   return minute;
 };
