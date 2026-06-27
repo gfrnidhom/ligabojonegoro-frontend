@@ -1106,9 +1106,9 @@ function Home() {
                               </div>
                               <div style={{ width: 44, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
                                 {isLive ? (
-                                  <span style={{ color: '#ef4444', fontSize: 14, fontWeight: 500 }}>{formatGameMinute(match.minute)}'</span>
+                                  <span style={{ color: '#ef4444', fontSize: 14, fontWeight: 500 }}>{formatGameMinute(match.minute)}{(typeof match.minute === 'number' || !isNaN(parseFloat(match.minute))) ? "'" : ""}</span>
                                 ) : isFinished ? (
-                                  <span style={{ fontSize: 14, fontWeight: 400, color: '#94a3b8' }}>FT</span>
+                                  <span style={{ fontSize: 14, fontWeight: 400, color: '#94a3b8' }}>{(typeof match.minute === 'number' || !isNaN(parseFloat(match.minute))) ? `${match.minute}'` : (match.minute || 'FT')}</span>
                                 ) : (
                                   <span style={{ fontSize: 13, fontWeight: 400, color: '#94a3b8' }}>{time}</span>
                                 )}

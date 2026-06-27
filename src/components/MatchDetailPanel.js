@@ -567,7 +567,7 @@ function RincianTab({ match }) {
             {/* Top Score Marker */}
             <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', zIndex: 10, marginBottom: 24 }}>
               <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: 20, padding: '4px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 12, fontWeight: 800, color: '#f8fafc' }}>{match.status === 'finished' ? 'FT' : formatGameMinute(match.minute) || 'LIVE'}</span>
+                <span style={{ fontSize: 12, fontWeight: 800, color: '#f8fafc' }}>{formatGameMinute(match.minute) + (typeof match.minute === 'number' || (typeof match.minute === 'string' && !['HT','FT','PEN'].includes(match.minute) && !match.minute.includes('+')) ? "'" : "") || 'LIVE'}</span>
                 <span style={{ fontSize: 12, fontWeight: 800, color: '#eab308' }}>{match.home_score}</span>
                 <span style={{ fontSize: 12, fontWeight: 800, color: '#eab308' }}>-</span>
                 <span style={{ fontSize: 12, fontWeight: 800, color: '#eab308' }}>{match.away_score}</span>

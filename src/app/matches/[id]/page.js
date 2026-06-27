@@ -37,21 +37,22 @@ const LiveMatchDetailClock = ({ match, lastFetchTime }) => {
     return () => clearInterval(iv);
   }, []);
 
-  if (match.status === 'half_time') return <span>HT</span>;
-  if (match.status === 'finished') return <span>FT</span>;
+  if (match.minute === 'HT') return <span>HT</span>;
+  if (match.minute === 'FT') return <span>FT</span>;
+  if (match.minute === 'PEN') return <span>PEN</span>;
+  if (match.minute === 'ET HT') return <span>ET HT</span>;
+  if (typeof match.minute === 'string' && match.minute.includes('+')) {
+      return <span>{match.minute}</span>;
+  }
 
   let totalSeconds = 0;
-  if (match.started_at) {
-    const start = new Date(match.started_at).getTime();
-    totalSeconds = Math.max(0, Math.floor((now - start) / 1000));
-    if (match.status === 'second_half' && totalSeconds < 45 * 60) {
-      totalSeconds += 45 * 60;
+  if (match.minute != null && !isNaN(match.minute)) {
+    if (['finished', 'half_time', 'extra_time_ht', 'penalty_shootout'].includes(match.status)) {
+        return <span>{Math.floor(match.minute)}'</span>;
     }
-  } else if (match.minute != null) {
     totalSeconds = (Math.floor(match.minute) * 60) + Math.floor((now - lastFetchTime) / 1000);
   } else {
-    const baseMinute = match.status === 'second_half' ? 45 : 0;
-    totalSeconds = (baseMinute * 60) + Math.floor((now - lastFetchTime) / 1000);
+    return <span>{match.minute}</span>;
   }
 
   const m = Math.floor(totalSeconds / 60);
