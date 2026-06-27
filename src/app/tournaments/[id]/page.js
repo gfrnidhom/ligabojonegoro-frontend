@@ -1241,10 +1241,10 @@ function StatistikTab({ match }) {
 
   const [period, setPeriod] = useState('all');
   const stats = match.statistics;
-  if (!stats || stats.possession_home === undefined) {
+  if (!stats || Object.keys(stats).length === 0) {
     return (
       <div className="empty-state" style={{ padding: '36px 16px' }}>
-        <p style={{ fontSize: 10, color: 'var(--text-secondary)', fontWeight: 600 }}>Statistik pertandingan belum tersedia.</p>
+        <p style={{ fontSize: 10, color: '#8b92a5', fontWeight: 600 }}>Statistik pertandingan belum tersedia.</p>
       </div>
     );
   }
