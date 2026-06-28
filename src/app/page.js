@@ -325,6 +325,10 @@ function Home() {
     if (statusFilter === 'live') list = list.filter(m => ['live', 'first_half', 'half_time', 'second_half', 'extra_time_1', 'extra_time_ht', 'extra_time_2', 'penalty_shootout', 'ongoing'].includes(m.status));
     else if (statusFilter === 'scheduled') list = list.filter(m => m.status === 'scheduled');
     else if (statusFilter === 'finished') list = list.filter(m => m.status === 'finished');
+    else {
+      // 'all' filter: Exclude live matches from the list because they are already shown in the Live Carousel
+      list = list.filter(m => !['live', 'first_half', 'half_time', 'second_half', 'extra_time_1', 'extra_time_ht', 'extra_time_2', 'penalty_shootout', 'ongoing'].includes(m.status));
+    }
 
     list.sort((a, b) => {
       const isALive = ['live', 'first_half', 'half_time', 'second_half', 'extra_time_1', 'extra_time_ht', 'extra_time_2', 'penalty_shootout', 'ongoing'].includes(a.status);
@@ -439,7 +443,15 @@ function Home() {
   const avatar = (name, bg = '3b82f6') =>
     `https://ui-avatars.com/api/?name=${encodeURIComponent(name || '?')}&size=48&background=${bg}&color=fff&bold=true&font-size=0.38`;
 
-  const liveMatches = matches.filter(m => ['live', 'first_half', 'half_time', 'second_half', 'extra_time_1', 'extra_time_ht', 'extra_time_2', 'penalty_shootout', 'ongoing'].includes(m.status));
+  const liveMatches = matches.filter(m => {
+    if (!['live', 'first_half', 'half_time', 'second_half', 'extra_time_1', 'extra_time_ht', 'extra_time_2', 'penalty_shootout', 'ongoing'].includes(m.status)) return false;
+    if (activeTournament && m.tournament_id !== activeTournament) return false;
+    if (activeSport) {
+      const sportTournamentIds = filteredTournaments.map(t => t.id);
+      if (!sportTournamentIds.includes(m.tournament_id)) return false;
+    }
+    return true;
+  });
   const featuredLive = liveMatches[0] || null;
 
   return (
