@@ -56,7 +56,7 @@ const LiveMatchDetailClock = ({ match, lastFetchTime }) => {
     if (['finished', 'half_time', 'extra_time_ht', 'penalty_shootout'].includes(match.status)) {
         return <span>{Math.floor(match.minute)}'</span>;
     }
-    totalSeconds = (Math.floor(match.minute) * 60) + Math.floor((now - lastFetchTime) / 1000);
+    totalSeconds = Math.floor(match.minute * 60) + Math.floor((now - lastFetchTime) / 1000);
   } else {
     return <span>{match.minute}</span>;
   }
