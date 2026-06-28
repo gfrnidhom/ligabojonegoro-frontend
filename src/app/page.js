@@ -80,25 +80,21 @@ const LiveMatchClock = ({ match, lastFetchTime }) => {
   }, []);
 
   if (match.status === 'half_time') return <span>HT</span>;
+
+  const period = match.tournament?.period_duration || match.period_duration || 45;
   let text = 'Live';
-  if (match.status === 'first_half' || (match.minute > 0 && match.minute <= 45)) text = 'Babak pertama';
-  else if (match.status === 'second_half' || match.minute > 45) text = 'Babak kedua';
+  if (match.status === 'first_half' || (match.minute > 0 && match.minute <= period)) text = 'Babak pertama';
+  else if (match.status === 'second_half' || match.minute > period) text = 'Babak kedua';
   else if (match.status === 'extra_time_1') text = 'Babak tambahan 1';
   else if (match.status === 'extra_time_2') text = 'Babak tambahan 2';
   else if (match.status === 'penalty_shootout') text = 'Adu Penalti';
 
   let totalSeconds = 0;
-  if (match.started_at) {
-    const start = new Date(match.started_at).getTime();
-    totalSeconds = Math.max(0, Math.floor((now - start) / 1000));
-    if (match.status === 'second_half' && totalSeconds < 45 * 60) {
-      // If started_at was updated at the start of second half, add 45 mins
-      totalSeconds += 45 * 60;
-    }
-  } else if (match.minute != null) {
-    totalSeconds = (Math.floor(match.minute) * 60) + Math.floor((now - lastFetchTime) / 1000);
+  if (match.minute != null && !isNaN(parseFloat(match.minute))) {
+    totalSeconds = (Math.floor(parseFloat(match.minute)) * 60) + Math.floor((now - lastFetchTime) / 1000);
   } else {
-    const baseMinute = match.status === 'second_half' ? 45 : 0;
+    // fallback if minute is somehow missing but status is known
+    const baseMinute = match.status === 'second_half' ? period : 0;
     totalSeconds = (baseMinute * 60) + Math.floor((now - lastFetchTime) / 1000);
   }
 
