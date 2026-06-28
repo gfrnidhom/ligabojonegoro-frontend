@@ -753,6 +753,49 @@ function Home() {
       {/* ═══ CENTER ═══ */}
       <main className={`${mobileTab === 'matches' ? 'block' : 'hidden'} lg:block flex-1 min-w-0`} style={{ flex: 1, minWidth: 0 }}>
 
+         {/* ═══ MOBILE NEWS SLIDER ═══ */}
+        {isMounted && typeof window !== 'undefined' && window.innerWidth < 1024 && latestNews.length > 0 && (
+          <div style={{ padding: '0 12px', marginBottom: 16, marginTop: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <h2 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>Berita Terkini</h2>
+              <span 
+                onClick={() => setMobileTab('news')} 
+                style={{ fontSize: 12, fontWeight: 600, color: 'var(--primary)', cursor: 'pointer' }}
+              >
+                Lihat Semua
+              </span>
+            </div>
+            <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8 }} className="hide-scrollbar">
+              {latestNews.slice(0, 5).map(item => (
+                <div 
+                  key={item.id}
+                  onClick={() => router.push(`/news/${item.slug}`)}
+                  style={{ 
+                    width: 240, flexShrink: 0,
+                    background: 'var(--bg-card)', borderRadius: 16, border: '1px solid var(--border)',
+                    overflow: 'hidden', cursor: 'pointer',
+                    boxShadow: 'var(--shadow-sm)'
+                  }}
+                >
+                  <img 
+                    src={getImageUrl(item.image_path)} 
+                    alt={item.title} 
+                    style={{ width: '100%', height: 130, objectFit: 'cover' }}
+                  />
+                  <div style={{ padding: 12 }}>
+                    <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 6px 0', lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {item.title}
+                    </h3>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 500 }}>
+                      {item.source || 'Liga Bojonegoro'} · {formatTimeAgo(item.published_at || item.created_at)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
          {/* ── Date Bar + Filters (Card) ── */}
         <div style={{
           zIndex: 50, position: 'relative',
