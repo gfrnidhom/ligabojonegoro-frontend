@@ -970,7 +970,7 @@ function Home() {
               return (
               <div key={name} style={{ 
                 marginBottom: 24, 
-                background: '#ffffff', 
+                background: '#f8fafc', 
                 borderRadius: 24, 
                 overflow: 'hidden', 
                 border: '1px solid #f1f5f9', 
@@ -983,7 +983,7 @@ function Home() {
                     display: 'flex', alignItems: 'center', gap: 12,
                     padding: '16px 20px', 
                     background: 'linear-gradient(90deg, #ffe4e6 0%, #e0e7ff 100%)',
-                    borderBottom: '1px solid #f1f5f9'
+                    borderBottom: 'none'
                   }}
                 >
                   <img
@@ -1040,13 +1040,13 @@ function Home() {
                           onClick={() => handleMatchClick(match.uuid || match.id)}
                           style={{
                             display: 'flex', alignItems: 'center',
-                            padding: currentViewMode === 'grid' ? '24px 20px 20px 20px' : '16px',
-                            background: currentViewMode === 'grid' ? '#ffffff' : (isSelected ? 'var(--bg-hover)' : 'var(--bg-card)'),
-                            borderBottom: currentViewMode === 'grid' ? 'none' : '1px solid #f8fafc',
+                            padding: currentViewMode === 'grid' ? '24px 20px 20px 20px' : '16px 20px',
+                            background: currentViewMode === 'grid' ? '#ffffff' : (isSelected ? '#f1f5f9' : 'transparent'),
+                            borderBottom: currentViewMode === 'grid' ? 'none' : '1px solid #f1f5f9',
                             border: currentViewMode === 'grid' ? '1px solid #f1f5f9' : 'none',
-                            borderRadius: currentViewMode === 'grid' ? 20 : 16,
-                            margin: currentViewMode === 'grid' ? 0 : '0 0 12px 0',
-                            boxShadow: currentViewMode === 'grid' ? '0 4px 20px rgba(0,0,0,0.03)' : '0 2px 10px rgba(0,0,0,0.02)',
+                            borderRadius: currentViewMode === 'grid' ? 20 : 0,
+                            margin: 0,
+                            boxShadow: currentViewMode === 'grid' ? '0 4px 20px rgba(0,0,0,0.03)' : 'none',
                             cursor: 'pointer', transition: 'all 0.2s ease',
                             position: 'relative'
                           }}

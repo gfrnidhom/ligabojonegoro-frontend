@@ -1237,17 +1237,17 @@ function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFor
   const getPos = (c, side) => {
     if (!isMobile) {
       // Horizontal pitch
-      if (side === 'home') return { left: `${5 + (c.y / 100) * 40}%`, top: `${c.x}%` };
-      else                 return { left: `${95 - (c.y / 100) * 40}%`, top: `${c.x}%` };
+      if (side === 'home') return { left: `${48 - (c.y / 100) * 42}%`, top: `${c.x}%` };
+      else                 return { left: `${52 + (c.y / 100) * 42}%`, top: `${c.x}%` };
     } else {
-      // Vertical pitch — use wider 46% spread for more spacing
-      if (side === 'home') return { left: `${c.x}%`, top: `${3 + (c.y / 100) * 46}%` };
-      else                 return { left: `${c.x}%`, top: `${97 - (c.y / 100) * 46}%` };
+      // Vertical pitch
+      if (side === 'home') return { left: `${c.x}%`, top: `${48 - (c.y / 100) * 44}%` };
+      else                 return { left: `${c.x}%`, top: `${52 + (c.y / 100) * 44}%` };
     }
   };
 
   const pitchMode = isMobile ? 'pitch-vertical' : 'pitch-horizontal';
-  const pitchHeight = isMobile ? 1100 : 600;
+  const pitchHeight = isMobile ? 900 : 600;
   const imgSize = isMobile ? 32 : 48;
   const nameFontSize = isMobile ? '9px' : '11px';
   const ratingFontSize = isMobile ? 9 : 11;
@@ -1274,7 +1274,7 @@ function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFor
       <div style={{
         position: 'absolute', display: 'flex', alignItems: 'center', gap: 8, zIndex: 20,
         ...(isMobile
-          ? { top: 12, left: 16, right: 16, justifyContent: 'center' }
+          ? { top: 16, left: 16, right: 16, justifyContent: 'center' }
           : { top: 20, left: 20 })
       }}>
         <div style={{ background: '#10b981', color: '#fff', fontSize: 11, fontWeight: 800, padding: '3px 7px', borderRadius: 4 }}>7.2</div>
@@ -1287,7 +1287,7 @@ function PitchVisualizer({ homeTeam, awayTeam, homePlayers, awayPlayers, homeFor
       <div style={{
         position: 'absolute', display: 'flex', alignItems: 'center', gap: 8, zIndex: 20,
         ...(isMobile
-          ? { bottom: 12, left: 16, right: 16, justifyContent: 'center' }
+          ? { bottom: 16, left: 16, right: 16, justifyContent: 'center' }
           : { top: 20, right: 20, flexDirection: 'row-reverse' })
       }}>
         <div style={{ background: '#f59e0b', color: '#fff', fontSize: 11, fontWeight: 800, padding: '3px 7px', borderRadius: 4 }}>6.8</div>
@@ -1833,7 +1833,7 @@ function PlayerStatsPanel({ playerStat, match, onClose }) {
   // Determine what stats are available
   const hasVal = (key) => stats[key] !== undefined && stats[key] !== null;
 
-  // All categories with Indonesian labels — show as many as possible
+  // All categories with Indonesian labels - matched to backend fields
   const categories = [
     {
       title: 'Statistik Utama',
@@ -1843,9 +1843,9 @@ function PlayerStatsPanel({ playerStat, match, onClose }) {
         { label: 'Menit Bermain', value: g('minutes_played', '-'), show: true },
         { label: 'Gol', value: g('goals', 0), show: true },
         { label: 'Assist', value: g('assists', 0), show: true },
-        { label: 'Umpan Akurat', value: hasVal('accurate_passes') && hasVal('total_passes') ? ratio('accurate_passes', 'total_passes') : hasVal('passing') ? g('passing') : '-', show: true },
-        { label: 'Peluang Diciptakan', value: g('chances_created', g('key_passes', 0)), show: true },
-        { label: 'Kontribusi Pertahanan', value: g('defensive_contributions', parseInt(g('tackles', 0)) + parseInt(g('interceptions', 0)) + parseInt(g('clearances', 0)) + parseInt(g('blocks', 0))), show: true },
+        { label: 'Umpan Akurat', value: g('accurate_passes', 0), show: true },
+        { label: 'Peluang Diciptakan', value: g('key_passes', 0), show: true },
+        { label: 'Kontribusi Pertahanan', value: parseInt(g('tackles', 0)) + parseInt(g('interceptions', 0)) + parseInt(g('clearances', 0)), show: true },
       ],
     },
     {
@@ -1853,17 +1853,8 @@ function PlayerStatsPanel({ playerStat, match, onClose }) {
       icon: <Target size={16} strokeWidth={2.5} />,
       color: '#ef4444',
       items: [
-        { label: 'Sentuhan Bola', value: g('touches', g('ball_touches', 0)), show: true },
-        { label: 'Sentuhan di Kotak Penalti', value: g('touches_in_box', g('touches_opposition_box', 0)), show: true },
-        { label: 'Umpan ke Sepertiga Akhir', value: g('passes_final_third', 0), show: true },
-        { label: 'Umpan Silang Akurat', value: hasVal('accurate_crosses') && hasVal('total_crosses') ? ratio('accurate_crosses', 'total_crosses') : g('crosses', '-'), show: true },
-        { label: 'Umpan Panjang Akurat', value: hasVal('accurate_long_balls') && hasVal('total_long_balls') ? ratio('accurate_long_balls', 'total_long_balls') : g('long_balls', '-'), show: true },
-        { label: 'Tembakan', value: g('shots', g('total_shots', 0)), show: true },
+        { label: 'Tembakan', value: g('shots', 0), show: true },
         { label: 'Tembakan Tepat Sasaran', value: g('shots_on_target', 0), show: true },
-        { label: 'Tembakan Melebar', value: g('shots_off_target', 0), show: true },
-        { label: 'Tembakan Diblok', value: g('shots_blocked', g('blocked_shots', 0)), show: true },
-        { label: 'Dribling Berhasil', value: hasVal('successful_dribbles') && hasVal('total_dribbles') ? ratio('successful_dribbles', 'total_dribbles') : g('dribbles', '-'), show: true },
-        { label: 'Kehilangan Bola', value: g('dispossessed', g('ball_lost', 0)), show: true },
         { label: 'Offside', value: g('offsides', 0), show: true },
       ],
     },
@@ -1872,54 +1863,22 @@ function PlayerStatsPanel({ playerStat, match, onClose }) {
       icon: <Shield size={16} strokeWidth={2.5} />,
       color: '#10b981',
       items: [
-        { label: 'Kontribusi Pertahanan', value: g('defensive_contributions', parseInt(g('tackles', 0)) + parseInt(g('interceptions', 0)) + parseInt(g('clearances', 0)) + parseInt(g('blocks', 0))), show: true },
         { label: 'Tekel', value: g('tackles', 0), show: true },
-        { label: 'Tekel Berhasil', value: hasVal('successful_tackles') && hasVal('total_tackles') ? ratio('successful_tackles', 'total_tackles') : '-', show: hasVal('successful_tackles') },
-        { label: 'Hadangan', value: g('blocks', g('block', 0)), show: true },
         { label: 'Sapuan', value: g('clearances', 0), show: true },
-        { label: 'Sapuan Dengan Kepala', value: g('headed_clearances', 0), show: hasVal('headed_clearances') },
         { label: 'Intersepsi', value: g('interceptions', 0), show: true },
-        { label: 'Pemulihan Bola', value: g('recoveries', g('ball_recoveries', 0)), show: true },
-        { label: 'Dilewati Lawan', value: g('dribbled_past', 0), show: true },
         { label: 'Penyelamatan', value: g('saves', 0), show: hasVal('saves') },
-        { label: 'Penyelamatan Dalam Kotak', value: g('saves_inside_box', 0), show: hasVal('saves_inside_box') },
-        { label: 'Tendangan Ditinju', value: g('punches', 0), show: hasVal('punches') },
-        { label: 'Gol Dimasukkan', value: g('goals_conceded', 0), show: hasVal('goals_conceded') },
         { label: 'Cleansheet', value: g('clean_sheet', '-'), show: hasVal('clean_sheet') },
       ],
     },
     {
-      title: 'Duel',
+      title: 'Pelanggaran & Disiplin',
       icon: <Activity size={16} strokeWidth={2.5} />,
       color: '#8b5cf6',
       items: [
-        { label: 'Duel Udara Dimenangkan', value: hasVal('aerial_won') && hasVal('aerial_total') ? ratio('aerial_won', 'aerial_total') : hasVal('aerial_won') ? g('aerial_won', 0) : '-', show: true },
-        { label: 'Duel Tanah Dimenangkan', value: hasVal('ground_duels_won') && hasVal('ground_duels_total') ? ratio('ground_duels_won', 'ground_duels_total') : g('ground_duels_won', '-'), show: hasVal('ground_duels_won') || hasVal('ground_duels_total') },
-        { label: 'Total Duel Dimenangkan', value: hasVal('duels_won') && hasVal('duels_total') ? ratio('duels_won', 'duels_total') : g('duels_won', '-'), show: hasVal('duels_won') || hasVal('duels_total') },
-        { label: 'Dilanggar Lawan', value: g('was_fouled', g('fouls_won', 0)), show: true },
-        { label: 'Pelanggaran Dilakukan', value: g('fouls_committed', g('fouls', 0)), show: true },
-      ],
-    },
-    {
-      title: 'Distribusi',
-      icon: <BarChart2 size={16} strokeWidth={2.5} />,
-      color: '#3b82f6',
-      items: [
-        { label: 'Total Umpan', value: g('total_passes', g('passes', 0)), show: true },
-        { label: 'Umpan Akurat', value: hasVal('accurate_passes') && hasVal('total_passes') ? ratio('accurate_passes', 'total_passes') : g('passing', '-'), show: true },
-        { label: 'Umpan Kunci', value: g('key_passes', 0), show: true },
-        { label: 'Umpan Silang', value: hasVal('accurate_crosses') && hasVal('total_crosses') ? ratio('accurate_crosses', 'total_crosses') : g('crosses', '-'), show: true },
-        { label: 'Umpan Panjang', value: hasVal('accurate_long_balls') && hasVal('total_long_balls') ? ratio('accurate_long_balls', 'total_long_balls') : g('long_balls', '-'), show: true },
-        { label: 'Lemparan Ke Dalam', value: g('throw_ins', 0), show: hasVal('throw_ins') },
-      ],
-    },
-    {
-      title: 'Kedisiplinan',
-      icon: <FileText size={16} strokeWidth={2.5} />,
-      color: '#eab308',
-      items: [
-        { label: 'Kartu Kuning', value: g('yellow_cards', g('yellow_card', 0)), show: true },
-        { label: 'Kartu Merah', value: g('red_cards', g('red_card', 0)), show: true },
+        { label: 'Dilanggar Lawan', value: g('was_fouled', 0), show: true },
+        { label: 'Pelanggaran Dilakukan', value: g('fouls_committed', 0), show: true },
+        { label: 'Kartu Kuning', value: g('yellow_cards', 0), show: true },
+        { label: 'Kartu Merah', value: g('red_cards', 0), show: true },
       ],
     },
     {

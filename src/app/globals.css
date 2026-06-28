@@ -309,13 +309,14 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .pitch-horizontal .pitch-d-right   { position: absolute; top: 50%; right: 126px; width: 40px; height: 80px; border: 2px solid rgba(255,255,255,0.2); border-right: none; border-radius: 40px 0 0 40px; transform: translateY(-50%); }
 
 /* ---------- Vertical field lines ---------- */
+.pitch-vertical .pitch-border    { top: 44px; bottom: 44px; left: 16px; right: 16px; }
 .pitch-vertical .pitch-midline   { position: absolute; left: 16px; right: 16px; top: 50%; height: 2px; background: rgba(255,255,255,0.2); transform: translateY(-50%); }
-.pitch-vertical .pitch-pen-left  { position: absolute; left: 22%; right: 22%; top: 16px; height: 110px; border: 2px solid rgba(255,255,255,0.2); border-top: none; }
-.pitch-vertical .pitch-pen-right { position: absolute; left: 22%; right: 22%; bottom: 16px; height: 110px; border: 2px solid rgba(255,255,255,0.2); border-bottom: none; }
-.pitch-vertical .pitch-goal-left { position: absolute; left: 38%; right: 38%; top: 16px; height: 50px; border: 2px solid rgba(255,255,255,0.2); border-top: none; }
-.pitch-vertical .pitch-goal-right{ position: absolute; left: 38%; right: 38%; bottom: 16px; height: 50px; border: 2px solid rgba(255,255,255,0.2); border-bottom: none; }
-.pitch-vertical .pitch-d-left    { position: absolute; left: 50%; top: 126px; height: 40px; width: 80px; border: 2px solid rgba(255,255,255,0.2); border-top: none; border-radius: 0 0 40px 40px; transform: translateX(-50%); }
-.pitch-vertical .pitch-d-right   { position: absolute; left: 50%; bottom: 126px; height: 40px; width: 80px; border: 2px solid rgba(255,255,255,0.2); border-bottom: none; border-radius: 40px 40px 0 0; transform: translateX(-50%); }
+.pitch-vertical .pitch-pen-left  { position: absolute; left: 22%; right: 22%; top: 44px; height: 110px; border: 2px solid rgba(255,255,255,0.2); border-top: none; }
+.pitch-vertical .pitch-pen-right { position: absolute; left: 22%; right: 22%; bottom: 44px; height: 110px; border: 2px solid rgba(255,255,255,0.2); border-bottom: none; }
+.pitch-vertical .pitch-goal-left { position: absolute; left: 38%; right: 38%; top: 44px; height: 50px; border: 2px solid rgba(255,255,255,0.2); border-top: none; }
+.pitch-vertical .pitch-goal-right{ position: absolute; left: 38%; right: 38%; bottom: 44px; height: 50px; border: 2px solid rgba(255,255,255,0.2); border-bottom: none; }
+.pitch-vertical .pitch-d-left    { position: absolute; left: 50%; top: 154px; height: 40px; width: 80px; border: 2px solid rgba(255,255,255,0.2); border-top: none; border-radius: 0 0 40px 40px; transform: translateX(-50%); }
+.pitch-vertical .pitch-d-right   { position: absolute; left: 50%; bottom: 154px; height: 40px; width: 80px; border: 2px solid rgba(255,255,255,0.2); border-bottom: none; border-radius: 40px 40px 0 0; transform: translateX(-50%); }
 
 /* ---------- Multi-sport Backgrounds ---------- */
 .pitch-container.sport-football { background: #0e8c56; }

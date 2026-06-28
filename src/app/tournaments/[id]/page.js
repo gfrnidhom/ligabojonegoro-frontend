@@ -23,7 +23,7 @@ export default function TournamentDetailPage({ params }) {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('matches'); // matches, standings, info, players, stats
 
-  const TABS = ['matches', 'standings', 'info', 'players', 'stats'];
+  const TABS = ['matches', 'standings', 'info', 'teams', 'players', 'stats'];
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -305,6 +305,7 @@ export default function TournamentDetailPage({ params }) {
             { id: 'info', label: 'Ringkasan', icon: Shield },
             { id: 'matches', label: 'Pertandingan', icon: Calendar },
             { id: 'standings', label: 'Klasemen', icon: Trophy, show: Array.isArray(standings) ? standings.length > 0 : (standings?.standings?.length > 0 || standings?.groups?.length > 0) },
+            { id: 'teams', label: 'Daftar Tim', icon: Users, show: tournament.teams?.length > 0 },
             { id: 'players', label: 'Pemain Terbaik', icon: Award },
             { id: 'stats', label: 'Statistik', icon: BarChart2 }
           ].filter(t => t.show !== false).map(tab => {
@@ -568,6 +569,39 @@ export default function TournamentDetailPage({ params }) {
             <KlasemenTab standings={standings} />
           </div>
         )}
+
+                        {activeTab === 'teams' && (
+                          <div style={{ padding: '8px 0' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+                              {tournament.teams?.length > 0 ? tournament.teams.map(team => (
+                                <div 
+                                  key={team.id || team.uuid} 
+                                  onClick={() => router.push(`/teams/${team.uuid || team.id}`)}
+                                  style={{
+                                    display: 'flex', alignItems: 'center', gap: 16, padding: '16px',
+                                    background: 'var(--bg-subtle)', borderRadius: 16, border: '1px solid var(--border)',
+                                    cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+                                  }}
+                                  onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.05)'; }}
+                                  onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.02)'; }}
+                                >
+                                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border-light)' }}>
+                                    <img src={getImageUrl(team.logo_path || team.logo) || avatar(team.name)} style={{ width: 32, height: 32, objectFit: 'contain' }} alt={team.name} />
+                                  </div>
+                                  <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{team.name}</div>
+                                    <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{team.city || 'Bojonegoro'}</div>
+                                  </div>
+                                  <ChevronRight size={16} color="var(--text-muted)" />
+                                </div>
+                              )) : (
+                                <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)', fontSize: 13 }}>
+                                  Belum ada tim terdaftar di turnamen ini.
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
 
                         {activeTab === 'players' && (
           <div className="animate-fade-in" style={{ padding: '0 4px', display: 'flex', flexDirection: 'column', gap: 24 }}>

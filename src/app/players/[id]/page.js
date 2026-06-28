@@ -218,15 +218,15 @@ export default function PlayerDetailPage({ params }) {
              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 24 }}>
                 <img src={getImageUrl(player.photo_path) || avatar(player.name)} className="hero-photo" alt="" style={{ width: 90, height: 110, objectFit: 'cover', borderRadius: '12px 12px 0 0', background: '#fff', display: 'block' }} />
                 <div style={{ paddingBottom: 20 }}>
-                   <h1 className="hero-name" style={{ fontSize: 20, fontWeight: 700, margin: '0 0 4px 0', color: '#fff' }}>{player.name}</h1>
-                   <div className="hero-team" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#e2e8f0' }}>
+                   <h1 className="hero-name" style={{ fontSize: 18, fontWeight: 700, margin: '0 0 4px 0', color: '#fff' }}>{player.name}</h1>
+                   <div className="hero-team" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: '#e2e8f0' }}>
                      <img src={getImageUrl(player.team?.logo_path) || avatar(player.team?.name)} style={{ width: 16, height: 16, borderRadius: '50%', background: '#fff' }} alt="" />
                      {player.team?.name}
                    </div>
                 </div>
              </div>
              <div style={{ paddingBottom: 20 }}>
-                <button className="follow-btn" style={{ background: '#fff', color: '#172554', border: 'none', borderRadius: 20, padding: '6px 20px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Follow</button>
+                <button className="follow-btn" style={{ background: '#fff', color: '#172554', border: 'none', borderRadius: 20, padding: '6px 20px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Follow</button>
              </div>
           </div>
        </div>
@@ -280,10 +280,10 @@ export default function PlayerDetailPage({ params }) {
                {/* Position Box */}
                <div className="position-section" style={{ borderTop: '1px solid #f1f5f9', display: 'flex', padding: 32 }}>
                   <div style={{ flex: 1 }}>
-                     <h3 style={{ fontSize: 14, fontWeight: 700, margin: '0 0 24px 0', color: '#0f172a' }}>Posisi</h3>
+                     <h3 style={{ fontSize: 13, fontWeight: 700, margin: '0 0 24px 0', color: '#0f172a' }}>Posisi</h3>
                      <div style={{ marginBottom: 16 }}>
-                        <span style={{ fontSize: 12, fontWeight: 600, color: '#1d4ed8', display: 'block', marginBottom: 4 }}>Utama</span>
-                        <span style={{ fontSize: 12, color: '#1e293b' }}>{posName}</span>
+                        <span style={{ fontSize: 11, fontWeight: 600, color: '#1d4ed8', display: 'block', marginBottom: 4 }}>Utama</span>
+                        <span style={{ fontSize: 11, color: '#1e293b' }}>{posName}</span>
                      </div>
                   </div>
                   <div style={{ width: 140, flexShrink: 0 }}>
@@ -311,15 +311,15 @@ export default function PlayerDetailPage({ params }) {
             {/* STATS */}
             <div className="card mt-4 p-4">
                <div style={{ display: 'flex', gap: 16, alignItems: 'baseline', marginBottom: 12 }}>
-                 <span style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>Statistik Keseluruhan</span>
+                 <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>Statistik Keseluruhan</span>
                </div>
                <div style={{ display: 'flex', flexDirection: 'column' }}>
                  {getSportStatKeys(player?.team?.sport_id, player?.team?.sport?.slug).map((stat, i) => {
                    const val = player?.aggregated_stats?.[stat.key] || 0;
                    return (
                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 4px', borderBottom: i === getSportStatKeys(player?.team?.sport_id, player?.team?.sport?.slug).length - 1 ? 'none' : '1px solid #f3f4f6' }}>
-                       <span style={{ fontSize: 12, fontWeight: 500, color: '#4b5563' }}>{stat.label}</span>
-                       <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{val}</span>
+                       <span style={{ fontSize: 11, fontWeight: 500, color: '#4b5563' }}>{stat.label}</span>
+                       <span style={{ fontSize: 12, fontWeight: 700, color: '#111827' }}>{val}</span>
                      </div>
                    );
                  })}
@@ -330,7 +330,7 @@ export default function PlayerDetailPage({ params }) {
          <div className="side-col">
             <div className="card p-4 mb-4">
                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                 <span style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>Profil Skill</span>
+                 <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>Profil Skill</span>
                  <HelpCircle size={16} color="#9ca3af" />
                </div>
                <DynamicRadarChart player={player} />
@@ -338,7 +338,7 @@ export default function PlayerDetailPage({ params }) {
 
             <div className="card p-4">
                <div style={{ paddingBottom: 16 }}>
-                 <span style={{ fontSize: 14, fontWeight: 700, display: 'block', color: '#111827' }}>Pertandingan</span>
+                 <span style={{ fontSize: 13, fontWeight: 700, display: 'block', color: '#111827' }}>Pertandingan</span>
                </div>
                
                {matches.upcoming?.length > 0 ? matches.upcoming.map((m, i) => {
@@ -348,18 +348,18 @@ export default function PlayerDetailPage({ params }) {
                   
                   return (
                     <div key={'up_'+i} onClick={() => router.push(`/matches/${m.uuid}`)} className="match-row-flex" style={{ display: 'flex', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #f3f4f6', cursor: 'pointer' }}>
-                      <div className="match-row-time" style={{ width: 60, flexShrink: 0, fontSize: 11, fontWeight: 600, color: '#64748b' }}>{time}</div>
+                      <div className="match-row-time" style={{ width: 60, flexShrink: 0, fontSize: 10, fontWeight: 600, color: '#64748b' }}>{time}</div>
                       <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
                         <div className="match-row-flex" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, minWidth: 0 }}>
-                          <span className="match-row-team-name" style={{ fontSize: 12, fontWeight: 500, color: '#1e293b', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.home_team?.name || 'Home'}</span>
+                          <span className="match-row-team-name" style={{ fontSize: 11, fontWeight: 500, color: '#1e293b', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.home_team?.name || 'Home'}</span>
                           <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} style={{ width: 24, height: 24, borderRadius: '50%' }} alt="" />
                         </div>
                         <div className="match-row-score" style={{ width: 72, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
-                          <div style={{ background: '#f3f4f6', padding: '4px 12px', borderRadius: 4, fontSize: 11, fontWeight: 700, color: '#6b7280' }}>v</div>
+                          <div style={{ background: '#f3f4f6', padding: '4px 12px', borderRadius: 4, fontSize: 10, fontWeight: 700, color: '#6b7280' }}>v</div>
                         </div>
                         <div className="match-row-flex" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 12, minWidth: 0 }}>
                           <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name)} style={{ width: 24, height: 24, borderRadius: '50%' }} alt="" />
-                          <span className="match-row-team-name" style={{ fontSize: 12, fontWeight: 500, color: '#1e293b', textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.away_team?.name || 'Away'}</span>
+                          <span className="match-row-team-name" style={{ fontSize: 11, fontWeight: 500, color: '#1e293b', textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.away_team?.name || 'Away'}</span>
                         </div>
                       </div>
                     </div>
@@ -377,25 +377,25 @@ export default function PlayerDetailPage({ params }) {
                      </div>
                      <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
                         <div className="match-row-flex" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, minWidth: 0 }}>
-                           <span className="match-row-team-name" style={{ fontSize: 12, fontWeight: 500, color: '#1e293b', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.home_team?.name || 'Home'}</span>
+                           <span className="match-row-team-name" style={{ fontSize: 11, fontWeight: 500, color: '#1e293b', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.home_team?.name || 'Home'}</span>
                            <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} style={{ width: 24, height: 24, borderRadius: '50%' }} alt="" />
                         </div>
                         <div className="match-row-score" style={{ width: 72, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
                            <div style={{ background: '#f8fafc', padding: '4px 10px', borderRadius: 4, display: 'flex', gap: 6, border: '1px solid #e2e8f0' }}>
-                              <span style={{ fontSize: 12, fontWeight: 700, color: homeWin ? '#111827' : '#64748b' }}>{m.home_score ?? '-'}</span>
-                              <span style={{ fontSize: 12, color: '#94a3b8' }}>-</span>
-                              <span style={{ fontSize: 12, fontWeight: 700, color: awayWin ? '#111827' : '#64748b' }}>{m.away_score ?? '-'}</span>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: homeWin ? '#111827' : '#64748b' }}>{m.home_score ?? '-'}</span>
+                              <span style={{ fontSize: 11, color: '#94a3b8' }}>-</span>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: awayWin ? '#111827' : '#64748b' }}>{m.away_score ?? '-'}</span>
                            </div>
                         </div>
                         <div className="match-row-flex" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 12, minWidth: 0 }}>
                            <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name)} style={{ width: 24, height: 24, borderRadius: '50%' }} alt="" />
-                           <span className="match-row-team-name" style={{ fontSize: 12, fontWeight: 500, color: '#1e293b', textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.away_team?.name || 'Away'}</span>
+                           <span className="match-row-team-name" style={{ fontSize: 11, fontWeight: 500, color: '#1e293b', textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.away_team?.name || 'Away'}</span>
                         </div>
                      </div>
                   </div>
                   );
                }) : (
-                  <div style={{ fontSize: 12, color: '#6b7280' }}>Belum ada pertandingan terbaru</div>
+                  <div style={{ fontSize: 11, color: '#6b7280' }}>Belum ada pertandingan terbaru</div>
                )}
             </div>
          </div>
@@ -420,8 +420,8 @@ export default function PlayerDetailPage({ params }) {
           
           .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; }
           .info-item { display: flex; flex-direction: column; gap: 4px; }
-          .info-val { font-size: 13px; font-weight: 700; color: #111827; }
-          .info-lbl { font-size: 12px; font-weight: 500; color: #64748b; }
+          .info-val { font-size: 12px; font-weight: 700; color: #111827; }
+          .info-lbl { font-size: 11px; font-weight: 500; color: #64748b; }
           .back-btn-container { display: none; }
 
           @media(max-width: 600px) {
