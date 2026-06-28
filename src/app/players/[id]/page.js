@@ -95,12 +95,63 @@ const getSportStatKeys = (sportId, sportSlug) => {
 };
 
 const DynamicRadarChart = ({ player }) => {
-  const skills = getSportSkills(player?.team?.sport_id, player?.team?.sport?.slug);
-  // Ensure we have exactly 6 skills for the hexagon radar
-  while (skills.length < 6) skills.push({ key: 'unknown', label: 'Unknown' });
-  const top6 = skills.slice(0, 6);
+  const formatLabel = (key) => {
+      const map = {
+          matches_played: 'Main', appearances: 'Main', goals: 'Gol', assists: 'Assist',
+          yellow_cards: 'Kartu Kuning', red_cards: 'Kartu Merah', saves: 'Penyelamatan',
+          tackles: 'Tekel', interceptions: 'Intersep', clearances: 'Sapuan', blocks: 'Blok',
+          fouls: 'Pelanggaran', fouls_committed: 'Pelanggaran (Dilakukan)', was_fouled: 'Pelanggaran (Diterima)',
+          shots: 'Tembakan', shots_on_target: 'Tembakan ke Gawang', possession: 'Penguasaan Bola',
+          clean_sheets: 'Clean Sheet', minutes_played: 'Menit Bermain', pass_accuracy: 'Akurasi Umpan',
+          total_passes: 'Total Umpan', successful_passes: 'Umpan Sukses', accurate_passes: 'Umpan Akurat',
+          failed_passes: 'Umpan Gagal', key_passes: 'Umpan Kunci', successful_tackles: 'Tekel Sukses',
+          offsides: 'Offside', successful_crosses: 'Umpan Silang Sukses', rating: 'Rating'
+      };
+      return map[key] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  };
+
+  let top6 = [];
   
-  const values = top6.map(s => getSkillValue(player, s.key));
+  if (player?.team?.sport?.stat_fields && Array.isArray(player.team.sport.stat_fields)) {
+     // Get all available stats for this player
+     const allStats = player.team.sport.stat_fields
+       .filter(key => key !== 'minutes_played' && key !== 'matches_played' && key !== 'appearances' && key !== 'possession') // Exclude some non-skill stats
+       .map(key => {
+         const val = player?.aggregated_stats?.[key] || 0;
+         return { key, label: formatLabel(key), rawValue: Number(val) };
+       })
+       .sort((a, b) => b.rawValue - a.rawValue);
+       
+     top6 = allStats.slice(0, 6);
+  }
+
+  // Fallback if sport config is missing
+  if (top6.length < 6) {
+     const defaultSkills = getSportSkills(player?.team?.sport_id, player?.team?.sport?.slug);
+     top6 = defaultSkills.slice(0, 6).map(s => ({
+        key: s.key,
+        label: s.label,
+        rawValue: getSkillValue(player, s.key)
+     }));
+  }
+  
+  // Ensure exactly 6
+  while (top6.length < 6) top6.push({ key: 'unknown', label: 'Unknown', rawValue: 0 });
+  top6 = top6.slice(0, 6);
+
+  // Normalize values for the radar chart (scale to 0-100)
+  // Find max value to determine scale, but cap scale at a reasonable minimum so small numbers (e.g. 2 goals) don't become 100% if they are the only stat.
+  const maxRaw = Math.max(...top6.map(s => s.rawValue));
+  
+  // If the stats are pseudo-random (60-95), maxRaw is already in percentage scale.
+  // If real stats are small (e.g. 5), we scale them up, but not too aggressively.
+  const scaleFactor = maxRaw > 100 ? (100 / maxRaw) : (maxRaw > 0 && maxRaw <= 20 ? (90 / maxRaw) : (maxRaw === 0 ? 0 : 1));
+
+  const values = top6.map(s => {
+      // If it's a real stat and max is <= 20, we scale it to look good on the radar. 
+      // If we use scaleFactor == 1, then a value of 100 is 100%.
+      return Math.min(100, Math.round(s.rawValue * scaleFactor));
+  });
   
   // Calculate polygon points based on values (0-100)
   const calculatePoint = (value, angleIndex) => {
@@ -139,17 +190,17 @@ const DynamicRadarChart = ({ player }) => {
         />
       </svg>
       {/* Top */}
-      <span style={{ position: 'absolute', top: -15, fontSize: 9, color: '#6b7280', fontWeight: 500, textAlign: 'center', transform: 'translateX(-50%)', left: '50%' }}><span style={{ color: '#111827', fontWeight: 800, display: 'block' }}>{values[0]}%</span>{top6[0].label}</span>
+      <span style={{ position: 'absolute', top: -15, fontSize: 9, color: '#6b7280', fontWeight: 500, textAlign: 'center', transform: 'translateX(-50%)', left: '50%' }}><span style={{ color: '#111827', fontWeight: 800, display: 'block' }}>{top6[0].rawValue}</span>{top6[0].label}</span>
       {/* Top Right */}
-      <span style={{ position: 'absolute', top: 35, right: -15, fontSize: 9, color: '#6b7280', fontWeight: 500, textAlign: 'center' }}><span style={{ color: '#111827', fontWeight: 800, display: 'block' }}>{values[1]}%</span>{top6[1].label}</span>
+      <span style={{ position: 'absolute', top: 35, right: -15, fontSize: 9, color: '#6b7280', fontWeight: 500, textAlign: 'center' }}><span style={{ color: '#111827', fontWeight: 800, display: 'block' }}>{top6[1].rawValue}</span>{top6[1].label}</span>
       {/* Bottom Right */}
-      <span style={{ position: 'absolute', bottom: 35, right: -15, fontSize: 9, color: '#6b7280', fontWeight: 500, textAlign: 'center' }}><span style={{ color: '#111827', fontWeight: 800, display: 'block' }}>{values[2]}%</span>{top6[2].label}</span>
+      <span style={{ position: 'absolute', bottom: 35, right: -15, fontSize: 9, color: '#6b7280', fontWeight: 500, textAlign: 'center' }}><span style={{ color: '#111827', fontWeight: 800, display: 'block' }}>{top6[2].rawValue}</span>{top6[2].label}</span>
       {/* Bottom */}
-      <span style={{ position: 'absolute', bottom: -15, fontSize: 9, color: '#6b7280', fontWeight: 500, textAlign: 'center', transform: 'translateX(-50%)', left: '50%' }}><span style={{ color: '#111827', fontWeight: 800, display: 'block' }}>{values[3]}%</span>{top6[3].label}</span>
+      <span style={{ position: 'absolute', bottom: -15, fontSize: 9, color: '#6b7280', fontWeight: 500, textAlign: 'center', transform: 'translateX(-50%)', left: '50%' }}><span style={{ color: '#111827', fontWeight: 800, display: 'block' }}>{top6[3].rawValue}</span>{top6[3].label}</span>
       {/* Bottom Left */}
-      <span style={{ position: 'absolute', bottom: 35, left: -15, fontSize: 9, color: '#6b7280', fontWeight: 500, textAlign: 'center' }}><span style={{ color: '#111827', fontWeight: 800, display: 'block' }}>{values[4]}%</span>{top6[4].label}</span>
+      <span style={{ position: 'absolute', bottom: 35, left: -15, fontSize: 9, color: '#6b7280', fontWeight: 500, textAlign: 'center' }}><span style={{ color: '#111827', fontWeight: 800, display: 'block' }}>{top6[4].rawValue}</span>{top6[4].label}</span>
       {/* Top Left */}
-      <span style={{ position: 'absolute', top: 35, left: -15, fontSize: 9, color: '#6b7280', fontWeight: 500, textAlign: 'center' }}><span style={{ color: '#111827', fontWeight: 800, display: 'block' }}>{values[5]}%</span>{top6[5].label}</span>
+      <span style={{ position: 'absolute', top: 35, left: -15, fontSize: 9, color: '#6b7280', fontWeight: 500, textAlign: 'center' }}><span style={{ color: '#111827', fontWeight: 800, display: 'block' }}>{top6[5].rawValue}</span>{top6[5].label}</span>
     </div>
   );
 };
@@ -314,15 +365,43 @@ export default function PlayerDetailPage({ params }) {
                  <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>Statistik Keseluruhan</span>
                </div>
                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                 {getSportStatKeys(player?.team?.sport_id, player?.team?.sport?.slug).map((stat, i) => {
-                   const val = player?.aggregated_stats?.[stat.key] || 0;
-                   return (
-                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 4px', borderBottom: i === getSportStatKeys(player?.team?.sport_id, player?.team?.sport?.slug).length - 1 ? 'none' : '1px solid #f3f4f6' }}>
-                       <span style={{ fontSize: 11, fontWeight: 500, color: '#4b5563' }}>{stat.label}</span>
-                       <span style={{ fontSize: 12, fontWeight: 700, color: '#111827' }}>{val}</span>
-                     </div>
-                   );
-                 })}
+                 {(() => {
+                   let statKeys = [];
+                   if (player?.team?.sport?.stat_fields && Array.isArray(player.team.sport.stat_fields)) {
+                       // Custom format map
+                       const formatLabel = (key) => {
+                           const map = {
+                               matches_played: 'Main', appearances: 'Main', goals: 'Gol', assists: 'Assist',
+                               yellow_cards: 'Kartu Kuning', red_cards: 'Kartu Merah', saves: 'Penyelamatan',
+                               tackles: 'Tekel', interceptions: 'Intersep', clearances: 'Sapuan', blocks: 'Blok',
+                               fouls: 'Pelanggaran', fouls_committed: 'Pelanggaran (Dilakukan)', was_fouled: 'Pelanggaran (Diterima)',
+                               shots: 'Tembakan', shots_on_target: 'Tembakan ke Gawang', possession: 'Penguasaan Bola',
+                               clean_sheets: 'Clean Sheet', minutes_played: 'Menit Bermain', pass_accuracy: 'Akurasi Umpan',
+                               total_passes: 'Total Umpan', successful_passes: 'Umpan Sukses', accurate_passes: 'Umpan Akurat',
+                               failed_passes: 'Umpan Gagal', key_passes: 'Umpan Kunci', successful_tackles: 'Tekel Sukses',
+                               offsides: 'Offside', successful_crosses: 'Umpan Silang Sukses', rating: 'Rating'
+                           };
+                           return map[key] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                       };
+                       
+                       statKeys = [{ key: 'matches_played', label: 'Main' }]; // Always include matches played first
+                       player.team.sport.stat_fields.forEach(f => {
+                           statKeys.push({ key: f, label: formatLabel(f) });
+                       });
+                   } else {
+                       statKeys = getSportStatKeys(player?.team?.sport_id, player?.team?.sport?.slug);
+                   }
+                   
+                   return statKeys.map((stat, i) => {
+                     const val = player?.aggregated_stats?.[stat.key] || 0;
+                     return (
+                       <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 4px', borderBottom: i === statKeys.length - 1 ? 'none' : '1px solid #f3f4f6' }}>
+                         <span style={{ fontSize: 11, fontWeight: 500, color: '#4b5563' }}>{stat.label}</span>
+                         <span style={{ fontSize: 12, fontWeight: 700, color: '#111827' }}>{val}</span>
+                       </div>
+                     );
+                   });
+                 })()}
                </div>
             </div>
          </div>
