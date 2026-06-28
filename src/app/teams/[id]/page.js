@@ -140,14 +140,14 @@ export default function TeamDetailPage({ params }) {
       onClick={() => setActiveTab(id)}
       style={{
         display: 'flex', alignItems: 'center', gap: 8,
-        padding: '14px 16px', fontSize: 14, fontWeight: 600, border: 'none', background: 'none', cursor: 'pointer',
+        padding: '14px 16px', fontSize: 13, fontWeight: 600, border: 'none', background: 'none', cursor: 'pointer',
         color: activeTab === id ? 'var(--primary)' : 'var(--text-secondary)',
         borderBottom: activeTab === id ? '2px solid var(--primary)' : '2px solid transparent',
         transition: 'all 0.2s ease', position: 'relative', bottom: -1,
         whiteSpace: 'nowrap'
       }}
     >
-      <Icon size={18} />
+      <Icon size={16} />
       {label}
       {count !== undefined && (
         <span style={{ 
@@ -181,18 +181,18 @@ export default function TeamDetailPage({ params }) {
             e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.02)';
           }}
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={18} />
         </button>
-        <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)' }}>Kembali</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>Kembali</span>
       </div>
 
       {/* Team Header Profile Card */}
       <div className="card" style={{ marginBottom: 32, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 32, alignItems: 'center' }}>
           <div style={{ 
-            width: 100, height: 100, borderRadius: '50%', 
+            width: 80, height: 80, borderRadius: '50%', 
             background: 'var(--bg-subtle)', border: '1px solid var(--border)', 
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 12
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 8
           }}>
             <img 
               src={getImageUrl(team.logo_path || team.logo) || avatar(team.name)} 
@@ -203,10 +203,10 @@ export default function TeamDetailPage({ params }) {
 
           <div style={{ flex: 1, minWidth: 200 }}>
             <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 8 }}>
-              <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.2 }}>{team.name}</h1>
+              <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.2 }}>{team.name}</h1>
               {team.sport && (
                 <span style={{
-                  fontSize: 11, fontWeight: 700, padding: '4px 12px', borderRadius: 20,
+                  fontSize: 10, fontWeight: 700, padding: '4px 10px', borderRadius: 20,
                   background: 'var(--bg-subtle)', color: 'var(--text-secondary)',
                 }}>
                   {team.sport.name}
@@ -214,17 +214,17 @@ export default function TeamDetailPage({ params }) {
               )}
             </div>
 
-            <p style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.6, marginBottom: 16, maxWidth: 800 }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.6, marginBottom: 16, maxWidth: 800 }}>
               {team.description || 'Ini adalah profil resmi tim yang berlaga dan berkompetisi dalam ekosistem Liga Bojonegoro.'}
             </p>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--text-muted)' }}>
-                <Users size={16} style={{ color: 'var(--primary)' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--text-muted)' }}>
+                <Users size={14} style={{ color: 'var(--primary)' }} />
                 <span>Pelatih / Manajer: <strong style={{ color: 'var(--text-primary)' }}>{team.coach_name || team.contact_person || 'TBA'}</strong></span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--text-muted)' }}>
-                <MapPin size={16} style={{ color: 'var(--primary)' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--text-muted)' }}>
+                <MapPin size={14} style={{ color: 'var(--primary)' }} />
                 <span>Asal / Kota: <strong style={{ color: 'var(--text-primary)' }}>{team.city || team.address || 'Bojonegoro'}</strong></span>
               </div>
             </div>
