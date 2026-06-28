@@ -195,7 +195,7 @@ function Home() {
   const [selectedMatchId, setSelectedMatchId] = useState(null);
   const [activeTournament, setActiveTournament] = useState(null);
   const [activeSport, setActiveSport] = useState(null);
-  const [viewMode, setViewMode] = useState('list');
+  const [viewModes, setViewModes] = useState({});
   const [showDatePicker, setShowDatePicker] = useState(false);
   const datePickerRef = useRef(null);
   const [calendarMonth, setCalendarMonth] = useState(new Date());
@@ -965,7 +965,9 @@ function Home() {
           </div>
         ) : Object.keys(groupedMatches).length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0, ...(isMounted && typeof window !== 'undefined' && window.innerWidth < 1024 ? { padding: '0 12px' } : {}) }}>
-            {Object.entries(groupedMatches).map(([name, group]) => (
+            {Object.entries(groupedMatches).map(([name, group]) => {
+              const currentViewMode = viewModes[name] || 'list';
+              return (
               <div key={name} style={{ 
                 marginBottom: 24, 
                 background: '#ffffff', 
@@ -1000,7 +1002,7 @@ function Home() {
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
-                        setViewMode(viewMode === 'list' ? 'grid' : 'list');
+                        setViewModes(prev => ({ ...prev, [name]: currentViewMode === 'list' ? 'grid' : 'list' }));
                       }} 
                       style={{ 
                         width: 32, height: 32, borderRadius: '50%', background: '#ffffff', 
@@ -1017,11 +1019,11 @@ function Home() {
 
                 <div>
                   <div style={{ 
-                    display: viewMode === 'grid' ? 'grid' : 'flex', 
+                    display: currentViewMode === 'grid' ? 'grid' : 'flex', 
                     flexDirection: 'column',
-                    gridTemplateColumns: viewMode === 'grid' ? 'repeat(auto-fill, minmax(340px, 1fr))' : 'none',
-                    gap: viewMode === 'grid' ? 24 : 0,
-                    padding: viewMode === 'grid' ? '24px 16px' : 0,
+                    gridTemplateColumns: currentViewMode === 'grid' ? 'repeat(auto-fill, minmax(340px, 1fr))' : 'none',
+                    gap: currentViewMode === 'grid' ? 24 : 0,
+                    padding: currentViewMode === 'grid' ? '24px 16px' : 0,
                   }}>
                     {group.matches.map(match => {
                       const isLive = ['live', 'first_half', 'half_time', 'second_half', 'extra_time_1', 'extra_time_ht', 'extra_time_2', 'penalty_shootout', 'ongoing'].includes(match.status);
@@ -1038,18 +1040,18 @@ function Home() {
                           onClick={() => handleMatchClick(match.uuid || match.id)}
                           style={{
                             display: 'flex', alignItems: 'center',
-                            padding: viewMode === 'grid' ? '24px 20px 20px 20px' : '16px',
-                            background: viewMode === 'grid' ? '#ffffff' : (isSelected ? 'var(--bg-hover)' : 'var(--bg-card)'),
-                            borderBottom: viewMode === 'grid' ? 'none' : '1px solid #f8fafc',
-                            border: viewMode === 'grid' ? '1px solid #f1f5f9' : 'none',
-                            borderRadius: viewMode === 'grid' ? 20 : 16,
-                            margin: viewMode === 'grid' ? 0 : '0 0 12px 0',
-                            boxShadow: viewMode === 'grid' ? '0 4px 20px rgba(0,0,0,0.03)' : '0 2px 10px rgba(0,0,0,0.02)',
+                            padding: currentViewMode === 'grid' ? '24px 20px 20px 20px' : '16px',
+                            background: currentViewMode === 'grid' ? '#ffffff' : (isSelected ? 'var(--bg-hover)' : 'var(--bg-card)'),
+                            borderBottom: currentViewMode === 'grid' ? 'none' : '1px solid #f8fafc',
+                            border: currentViewMode === 'grid' ? '1px solid #f1f5f9' : 'none',
+                            borderRadius: currentViewMode === 'grid' ? 20 : 16,
+                            margin: currentViewMode === 'grid' ? 0 : '0 0 12px 0',
+                            boxShadow: currentViewMode === 'grid' ? '0 4px 20px rgba(0,0,0,0.03)' : '0 2px 10px rgba(0,0,0,0.02)',
                             cursor: 'pointer', transition: 'all 0.2s ease',
                             position: 'relative'
                           }}
                         >
-                          {viewMode === 'grid' ? (
+                          {currentViewMode === 'grid' ? (
                             <div style={{ display: 'flex', flexDirection: 'column', width: '100%', position: 'relative' }}>
                                {isLive && (
                                  <div style={{ position: 'absolute', top: -38, left: '50%', transform: 'translateX(-50%)', background: '#ef4444', color: '#fff', padding: '6px 20px', borderRadius: 24, fontSize: 13, fontWeight: 700, zIndex: 1, boxShadow: '0 4px 10px rgba(239, 68, 68, 0.3)' }}>
