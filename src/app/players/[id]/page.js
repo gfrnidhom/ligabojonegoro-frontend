@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useMemo, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { HelpCircle, Calendar, ArrowRight } from 'lucide-react';
+import { HelpCircle, Calendar, ArrowRight, ArrowLeft } from 'lucide-react';
 import api, { getImageUrl } from '../../../api';
 
 const avatar = (name, bg = 'ff1a1a') =>
@@ -154,29 +154,6 @@ const DynamicRadarChart = ({ player }) => {
   );
 };
 
-const PositionPitch = ({ posCode }) => {
-   let left = '50%';
-   let bottom = '15%';
-   if (posCode === 'DF') bottom = '25%';
-   if (posCode === 'MF') bottom = '50%';
-   if (posCode === 'FW') bottom = '80%';
-   
-   return (
-      <div className="mini-pitch">
-         <div className="pitch-line" style={{ top: 0, left: 0, right: 0, bottom: 0, margin: 8 }} />
-         <div className="pitch-line" style={{ top: '50%', left: 8, right: 8, height: 0 }} />
-         <div className="pitch-line" style={{ top: '50%', left: '50%', width: 40, height: 40, borderRadius: '50%', transform: 'translate(-50%, -50%)' }} />
-         <div className="pitch-line" style={{ top: 8, left: '20%', right: '20%', height: 30, borderTop: 'none' }} />
-         <div className="pitch-line" style={{ bottom: 8, left: '20%', right: '20%', height: 30, borderBottom: 'none' }} />
-         
-         <div style={{ position: 'absolute', bottom: bottom, left: left, transform: 'translate(-50%, 50%)', background: '#ff1a1a', color: '#fff', fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 10, border: '1px solid #fff' }}>
-            {posCode || 'GK'}
-         </div>
-      </div>
-   );
-}
-
-
 
 export default function PlayerDetailPage({ params }) {
   const { id: playerId } = use(params);
@@ -228,78 +205,121 @@ export default function PlayerDetailPage({ params }) {
 
   return (
     <div className="player-layout">
-       <div className="hero-banner" style={{ background: heroColor }}>
-          <div className="hero-inner">
-             <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-                <img src={getImageUrl(player.photo_path) || avatar(player.name)} className="hero-photo" alt="" />
-                <div>
-                   <h1 className="hero-name">{player.name}</h1>
-                   <div className="hero-team">
-                     <img src={getImageUrl(player.team?.logo_path) || avatar(player.team?.name)} className="hero-team-logo" alt="" />
+       
+       {/* Hero Banner (Full Width on Desktop) */}
+       <div className="hero-banner" style={{ background: '#1e293b', padding: '64px 32px 0 32px', position: 'relative', overflow: 'hidden', marginBottom: 24, borderRadius: 16, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}>
+          <div className="back-btn-container" style={{ position: 'absolute', top: 16, left: 16, zIndex: 10 }}>
+             <button className="back-btn" onClick={() => router.back()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, background: 'rgba(255,255,255,0.1)', color: '#fff', borderRadius: '50%', border: 'none', cursor: 'pointer' }}>
+                <ArrowLeft size={18} />
+             </button>
+          </div>
+          
+          <div className="hero-inner" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 20 }}>
+             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 24 }}>
+                <img src={getImageUrl(player.photo_path) || avatar(player.name)} className="hero-photo" alt="" style={{ width: 90, height: 110, objectFit: 'cover', borderRadius: '12px 12px 0 0', background: '#fff', display: 'block' }} />
+                <div style={{ paddingBottom: 20 }}>
+                   <h1 className="hero-name" style={{ fontSize: 20, fontWeight: 700, margin: '0 0 4px 0', color: '#fff' }}>{player.name}</h1>
+                   <div className="hero-team" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#e2e8f0' }}>
+                     <img src={getImageUrl(player.team?.logo_path) || avatar(player.team?.name)} style={{ width: 16, height: 16, borderRadius: '50%', background: '#fff' }} alt="" />
                      {player.team?.name}
                    </div>
                 </div>
              </div>
-             <button className="follow-btn">Follow</button>
+             <div style={{ paddingBottom: 20 }}>
+                <button className="follow-btn" style={{ background: '#fff', color: '#172554', border: 'none', borderRadius: 20, padding: '6px 20px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Follow</button>
+             </div>
           </div>
        </div>
 
        <div className="grid-layout">
          <div className="main-col">
-            <div className="card info-grid">
-               <div className="info-item">
-                  <span className="info-val">{player.metadata?.height || player.tinggi_badan || '-'}</span>
-                  <span className="info-lbl">Tinggi Badan</span>
-               </div>
-               <div className="info-item">
-                  <span className="info-val">{player.jersey_number || '-'}</span>
-                  <span className="info-lbl">Nomor Punggung</span>
-               </div>
-               
-               <div className="info-position-box" style={{ gridRow: 'span 3', gridColumn: '3' }}>
-                  <span className="info-lbl" style={{ marginBottom: 12, display: 'block' }}>Posisi</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: heroColor }}>Utama</span><br/>
-                  <span style={{ fontSize: 13, color: '#111827' }}>{posName}</span>
-                  <PositionPitch posCode={positionCode} />
+            
+            {/* MAIN PROFILE CARD */}
+            <div className="card profile-card" style={{ padding: '24px 0 0 0', overflow: 'hidden' }}>
+
+               {/* Info Grid */}
+               <div className="info-grid" style={{ padding: '0 32px' }}>
+                  {/* Row 1 */}
+                  <div className="info-item" style={{ borderBottom: '1px solid #f1f5f9', padding: '16px 0' }}>
+                     <span className="info-val">{player.metadata?.height || player.tinggi_badan || '-'}</span>
+                     <span className="info-lbl">Tinggi Badan</span>
+                  </div>
+                  <div className="info-item" style={{ borderBottom: '1px solid #f1f5f9', padding: '16px 0' }}>
+                     <span className="info-val">{player.jersey_number || '-'}</span>
+                     <span className="info-lbl">Nomor Punggung</span>
+                  </div>
+                  
+                  {/* Row 2 */}
+                  <div className="info-item" style={{ borderBottom: '1px solid #f1f5f9', padding: '16px 0' }}>
+                     <span className="info-val">{age ? `${age} Tahun` : '-'}</span>
+                     <span className="info-lbl">{player.date_of_birth ? new Date(player.date_of_birth).toLocaleDateString('id-ID', { month: 'short', day: 'numeric', year: 'numeric'}) : ''}</span>
+                  </div>
+                  <div className="info-item" style={{ borderBottom: '1px solid #f1f5f9', padding: '16px 0' }}>
+                     <span className="info-val">{player.metadata?.preferred_foot || player.kaki_dominan || '-'}</span>
+                     <span className="info-lbl">Kaki Dominan</span>
+                  </div>
+                  
+                  {/* Row 3 */}
+                  <div className="info-item" style={{ borderBottom: '1px solid #f1f5f9', padding: '16px 0' }}>
+                     <span className="info-val">{player.tempat_lahir || '-'}</span>
+                     <span className="info-lbl">Tempat Lahir</span>
+                  </div>
+                  <div className="info-item" style={{ borderBottom: '1px solid #f1f5f9', padding: '16px 0' }}>
+                     <span className="info-val">{player.no_telp || '-'}</span>
+                     <span className="info-lbl">No. Telepon</span>
+                  </div>
+
+                  {/* Row 4 */}
+                  <div className="info-item" style={{ padding: '16px 0' }}>
+                     <span className="info-val">{player.asal_sekolah || '-'}</span>
+                     <span className="info-lbl">Asal Sekolah</span>
+                  </div>
+                  <div className="info-item" style={{ padding: '16px 0' }}></div>
                </div>
 
-               <div className="info-item">
-                  <span className="info-val">{age ? `${age} Tahun` : '-'}</span>
-                  <span className="info-lbl">{player.date_of_birth ? new Date(player.date_of_birth).toLocaleDateString('id-ID', { month: 'short', day: 'numeric', year: 'numeric'}) : ''}</span>
-               </div>
-               <div className="info-item">
-                  <span className="info-val">{player.metadata?.preferred_foot || player.kaki_dominan || '-'}</span>
-                  <span className="info-lbl">Kaki Dominan</span>
-               </div>
-               
-               <div className="info-item" style={{ gridColumn: 'span 2' }}>
-                  <span className="info-val" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    {player.tempat_lahir || '-'}
-                  </span>
-                  <span className="info-lbl">Tempat Lahir</span>
-               </div>
-
-               <div className="info-item">
-                  <span className="info-val">{player.no_telp || '-'}</span>
-                  <span className="info-lbl">No. Telepon</span>
-               </div>
-               <div className="info-item" style={{ gridColumn: 'span 2' }}>
-                  <span className="info-val">{player.asal_sekolah || '-'}</span>
-                  <span className="info-lbl">Asal Sekolah</span>
+               {/* Position Box */}
+               <div className="position-section" style={{ borderTop: '1px solid #f1f5f9', display: 'flex', padding: 32 }}>
+                  <div style={{ flex: 1 }}>
+                     <h3 style={{ fontSize: 14, fontWeight: 700, margin: '0 0 24px 0', color: '#0f172a' }}>Posisi</h3>
+                     <div style={{ marginBottom: 16 }}>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: '#1d4ed8', display: 'block', marginBottom: 4 }}>Utama</span>
+                        <span style={{ fontSize: 12, color: '#1e293b' }}>{posName}</span>
+                     </div>
+                  </div>
+                  <div style={{ width: 140, flexShrink: 0 }}>
+                     {/* Vertical Pitch */}
+                     <div style={{ width: '100%', aspectRatio: '2/3', background: '#f1f5f9', borderRadius: 8, position: 'relative', overflow: 'hidden' }}>
+                        {/* Outline */}
+                        <div style={{ position: 'absolute', top: 6, left: 6, right: 6, bottom: 6, border: '1.5px solid #fff' }} />
+                        {/* Halfway Line */}
+                        <div style={{ position: 'absolute', top: '50%', left: 6, right: 6, height: 0, borderTop: '1.5px solid #fff' }} />
+                        {/* Center Circle */}
+                        <div style={{ position: 'absolute', top: '50%', left: '50%', width: 40, height: 40, borderRadius: '50%', transform: 'translate(-50%, -50%)', border: '1.5px solid #fff' }} />
+                        {/* Penalty Boxes */}
+                        <div style={{ position: 'absolute', top: 6, left: '20%', right: '20%', height: '16%', border: '1.5px solid #fff', borderTop: 'none' }} />
+                        <div style={{ position: 'absolute', bottom: 6, left: '20%', right: '20%', height: '16%', border: '1.5px solid #fff', borderBottom: 'none' }} />
+                        
+                        {/* Player Dot */}
+                        <div style={{ position: 'absolute', bottom: positionCode === 'FW' ? '75%' : positionCode === 'MF' ? '50%' : positionCode === 'DF' ? '25%' : '10%', left: '50%', transform: 'translate(-50%, 50%)', background: '#1d4ed8', color: '#fff', fontSize: 10, fontWeight: 700, width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #fff' }}>
+                           {positionCode || 'GK'}
+                        </div>
+                     </div>
+                  </div>
                </div>
             </div>
 
+            {/* STATS */}
             <div className="card mt-4 p-4">
                <div style={{ display: 'flex', gap: 16, alignItems: 'baseline', marginBottom: 12 }}>
-                 <span style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>Statistik Keseluruhan</span>
+                 <span style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>Statistik Keseluruhan</span>
                </div>
                <div style={{ display: 'flex', flexDirection: 'column' }}>
                  {getSportStatKeys(player?.team?.sport_id, player?.team?.sport?.slug).map((stat, i) => {
                    const val = player?.aggregated_stats?.[stat.key] || 0;
                    return (
                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 4px', borderBottom: i === getSportStatKeys(player?.team?.sport_id, player?.team?.sport?.slug).length - 1 ? 'none' : '1px solid #f3f4f6' }}>
-                       <span style={{ fontSize: 13, fontWeight: 500, color: '#4b5563' }}>{stat.label}</span>
-                       <span style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{val}</span>
+                       <span style={{ fontSize: 12, fontWeight: 500, color: '#4b5563' }}>{stat.label}</span>
+                       <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{val}</span>
                      </div>
                    );
                  })}
@@ -308,80 +328,68 @@ export default function PlayerDetailPage({ params }) {
          </div>
 
          <div className="side-col">
-            <div className="card p-4">
-               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                 <span style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>Karakteristik Pemain</span>
+            <div className="card p-4 mb-4">
+               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                 <span style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>Profil Skill</span>
                  <HelpCircle size={16} color="#9ca3af" />
                </div>
-               <div style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>Statistik dibandingkan pemain {posName} lainnya</div>
                <DynamicRadarChart player={player} />
             </div>
 
-            <div className="card mt-4 p-4">
+            <div className="card p-4">
                <div style={{ paddingBottom: 16 }}>
-                 <span style={{ fontSize: 15, fontWeight: 700, display: 'block', color: '#111827' }}>Riwayat Pertandingan</span>
+                 <span style={{ fontSize: 14, fontWeight: 700, display: 'block', color: '#111827' }}>Pertandingan</span>
                </div>
                
-               {matches.upcoming?.length > 0 && (
-                 <>
-                   <div style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', marginBottom: 12, paddingBottom: 8, borderBottom: '1px solid #f3f4f6' }}>Pertandingan Akan Datang</div>
-                   {matches.upcoming.map((m, i) => {
-                      const time = new Date(m.scheduled_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
-                      return (
-                      <div key={'up_'+i} onClick={() => router.push(`/matches/${m.uuid}`)} className="match-row-flex" style={{ display: 'flex', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #f3f4f6', cursor: 'pointer' }}>
-                        <div className="match-row-time" style={{ width: 60, flexShrink: 0, fontSize: 11, fontWeight: 600, color: '#64748b' }}>{time}</div>
-                        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 0 }}>
-                          <div className="match-row-flex" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, minWidth: 0 }}>
-                            <span className="match-row-team-name" style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.home_team?.name || 'Home'}</span>
-                            <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} alt="" />
-                          </div>
-                          <div className="match-row-score" style={{ width: 72, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
-                            <span style={{ fontSize: 13, fontWeight: 600, color: '#9ca3af' }}>-</span>
-                          </div>
-                          <div className="match-row-flex" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 12, minWidth: 0 }}>
-                            <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name)} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} alt="" />
-                            <span className="match-row-team-name" style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.away_team?.name || 'Away'}</span>
-                          </div>
+               {matches.upcoming?.length > 0 ? matches.upcoming.map((m, i) => {
+                  let time = m.scheduled_at ? new Date(m.scheduled_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
+                  if (m.status === 'finished') time = 'FT';
+                  else if (m.status === 'playing') time = 'LIVE';
+                  
+                  return (
+                    <div key={'up_'+i} onClick={() => router.push(`/matches/${m.uuid}`)} className="match-row-flex" style={{ display: 'flex', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #f3f4f6', cursor: 'pointer' }}>
+                      <div className="match-row-time" style={{ width: 60, flexShrink: 0, fontSize: 11, fontWeight: 600, color: '#64748b' }}>{time}</div>
+                      <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                        <div className="match-row-flex" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, minWidth: 0 }}>
+                          <span className="match-row-team-name" style={{ fontSize: 12, fontWeight: 500, color: '#1e293b', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.home_team?.name || 'Home'}</span>
+                          <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} style={{ width: 24, height: 24, borderRadius: '50%' }} alt="" />
+                        </div>
+                        <div className="match-row-score" style={{ width: 72, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
+                          <div style={{ background: '#f3f4f6', padding: '4px 12px', borderRadius: 4, fontSize: 11, fontWeight: 700, color: '#6b7280' }}>v</div>
+                        </div>
+                        <div className="match-row-flex" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 12, minWidth: 0 }}>
+                          <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name)} style={{ width: 24, height: 24, borderRadius: '50%' }} alt="" />
+                          <span className="match-row-team-name" style={{ fontSize: 12, fontWeight: 500, color: '#1e293b', textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.away_team?.name || 'Away'}</span>
                         </div>
                       </div>
-                      );
-                   })}
-                 </>
-               )}
-
-               <div style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', marginBottom: 12, marginTop: matches.upcoming?.length > 0 ? 16 : 0, paddingBottom: 8, borderBottom: '1px solid #f3f4f6' }}>Pertandingan Terbaru</div>
-               {matches.recent?.length > 0 ? matches.recent.map((m, i) => {
-                  const isFinished = m.status === 'finished';
-                  const isLive = ['live', 'first_half', 'half_time', 'second_half', 'extra_time_1', 'extra_time_ht', 'extra_time_2', 'penalty_shootout', 'ongoing'].includes(m.status);
-                  const hasScore = isLive || isFinished;
+                    </div>
+                  );
+               }) : matches.recent?.length > 0 ? matches.recent.map((m, i) => {
+                  const homeWin = m.home_score > m.away_score;
+                  const awayWin = m.away_score > m.home_score;
+                  
                   return (
                   <div key={'rec_'+i} onClick={() => router.push(`/matches/${m.uuid}`)} className="match-row-flex" style={{ display: 'flex', alignItems: 'center', padding: '12px 0', borderBottom: i === matches.recent.length - 1 ? 'none' : '1px solid #f3f4f6', cursor: 'pointer' }}>
                      <div className="match-row-time" style={{ width: 60, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-                        {isLive ? (
-                           <span style={{ color: '#ef4444', fontSize: 11, fontWeight: 700 }}>Live</span>
-                        ) : isFinished ? (
-                           <div style={{ background: '#f1f5f9', borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#94a3b8' }}>FT</div>
-                        ) : (
-                           <span style={{ fontSize: 11, fontWeight: 600, color: '#64748b' }}>{new Date(m.scheduled_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}</span>
-                        )}
+                        <div style={{ fontSize: 10, color: '#64748b', fontWeight: 600, display: 'flex', flexDirection: 'column' }}>
+                           {new Date(m.scheduled_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                        </div>
                      </div>
-                     <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 0 }}>
+                     <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
                         <div className="match-row-flex" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, minWidth: 0 }}>
-                           <span className="match-row-team-name" style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.home_team?.name || 'Home'}</span>
-                           <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} alt="" />
+                           <span className="match-row-team-name" style={{ fontSize: 12, fontWeight: 500, color: '#1e293b', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.home_team?.name || 'Home'}</span>
+                           <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} style={{ width: 24, height: 24, borderRadius: '50%' }} alt="" />
                         </div>
                         <div className="match-row-score" style={{ width: 72, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
-                           {hasScore ? (
-                              <span style={{ fontSize: 14, fontWeight: 700, color: isLive ? '#ef4444' : '#1e293b', whiteSpace: 'nowrap', letterSpacing: '1px' }}>
-                                 {m.home_score} - {m.away_score}
-                              </span>
-                           ) : (
-                              <span style={{ fontSize: 13, fontWeight: 600, color: '#9ca3af' }}>-</span>
-                           )}
+                           <div style={{ background: '#f8fafc', padding: '4px 10px', borderRadius: 4, display: 'flex', gap: 6, border: '1px solid #e2e8f0' }}>
+                              <span style={{ fontSize: 12, fontWeight: 700, color: homeWin ? '#111827' : '#64748b' }}>{m.home_score ?? '-'}</span>
+                              <span style={{ fontSize: 12, color: '#94a3b8' }}>-</span>
+                              <span style={{ fontSize: 12, fontWeight: 700, color: awayWin ? '#111827' : '#64748b' }}>{m.away_score ?? '-'}</span>
+                           </div>
                         </div>
                         <div className="match-row-flex" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 12, minWidth: 0 }}>
-                           <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name)} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} alt="" />
-                           <span className="match-row-team-name" style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.away_team?.name || 'Away'}</span>
+                           <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name)} style={{ width: 24, height: 24, borderRadius: '50%' }} alt="" />
+                           <span className="match-row-team-name" style={{ fontSize: 12, fontWeight: 500, color: '#1e293b', textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.away_team?.name || 'Away'}</span>
                         </div>
                      </div>
                   </div>
@@ -394,16 +402,13 @@ export default function PlayerDetailPage({ params }) {
        </div>
 
        <style dangerouslySetInnerHTML={{ __html: `
-          body { background: #f9fafb; margin: 0; }
+          body { background: var(--bg-app); margin: 0; }
           .player-layout { max-width: 1040px; margin: 0 auto; padding: 24px; }
-          .hero-banner { border-radius: 16px; padding: 24px 32px; color: #fff; margin-bottom: 24px; position: relative; overflow: hidden; box-shadow: 0 4px 12px rgba(255,26,26,0.2); }
-          .hero-inner { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 2; }
-          .hero-photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; background: #fff; }
-          .hero-name { font-size: 28px; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.5px; }
-          .hero-team { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; opacity: 0.9; }
-          .hero-team-logo { width: 16px; height: 16px; border-radius: 50%; background: #fff; padding: 1px; object-fit: contain; }
-          .follow-btn { background: #fff; color: #ff1a1a; border: none; border-radius: 20px; padding: 8px 24px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-          .follow-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+          
+          .card { background: #fff; border-radius: 16px; border: 1px solid var(--border-light); box-shadow: none; }
+          .p-4 { padding: 24px; }
+          .mt-4 { margin-top: 24px; }
+          .mb-4 { margin-bottom: 24px; }
 
           .grid-layout { display: grid; grid-template-columns: 1fr; gap: 24px; }
           @media(min-width: 900px) {
@@ -413,22 +418,21 @@ export default function PlayerDetailPage({ params }) {
             .grid-layout { grid-template-columns: 1.4fr 1fr; }
           }
           
-          .card { background: #fff; border-radius: 16px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-          .p-4 { padding: 24px; }
-          .mt-4 { margin-top: 24px; }
-
-          .info-grid { padding: 24px; display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 28px 16px; align-items: start; }
-          @media(max-width: 600px) {
-             .info-grid { grid-template-columns: 1fr 1fr; gap: 20px 16px; }
-             .info-position-box { grid-column: 1 / -1 !important; grid-row: auto !important; margin-top: 8px; border-top: 1px solid #f3f4f6; border-left: none !important; padding-left: 0 !important; padding-top: 20px; }
-          }
+          .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; }
           .info-item { display: flex; flex-direction: column; gap: 4px; }
-          .info-val { font-size: 14px; font-weight: 700; color: #111827; }
-          .info-lbl { font-size: 12px; font-weight: 500; color: #6b7280; }
+          .info-val { font-size: 13px; font-weight: 700; color: #111827; }
+          .info-lbl { font-size: 12px; font-weight: 500; color: #64748b; }
+          .back-btn-container { display: none; }
 
-          .info-position-box { border-left: 1px solid #f3f4f6; padding-left: 24px; height: 100%; display: flex; flex-direction: column; }
-          .mini-pitch { flex: 1; min-height: 150px; background: #f3f4f6; border-radius: 8px; margin-top: 16px; position: relative; overflow: hidden; border: 1px solid #e5e7eb; }
-          .pitch-line { position: absolute; border: 1.5px solid #d1d5db; }
+          @media(max-width: 600px) {
+             .back-btn-container { display: block; }
+             .hero-inner { flex-direction: column !important; align-items: center !important; text-align: center; gap: 16px !important; }
+             .hero-inner > div { flex-direction: column !important; align-items: center !important; text-align: center; }
+             .hero-photo { width: 100px !important; height: 120px !important; margin-bottom: 12px; }
+             .hero-team { justify-content: center; }
+             .info-grid { padding: 0 20px !important; gap: 0 16px; }
+             .position-section { flex-direction: row; padding: 24px 20px !important; gap: 16px; align-items: stretch; justify-content: space-between; }
+          }
        `}} />
     </div>
   );

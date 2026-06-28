@@ -809,7 +809,7 @@ function RincianTab({ match }) {
                 };
 
                 const MinuteCircle = () => (
-                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#111827', zIndex: 2 }}>
+                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#111827', zIndex: 2 }} className="text-[10px] sm:text-xs md:text-sm">
                     {ev.minute ? `${ev.minute}'` : `#${ev.sequence}`}
                   </div>
                 );
@@ -819,38 +819,41 @@ function RincianTab({ match }) {
                 const subtext = ev.event_type === 'own_goal' ? 'Own goal' : ev.event_type === 'penalty' ? 'Penalty' : ev.event_data?.commentary;
 
                 const EventContent = () => (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexDirection: isHome ? 'row' : 'row-reverse' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: isHome ? 'flex-end' : 'flex-start', textAlign: isHome ? 'right' : 'left' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexDirection: isHome ? 'row' : 'row-reverse', maxWidth: '100%' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: isHome ? 'flex-end' : 'flex-start', textAlign: isHome ? 'right' : 'left', minWidth: 0, flex: 1 }}>
                       {isSub ? (
                         <>
-                          <span style={{ fontSize: 13, fontWeight: 500, color: '#10b981', lineHeight: '18px' }}>{ev.event_data?.player_in || ev.player?.name}</span>
-                          <span style={{ fontSize: 13, fontWeight: 500, color: '#ef4444', lineHeight: '18px' }}>{ev.event_data?.player_out || ev.event_data?.player_off || 'Pemain Keluar'}</span>
+                          <span style={{ fontWeight: 600, color: '#10b981', lineHeight: '1.2' }} className="text-[11px] sm:text-xs md:text-sm">{ev.event_data?.player_in || ev.player?.name}</span>
+                          <span style={{ fontWeight: 600, color: '#ef4444', lineHeight: '1.2', marginTop: 2 }} className="text-[11px] sm:text-xs md:text-sm">{ev.event_data?.player_out || ev.event_data?.player_off || 'Pemain Keluar'}</span>
                         </>
                       ) : (
                         <>
-                          <div style={{ fontSize: 14, fontWeight: 500, color: '#111827', display: 'flex', alignItems: 'center', gap: 6, flexDirection: isHome ? 'row' : 'row-reverse' }}>
-                            <span onClick={() => handlePlayerClick(ev.player?.uuid)} style={{ cursor: 'pointer' }}>{ev.player?.name || 'Pemain'}</span>
-                            {isGoal && <span style={{ fontWeight: 700, color: '#374151' }}>({runningScore})</span>}
+                          <div style={{ fontWeight: 600, color: '#111827', textAlign: isHome ? 'right' : 'left' }} className="text-[11px] sm:text-xs md:text-sm">
+                            {!isHome && isGoal && <span style={{ fontWeight: 800, color: '#374151', marginRight: 4 }}>({runningScore})</span>}
+                            <span onClick={() => handlePlayerClick(ev.player?.uuid)} style={{ cursor: 'pointer', lineHeight: '1.3' }}>{ev.player?.name || 'Pemain'}</span>
+                            {isHome && isGoal && <span style={{ fontWeight: 800, color: '#374151', marginLeft: 4 }}>({runningScore})</span>}
                           </div>
-                          {subtext && <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 2 }}>{subtext}</div>}
+                          {subtext && <div style={{ color: '#9ca3af', marginTop: 2, lineHeight: '1.2' }} className="text-[10px] sm:text-[11px] md:text-xs">{subtext}</div>}
                         </>
                       )}
                     </div>
-                    <EventIconCircle type={ev.event_type} />
+                    <div style={{ flexShrink: 0 }}>
+                      <EventIconCircle type={ev.event_type} />
+                    </div>
                   </div>
                 );
 
                 return (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
-                    <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', paddingRight: 24 }}>
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', position: 'relative', width: '100%' }}>
+                    <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', paddingRight: 16, minWidth: 0 }}>
                       {isHome ? <EventContent /> : null}
                     </div>
                     
                     <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', background: '#fff', padding: '4px 0', zIndex: 2 }}>
                       <MinuteCircle />
                     </div>
-
-                    <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start', paddingLeft: 24 }}>
+                    
+                    <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start', paddingLeft: 16, minWidth: 0 }}>
                       {!isHome ? <EventContent /> : null}
                     </div>
                   </div>
@@ -956,28 +959,28 @@ function SubstitutesBlock({ match }) {
             const ratingColor = rating >= 7.0 ? '#10b981' : rating >= 6.0 ? '#f59e0b' : '#ef4444';
             
             return (
-              <div key={i} onClick={() => handlePlayerClick(hP.player?.uuid)} style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', padding: '12px 0', borderBottom: i < homeSubs.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
-                 <img src={getImageUrl(hP.player?.photo_path) || avatar(hP.player?.name, '3b82f6')} style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', background: '#f3f4f6', flexShrink: 0 }} alt="" />
+              <div key={i} onClick={() => handlePlayerClick(hP.player?.uuid)} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '12px 0', borderBottom: i < homeSubs.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
+                 <img src={getImageUrl(hP.player?.photo_path) || avatar(hP.player?.name, '3b82f6')} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', background: '#f3f4f6', flexShrink: 0 }} alt="" />
                  
                  {subEvent && (
-                   <div style={{ background: ratingColor, color: '#fff', fontSize: 13, fontWeight: 700, padding: '4px 10px', borderRadius: 14, marginLeft: 4 }}>
+                   <div style={{ background: ratingColor, color: '#fff', fontWeight: 700, padding: '4px 8px', borderRadius: 14, marginLeft: 2 }} className="text-[10px] sm:text-xs md:text-sm">
                      {rating}
                    </div>
                  )}
                  
-                 <div style={{ fontSize: 16, fontWeight: 600, color: '#9ca3af', width: 28, textAlign: 'center', marginLeft: subEvent ? 4 : 12 }}>
+                 <div style={{ fontWeight: 600, color: '#9ca3af', width: 24, textAlign: 'center', marginLeft: subEvent ? 4 : 8 }} className="text-xs sm:text-sm md:text-base">
                     {hP.player?.jersey_number}
                  </div>
                  
-                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <div style={{ fontSize: 15, fontWeight: 500, color: '#111827' }}>{hP.player?.name}</div>
-                    <div style={{ fontSize: 14, color: '#9ca3af', marginTop: 2 }}>{hP.position?.name || 'Substitute'}</div>
+                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} className="text-[12px] sm:text-sm md:text-base">{hP.player?.name}</div>
+                    <div style={{ color: '#9ca3af', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} className="text-[10px] sm:text-xs md:text-sm">{hP.position?.name || 'Substitute'}</div>
                  </div>
                  
                  {subEvent && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#10b981', fontWeight: 600, fontSize: 14 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#10b981', fontWeight: 600 }} className="text-[11px] sm:text-xs md:text-sm">
                        {subEvent.minute}'
-                       <div style={{ width: 26, height: 26, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                       <div style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                <path d="M5 12h14M12 5l7 7-7 7" />
@@ -999,28 +1002,28 @@ function SubstitutesBlock({ match }) {
             const ratingColor = rating >= 7.0 ? '#10b981' : rating >= 6.0 ? '#f59e0b' : '#ef4444';
 
             return (
-              <div key={i} onClick={() => handlePlayerClick(aP.player?.uuid)} style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', padding: '12px 0', borderBottom: i < awaySubs.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
-                 <img src={getImageUrl(aP.player?.photo_path) || avatar(aP.player?.name, 'ef4444')} style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', background: '#f3f4f6', flexShrink: 0 }} alt="" />
+              <div key={i} onClick={() => handlePlayerClick(aP.player?.uuid)} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '12px 0', borderBottom: i < awaySubs.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
+                 <img src={getImageUrl(aP.player?.photo_path) || avatar(aP.player?.name, 'ef4444')} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', background: '#f3f4f6', flexShrink: 0 }} alt="" />
                  
                  {subEvent && (
-                   <div style={{ background: ratingColor, color: '#fff', fontSize: 13, fontWeight: 700, padding: '4px 10px', borderRadius: 14, marginLeft: 4 }}>
+                   <div style={{ background: ratingColor, color: '#fff', fontWeight: 700, padding: '4px 8px', borderRadius: 14, marginLeft: 2 }} className="text-[10px] sm:text-xs md:text-sm">
                      {rating}
                    </div>
                  )}
                  
-                 <div style={{ fontSize: 16, fontWeight: 600, color: '#9ca3af', width: 28, textAlign: 'center', marginLeft: subEvent ? 4 : 12 }}>
+                 <div style={{ fontWeight: 600, color: '#9ca3af', width: 24, textAlign: 'center', marginLeft: subEvent ? 4 : 8 }} className="text-xs sm:text-sm md:text-base">
                     {aP.player?.jersey_number}
                  </div>
                  
-                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <div style={{ fontSize: 15, fontWeight: 500, color: '#111827' }}>{aP.player?.name}</div>
-                    <div style={{ fontSize: 14, color: '#9ca3af', marginTop: 2 }}>{aP.position?.name || 'Substitute'}</div>
+                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} className="text-[12px] sm:text-sm md:text-base">{aP.player?.name}</div>
+                    <div style={{ color: '#9ca3af', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} className="text-[10px] sm:text-xs md:text-sm">{aP.position?.name || 'Substitute'}</div>
                  </div>
                  
                  {subEvent && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#10b981', fontWeight: 600, fontSize: 14 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#10b981', fontWeight: 600 }} className="text-[11px] sm:text-xs md:text-sm">
                        {subEvent.minute}'
-                       <div style={{ width: 26, height: 26, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                       <div style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                <path d="M5 12h14M12 5l7 7-7 7" />
@@ -1055,7 +1058,7 @@ function SubstitutionsTimelineBlock({ match }) {
           const isHome = ev.team_id === match.home_team?.id;
 
           const MinuteCircle = () => (
-            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#111827', zIndex: 2 }}>
+            <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#111827', zIndex: 2 }} className="text-[10px] sm:text-xs md:text-sm">
               {ev.minute ? `${ev.minute}'` : `#${ev.sequence}`}
             </div>
           );
@@ -1070,24 +1073,26 @@ function SubstitutionsTimelineBlock({ match }) {
           );
 
           const EventContent = () => (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexDirection: isHome ? 'row' : 'row-reverse' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: isHome ? 'flex-end' : 'flex-start', textAlign: isHome ? 'right' : 'left' }}>
-                 <span style={{ fontSize: 13, fontWeight: 500, color: '#10b981', lineHeight: '18px' }}>{ev.event_data?.player_in || ev.player?.name}</span>
-                 <span style={{ fontSize: 13, fontWeight: 500, color: '#ef4444', lineHeight: '18px' }}>{ev.event_data?.player_out || ev.event_data?.player_off || 'Pemain Keluar'}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexDirection: isHome ? 'row' : 'row-reverse', maxWidth: '100%' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: isHome ? 'flex-end' : 'flex-start', textAlign: isHome ? 'right' : 'left', minWidth: 0, flex: 1 }}>
+                 <span style={{ fontWeight: 600, color: '#10b981', lineHeight: '1.2' }} className="text-[11px] sm:text-xs md:text-sm">{ev.event_data?.player_in || ev.player?.name}</span>
+                 <span style={{ fontWeight: 600, color: '#ef4444', lineHeight: '1.2', marginTop: 2 }} className="text-[11px] sm:text-xs md:text-sm">{ev.event_data?.player_out || ev.event_data?.player_off || 'Pemain Keluar'}</span>
               </div>
-              <SubIcon />
+              <div style={{ flexShrink: 0 }}>
+                <SubIcon />
+              </div>
             </div>
           );
 
           return (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
-              <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', paddingRight: 24 }}>
+            <div key={i} style={{ display: 'flex', alignItems: 'center', position: 'relative', width: '100%' }}>
+              <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', paddingRight: 16, minWidth: 0 }}>
                 {isHome ? <EventContent /> : null}
               </div>
               <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', background: '#fff', padding: '4px 0', zIndex: 2 }}>
                 <MinuteCircle />
               </div>
-              <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start', paddingLeft: 24 }}>
+              <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start', paddingLeft: 16, minWidth: 0 }}>
                 {!isHome ? <EventContent /> : null}
               </div>
             </div>

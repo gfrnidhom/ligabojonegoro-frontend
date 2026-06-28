@@ -32,14 +32,14 @@
   --success: #00985F;
   --warning: #f5a623;
 
-  --bg-app: #f2f2f2;
+  --bg-app: #fbfbfb;
   --bg-card: #ffffff;
   --bg-card-solid: #ffffff;
-  --bg-hover: #f8f8f8;
-  --bg-subtle: #f9f9f9;
+  --bg-hover: #f1f3f5;
+  --bg-subtle: #f8f9fa;
   --bg-glass: #ffffff;
   --bg-surface: #ffffff;
-  --bg-surface-hover: #f8f8f8;
+  --bg-surface-hover: #f1f3f5;
 
   --text-primary: #000000;
   --text-secondary: #333333;
@@ -95,10 +95,10 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .card {
   background: var(--bg-card) !important;
   backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
-  border: 1px solid rgba(0, 0, 0, 0.03) !important;
-  border-radius: var(--radius) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 12px !important;
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04) !important;
+  box-shadow: none !important;
 }
 
 .card-header {

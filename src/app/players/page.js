@@ -37,14 +37,15 @@ export default function PlayersPage() {
     fetchData();
   }, []);
 
+  const extractPos = (p) => typeof p.position === 'object' ? (p.position?.abbreviation || p.position?.name) : p.position;
   const filtered = players.filter(p => {
     const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase());
     const matchTeam = !teamFilter || String(p.team_id) === teamFilter;
-    const matchPos = !posFilter || p.position === posFilter;
+    const matchPos = !posFilter || extractPos(p) === posFilter;
     return matchSearch && matchTeam && matchPos;
   });
 
-  const positions = [...new Set(players.map(p => p.position).filter(Boolean))];
+  const positions = [...new Set(players.map(extractPos).filter(Boolean))];
   const posLabels = { GK: 'Kiper', DF: 'Bek', MF: 'Gelandang', FW: 'Penyerang' };
 
   return (
@@ -130,7 +131,8 @@ export default function PlayersPage() {
       ) : filtered.length > 0 ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 16 }}>
           {filtered.map(player => {
-            const posColor = { GK: '#f59e0b', DF: '#10b981', MF: '#3b82f6', FW: '#ef4444' }[player.position] || '#64748b';
+            const posVal = extractPos(player);
+            const posColor = { GK: '#f59e0b', DF: '#10b981', MF: '#3b82f6', FW: '#ef4444' }[posVal] || '#64748b';
             return (
               <Link href={`/players/${player.uuid || player.id}`} key={player.id} style={{ textDecoration: 'none' }}>
                 <div style={{
@@ -185,14 +187,14 @@ export default function PlayersPage() {
                   </div>
 
                   {/* Position badge */}
-                  {player.position && (
+                  {posVal && (
                     <div style={{
                       padding: '4px 10px', borderRadius: 8,
                       background: `${posColor}15`, border: `1px solid ${posColor}30`,
                       fontSize: 9, fontWeight: 700, color: posColor,
                       flexShrink: 0,
                     }}>
-                      {posLabels[player.position] || player.position}
+                      {posLabels[posVal] || posVal}
                     </div>
                   )}
                 </div>
