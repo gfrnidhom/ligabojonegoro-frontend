@@ -4,8 +4,9 @@ import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, ArrowLeft, MapPin, Calendar, Users, Award, Shield, ChevronRight, Star, LayoutGrid, List, BarChart2, ChevronUp, ChevronDown, Minus } from 'lucide-react';
+import { Trophy, ArrowLeft, MapPin, Calendar, Users, Award, Shield, ChevronRight, Star, LayoutGrid, List, BarChart2, GitMerge } from 'lucide-react';
 import api, { getImageUrl } from '../../../api';
+import TournamentBracket from '../../../components/TournamentBracket';
 
 const avatar = (name, bg = '3b82f6') => {
   if (!name) return `https://ui-avatars.com/api/?name=L&background=${bg}&color=fff&bold=true`;
@@ -20,10 +21,11 @@ export default function TournamentDetailPage({ params }) {
   const [tournament, setTournament] = useState(null);
   const [standings, setStandings] = useState([]);
   const [matches, setMatches] = useState([]);
+  const [bracketData, setBracketData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('matches'); // matches, standings, info, players, stats
+  const [activeTab, setActiveTab] = useState('matches'); // matches, bracket, standings, info, players, stats
 
-  const TABS = ['matches', 'standings', 'info', 'teams', 'players', 'stats'];
+  const TABS = ['matches', 'bracket', 'standings', 'info', 'teams', 'players', 'stats'];
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -59,6 +61,19 @@ export default function TournamentDetailPage({ params }) {
           const matched = tRes.data.data.find(t => String(t.uuid) === String(tournamentId) || String(t.id) === String(tournamentId));
           if (matched) {
             setTournament(matched);
+            
+            // If it's a knockout or group_knockout, or has_knockout is true, fetch bracket
+            if (matched.type === 'group_knockout' || matched.type === 'knockout' || matched.has_knockout) {
+              try {
+                const kRes = await api.get(`/tournaments/${matched.uuid || matched.id}/knockout`);
+                if (kRes.data.success && kRes.data.data.bracket) {
+                  setBracketData(kRes.data.data.bracket);
+                }
+              } catch (err) {
+                console.log('No knockout bracket available yet');
+              }
+            }
+
             // Fetch standings for this tournament using UUID if possible
             try {
               const sRes = await api.get(`/standings/${matched.uuid || matched.id}`);
@@ -304,6 +319,7 @@ export default function TournamentDetailPage({ params }) {
           {[
             { id: 'info', label: 'Ringkasan', icon: Shield },
             { id: 'matches', label: 'Pertandingan', icon: Calendar },
+            { id: 'bracket', label: 'Bracket', icon: GitMerge, show: (tournament.type === 'group_knockout' || tournament.type === 'knockout' || bracketData.length > 0) },
             { id: 'standings', label: 'Klasemen', icon: Trophy, show: Array.isArray(standings) ? standings.length > 0 : (standings?.standings?.length > 0 || standings?.groups?.length > 0) },
             { id: 'teams', label: 'Daftar Tim', icon: Users, show: tournament.teams?.length > 0 },
             { id: 'players', label: 'Pemain Terbaik', icon: Award },
@@ -935,6 +951,12 @@ export default function TournamentDetailPage({ params }) {
                 })() : <div style={{ fontSize: 11, color: 'var(--text-secondary)', padding: '24px 0', textAlign: 'center' }}>Belum ada data menit bermain.</div>}
               </div>
             </div>
+          </div>
+        )}
+
+        {activeTab === 'bracket' && (
+          <div className="animate-fade-in">
+            <TournamentBracket bracketData={bracketData} />
           </div>
         )}
 
