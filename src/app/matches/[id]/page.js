@@ -1612,15 +1612,15 @@ function KlasemenTab({ standings, match, sport }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
           {standings.phases?.map((phase, pi) => (
             <div key={pi}>
-              <h2 style={{ fontSize: 16, fontWeight: 800, color: '#e8eaed', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+              <h2 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid var(--border)' }}>
                 {phase.name}
               </h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                 {phase.groups?.map((g, gi) => (
                   <div key={gi}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                      <div style={{ width: 4, height: 18, borderRadius: 2, background: '#3b82f6' }} />
-                      <span style={{ fontSize: 11, fontWeight: 700, color: '#e8eaed', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{g.group?.name}</span>
+                      <div style={{ width: 4, height: 18, borderRadius: 2, background: 'var(--primary)' }} />
+                      <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{g.group?.name}</span>
                     </div>
                     <StandingsTable rows={g.standings} match={match} sport={sport} />
                   </div>
@@ -1634,8 +1634,8 @@ function KlasemenTab({ standings, match, sport }) {
           {standings.groups.map((g, i) => (
             <div key={i}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                <div style={{ width: 4, height: 18, borderRadius: 2, background: '#3b82f6' }} />
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#e8eaed', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{g.group?.name}</span>
+                <div style={{ width: 4, height: 18, borderRadius: 2, background: 'var(--primary)' }} />
+                <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{g.group?.name}</span>
               </div>
               <StandingsTable rows={g.standings} match={match} sport={sport} />
             </div>
