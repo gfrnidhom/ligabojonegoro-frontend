@@ -1129,6 +1129,8 @@ function H2HTab({ match }) {
 
 /* ─── Klasemen ─── */
 function KlasemenTab({ standings, match, sport }) {
+  const [activePhaseTab, setActivePhaseTab] = useState(0);
+
   if (!standings) {
     return (
       <div className="empty-state" style={{ padding: '36px 16px' }}>
@@ -1143,25 +1145,44 @@ function KlasemenTab({ standings, match, sport }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       {standings.type === 'grouped_phases' ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-          {standings.phases?.map((phase, pi) => (
-            <div key={pi}>
-              <h2 style={{ fontSize: 16, fontWeight: 800, color: '#e8eaed', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+        <div>
+          {/* Phase Tabs */}
+          <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
+            {standings.phases?.map((phase, pi) => (
+              <button 
+                key={pi} 
+                onClick={() => setActivePhaseTab(pi)}
+                style={{ 
+                  padding: '8px 16px', 
+                  borderRadius: 999, 
+                  fontSize: 13, 
+                  fontWeight: 600, 
+                  cursor: 'pointer',
+                  border: activePhaseTab === pi ? '1px solid #3b82f6' : '1px solid rgba(255,255,255,0.1)',
+                  background: activePhaseTab === pi ? '#3b82f6' : 'rgba(255,255,255,0.05)',
+                  color: activePhaseTab === pi ? '#ffffff' : '#9ca3af',
+                  transition: 'all 0.2s ease'
+                }}
+              >
                 {phase.name}
-              </h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                {phase.groups?.map((g, gi) => (
-                  <div key={gi}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                      <div style={{ width: 4, height: 18, borderRadius: 2, background: '#3b82f6' }} />
-                      <span style={{ fontSize: 11, fontWeight: 700, color: '#e8eaed', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{g.group?.name}</span>
-                    </div>
-                    <StandingsTable rows={g.standings} match={match} sport={sport} />
+              </button>
+            ))}
+          </div>
+
+          {/* Active Phase Content */}
+          {standings.phases?.[activePhaseTab] && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+              {standings.phases[activePhaseTab].groups?.map((g, gi) => (
+                <div key={gi}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                    <div style={{ width: 4, height: 18, borderRadius: 2, background: '#3b82f6' }} />
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#e8eaed', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{g.group?.name}</span>
                   </div>
-                ))}
-              </div>
+                  <StandingsTable rows={g.standings} match={match} sport={sport} />
+                </div>
+              ))}
             </div>
-          ))}
+          )}
         </div>
       ) : standings.type === 'grouped' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>

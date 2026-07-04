@@ -11,6 +11,7 @@ export default function StandingsPage() {
   const [standings, setStandings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadingStandings, setLoadingStandings] = useState(false);
+  const [activePhaseTab, setActivePhaseTab] = useState(0);
 
   const avatar = (name, bg = '3b82f6') => {
     if (!name) return `https://ui-avatars.com/api/?name=T&background=${bg}&color=fff&bold=true`;
@@ -46,6 +47,7 @@ export default function StandingsPage() {
         const res = await api.get(`/standings/${selectedTournament.uuid || selectedTournament.id}`);
         if (res.data.success) {
           setStandings(res.data.data);
+          setActivePhaseTab(0);
         }
       } catch (err) {
         console.error('Error fetching standings:', err);
@@ -229,20 +231,39 @@ export default function StandingsPage() {
         </div>
       ) : standings.type === 'grouped_phases' ? (
         <div>
-          {standings.phases?.map((phase, pi) => (
-            <div key={pi} style={{ marginBottom: 32 }}>
-              <h2 style={{ fontSize: 18, fontWeight: 800, color: '#cca26b', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid rgba(204, 162, 107, 0.2)' }}>
+          {/* Phase Tabs */}
+          <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
+            {standings.phases?.map((phase, pi) => (
+              <button 
+                key={pi} 
+                onClick={() => setActivePhaseTab(pi)}
+                style={{ 
+                  padding: '8px 16px', 
+                  borderRadius: 999, 
+                  fontSize: 13, 
+                  fontWeight: 600, 
+                  cursor: 'pointer',
+                  border: activePhaseTab === pi ? '1px solid var(--primary)' : '1px solid var(--border)',
+                  background: activePhaseTab === pi ? 'var(--primary)' : 'var(--bg-card)',
+                  color: activePhaseTab === pi ? '#ffffff' : 'var(--text-secondary)',
+                  transition: 'all 0.2s ease'
+                }}
+              >
                 {phase.name}
-              </h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '24px' }}>
-                {phase.groups?.map((group, gi) => (
-                  <div key={group.group?.id || gi}>
-                    {renderTable(group.standings || [], group.group?.name || `Grup ${gi + 1}`)}
-                  </div>
-                ))}
-              </div>
+              </button>
+            ))}
+          </div>
+
+          {/* Active Phase Content */}
+          {standings.phases?.[activePhaseTab] && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '24px' }}>
+              {standings.phases[activePhaseTab].groups?.map((group, gi) => (
+                <div key={group.group?.id || gi}>
+                  {renderTable(group.standings || [], group.group?.name || `Grup ${gi + 1}`)}
+                </div>
+              ))}
             </div>
-          ))}
+          )}
         </div>
       ) : standings.type === 'grouped' ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '24px' }}>
