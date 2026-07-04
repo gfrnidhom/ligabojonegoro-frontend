@@ -4,7 +4,7 @@ import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, ArrowLeft, MapPin, Calendar, Users, Award, Shield, ChevronRight, Star, LayoutGrid, List, BarChart2, GitMerge } from 'lucide-react';
+import { Trophy, ArrowLeft, MapPin, Calendar, Users, Award, Shield, ChevronRight, Star, LayoutGrid, List, BarChart2, GitMerge, ChevronUp, ChevronDown } from 'lucide-react';
 import api, { getImageUrl } from '../../../api';
 import TournamentBracket from '../../../components/TournamentBracket';
 
