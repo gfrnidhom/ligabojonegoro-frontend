@@ -227,10 +227,29 @@ export default function StandingsPage() {
           <p style={{ fontSize: 12, fontWeight: 600 }}>Klasemen belum tersedia untuk turnamen ini.</p>
           <p style={{ fontSize: 10, marginTop: 4 }}>Klasemen akan muncul setelah pertandingan dimulai.</p>
         </div>
-      ) : standings.type === 'grouped' ? (
+      ) : standings.type === 'grouped_phases' ? (
         <div>
+          {standings.phases?.map((phase, pi) => (
+            <div key={pi} style={{ marginBottom: 32 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 800, color: '#cca26b', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid rgba(204, 162, 107, 0.2)' }}>
+                {phase.name}
+              </h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '24px' }}>
+                {phase.groups?.map((group, gi) => (
+                  <div key={group.group?.id || gi}>
+                    {renderTable(group.standings || [], group.group?.name || `Grup ${gi + 1}`)}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : standings.type === 'grouped' ? (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '24px' }}>
           {standings.groups?.map((group, gi) => (
-            renderTable(group.standings || [], group.group?.name || `Grup ${gi + 1}`)
+            <div key={group.group?.id || gi}>
+              {renderTable(group.standings || [], group.group?.name || `Grup ${gi + 1}`)}
+            </div>
           ))}
         </div>
       ) : (

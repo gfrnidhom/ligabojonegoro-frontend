@@ -78,7 +78,11 @@ export default function StatsInfographicsPage() {
   // Derive "Tim Terbaik" from standings (top 3 overall)
   let bestTeams = [];
   if (standings) {
-    if (standings.type === 'grouped') {
+    if (standings.type === 'grouped_phases') {
+      // Just grab the top team from each group across all phases
+      const allTopTeams = (standings.phases || []).flatMap(p => (p.groups || []).map(g => g.standings?.[0])).filter(Boolean);
+      bestTeams = allTopTeams.sort((a, b) => b.points - a.points).slice(0, 3);
+    } else if (standings.type === 'grouped') {
       // Just grab the top team from each group
       const allTopTeams = (standings.groups || []).map(g => g.standings?.[0]).filter(Boolean);
       bestTeams = allTopTeams.sort((a, b) => b.points - a.points).slice(0, 3);
