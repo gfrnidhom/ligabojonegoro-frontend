@@ -187,12 +187,17 @@ export default function TeamDetailPage({ params }) {
       </div>
 
       {/* Team Header Profile Card */}
-      <div className="card" style={{ marginBottom: 32, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'center' }}>
+      <div className="card" style={{ marginBottom: 32, padding: 32, display: 'flex', flexDirection: 'column', gap: 24, background: 'linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)', position: 'relative', overflow: 'hidden', border: 'none', borderRadius: 32, boxShadow: '0 20px 40px -10px rgba(79, 70, 229, 0.4)' }}>
+        
+        {/* Decorative background circles */}
+        <div style={{ position: 'absolute', top: -50, right: -50, width: 250, height: 250, background: 'linear-gradient(135deg, #a855f7 0%, transparent 100%)', borderRadius: '50%', opacity: 0.5, filter: 'blur(40px)' }} />
+        <div style={{ position: 'absolute', bottom: -50, left: -50, width: 200, height: 200, background: 'linear-gradient(135deg, #ec4899 0%, transparent 100%)', borderRadius: '50%', opacity: 0.5, filter: 'blur(40px)' }} />
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'center', position: 'relative', zIndex: 1 }}>
           <div style={{ 
             width: 72, height: 72, borderRadius: '50%', 
-            background: 'var(--bg-subtle)', border: '1px solid var(--border)', 
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 8
+            background: 'rgba(255, 255, 255, 0.2)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255, 255, 255, 0.3)', 
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 8, boxShadow: '0 8px 20px rgba(0,0,0,0.15)'
           }}>
             <img 
               src={getImageUrl(team.logo_path || team.logo) || avatar(team.name)} 
@@ -203,29 +208,29 @@ export default function TeamDetailPage({ params }) {
 
           <div style={{ flex: 1, minWidth: 200 }}>
             <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 8 }}>
-              <h1 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.2 }}>{team.name}</h1>
+              <h1 style={{ fontSize: 24, fontWeight: 900, color: '#fff', lineHeight: 1.2, textShadow: '0 2px 4px rgba(0,0,0,0.1)', letterSpacing: '-0.02em' }}>{team.name}</h1>
               {team.sport && (
                 <span style={{
-                  fontSize: 10, fontWeight: 700, padding: '4px 10px', borderRadius: 20,
-                  background: 'var(--bg-subtle)', color: 'var(--text-secondary)',
+                  fontSize: 10, fontWeight: 800, padding: '4px 10px', borderRadius: 20,
+                  background: 'rgba(255, 255, 255, 0.2)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', backdropFilter: 'blur(5px)', letterSpacing: '0.05em', textTransform: 'uppercase'
                 }}>
                   {team.sport.name}
                 </span>
               )}
             </div>
 
-            <p style={{ color: 'var(--text-secondary)', fontSize: 12, lineHeight: 1.6, marginBottom: 16, maxWidth: 800 }}>
+            <p style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: 12, lineHeight: 1.6, marginBottom: 16, maxWidth: 800 }}>
               {team.description || 'Ini adalah profil resmi tim yang berlaga dan berkompetisi dalam ekosistem Liga Bojonegoro.'}
             </p>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: 'var(--text-muted)' }}>
-                <Users size={14} style={{ color: 'var(--primary)' }} />
-                <span>Pelatih / Manajer: <strong style={{ color: 'var(--text-primary)' }}>{team.coach_name || team.contact_person || 'TBA'}</strong></span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: 'rgba(255, 255, 255, 0.8)' }}>
+                <Users size={14} color="#6ee7b7" />
+                <span>Pelatih / Manajer: <strong style={{ color: '#fff' }}>{team.coach_name || team.contact_person || 'TBA'}</strong></span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: 'var(--text-muted)' }}>
-                <MapPin size={14} style={{ color: 'var(--primary)' }} />
-                <span>Asal / Kota: <strong style={{ color: 'var(--text-primary)' }}>{team.city || team.address || 'Bojonegoro'}</strong></span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: 'rgba(255, 255, 255, 0.8)' }}>
+                <MapPin size={14} color="#fca5a5" />
+                <span>Asal / Kota: <strong style={{ color: '#fff' }}>{team.city || team.address || 'Bojonegoro'}</strong></span>
               </div>
             </div>
           </div>

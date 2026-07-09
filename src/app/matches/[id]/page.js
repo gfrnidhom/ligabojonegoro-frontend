@@ -243,20 +243,28 @@ export default function MatchDetailPage({ params }) {
           </div>
 
           {/* Card dibawahnya arrow */}
-          <div style={{ position: 'relative', padding: '32px 0 40px', background: 'linear-gradient(135deg, #fdfbf7 0%, #eef2ff 100%)', color: 'var(--text-primary)', borderRadius: 24, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.05)', marginBottom: 24 }}>
+          <div style={{ position: 'relative', padding: '32px 0 40px', background: 'linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)', color: '#fff', borderRadius: 24, overflow: 'hidden', border: 'none', marginBottom: 24, boxShadow: '0 20px 40px -10px rgba(79, 70, 229, 0.4)' }}>
+            
+            {/* Decorative background circles */}
+            <div style={{ position: 'absolute', top: -50, right: -50, width: 200, height: 200, background: 'linear-gradient(135deg, #a855f7 0%, transparent 100%)', borderRadius: '50%', opacity: 0.5, filter: 'blur(40px)', zIndex: 0 }} />
+            <div style={{ position: 'absolute', bottom: -50, left: -50, width: 150, height: 150, background: 'linear-gradient(135deg, #ec4899 0%, transparent 100%)', borderRadius: '50%', opacity: 0.5, filter: 'blur(30px)', zIndex: 0 }} />
+            
+            <div style={{ position: 'relative', zIndex: 1 }}>
 
             {/* Teams & Score */}
             <div className="match-header-flex" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 32, marginTop: 10, padding: '0 24px' }}>
               {/* Home */}
               <div className="team-column" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
-                <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name, '3b82f6')} alt="" className="team-logo" style={{ width: 64, height: 64, objectFit: 'contain' }} />
-                <span className="team-name-text" style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginTop: 12, textAlign: 'center' }}>{match.home_team?.name}</span>
+                <div style={{ width: 80, height: 80, borderRadius: 24, background: 'rgba(255, 255, 255, 0.2)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255, 255, 255, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 20px rgba(0,0,0,0.15)', padding: 12 }}>
+                  <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name, 'ffffff')} alt="" className="team-logo" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }} />
+                </div>
+                <span className="team-name-text" style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginTop: 16, textAlign: 'center', textShadow: '0 1px 3px rgba(0,0,0,0.2)' }}>{match.home_team?.name}</span>
               </div>
 
               {/* Score Center */}
               <div className="score-center-column" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 {isLive && (
-                  <div style={{ background: '#ef4444', color: '#fff', fontSize: 9, fontWeight: 800, padding: '4px 12px', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  <div style={{ background: '#ef4444', color: '#fff', fontSize: 9, fontWeight: 800, padding: '4px 12px', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em', boxShadow: '0 4px 10px rgba(239, 68, 68, 0.4)' }}>
                     <Activity size={12} /> LIVE
                   </div>
                 )}
@@ -264,24 +272,24 @@ export default function MatchDetailPage({ params }) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                   {isFinished || isLive ? (
                     <>
-                      <span className="score-number" style={{ fontSize: 31, fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{match.home_score}</span>
-                      <span className="score-divider" style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>-</span>
-                      <span className="score-number" style={{ fontSize: 31, fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{match.away_score}</span>
+                      <span className="score-number" style={{ fontSize: 36, fontWeight: 800, color: '#fff', fontVariantNumeric: 'tabular-nums', lineHeight: 1, textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>{match.home_score}</span>
+                      <span className="score-divider" style={{ fontSize: 16, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>-</span>
+                      <span className="score-number" style={{ fontSize: 36, fontWeight: 800, color: '#fff', fontVariantNumeric: 'tabular-nums', lineHeight: 1, textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>{match.away_score}</span>
                     </>
                   ) : (
-                    <span className="score-time" style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)' }}>
+                    <span className="score-time" style={{ fontSize: 26, fontWeight: 800, color: '#fff', textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                       {sched?.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   )}
                 </div>
 
                 {isLive && (
-                  <span style={{ fontSize: 13, fontWeight: 700, color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '4px 12px', borderRadius: 6, marginTop: 12, fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: '#fff', background: 'rgba(255, 255, 255, 0.2)', border: '1px solid rgba(255, 255, 255, 0.3)', padding: '4px 12px', borderRadius: 6, marginTop: 12, fontVariantNumeric: 'tabular-nums', backdropFilter: 'blur(5px)' }}>
                     <LiveMatchDetailClock match={match} lastFetchTime={lastFetchTime} />
                   </span>
                 )}
                 {isFinished && !isLive && (
-                  <div className="status-text" style={{ color: 'var(--text-secondary)', fontSize: 9, fontWeight: 500, marginTop: 12 }}>
+                  <div className="status-text" style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: 10, fontWeight: 700, marginTop: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     Waktu Penuh
                   </div>
                 )}
@@ -289,8 +297,10 @@ export default function MatchDetailPage({ params }) {
 
               {/* Away */}
               <div className="team-column" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
-                <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name, 'ef4444')} alt="" className="team-logo" style={{ width: 64, height: 64, objectFit: 'contain' }} />
-                <span className="team-name-text" style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginTop: 12, textAlign: 'center' }}>{match.away_team?.name}</span>
+                <div style={{ width: 80, height: 80, borderRadius: 24, background: 'rgba(255, 255, 255, 0.2)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255, 255, 255, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 20px rgba(0,0,0,0.15)', padding: 12 }}>
+                  <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name, 'ffffff')} alt="" className="team-logo" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }} />
+                </div>
+                <span className="team-name-text" style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginTop: 16, textAlign: 'center', textShadow: '0 1px 3px rgba(0,0,0,0.2)' }}>{match.away_team?.name}</span>
               </div>
             </div>
 
@@ -306,33 +316,33 @@ export default function MatchDetailPage({ params }) {
                   {/* Home Scorers */}
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
                     {homeGoals.map((g, idx) => (
-                      <div key={idx} style={{ fontSize: 9, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <div key={idx} style={{ fontSize: 10, color: '#fff', display: 'flex', alignItems: 'center', gap: 6 }}>
                         <span
                           onClick={() => handlePlayerClick(g.player?.uuid)}
-                          style={{ fontWeight: 500, cursor: 'pointer' }}
+                          style={{ fontWeight: 600, cursor: 'pointer', textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}
                         >
                           {g.player?.name || 'Pemain'}
                         </span>
-                        <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>{formatGameMinute(g.minute)}&apos;</span>
-                        {g.event_type === 'penalty' && <span style={{ fontSize: 9, color: '#6b7280' }}>(P)</span>}
-                        {g.event_type === 'own_goal' && <span style={{ fontSize: 9, color: '#6b7280' }}>(OG)</span>}
+                        <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontWeight: 500 }}>{formatGameMinute(g.minute)}&apos;</span>
+                        {g.event_type === 'penalty' && <span style={{ fontSize: 9, color: 'rgba(255, 255, 255, 0.6)' }}>(P)</span>}
+                        {g.event_type === 'own_goal' && <span style={{ fontSize: 9, color: 'rgba(255, 255, 255, 0.6)' }}>(OG)</span>}
                       </div>
                     ))}
                   </div>
                   {/* Ball Icon */}
                   <div className="ball-icon-divider" style={{ display: 'flex', alignItems: 'flex-start', paddingTop: 2, flexShrink: 0 }}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255, 255, 255, 0.8)" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
                   </div>
                   {/* Away Scorers */}
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
                     {awayGoals.map((g, idx) => (
-                      <div key={idx} style={{ fontSize: 9, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        {g.event_type === 'penalty' && <span style={{ fontSize: 9, color: '#6b7280' }}>(P)</span>}
-                        {g.event_type === 'own_goal' && <span style={{ fontSize: 9, color: '#6b7280' }}>(OG)</span>}
-                        <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>{formatGameMinute(g.minute)}&apos;</span>
+                      <div key={idx} style={{ fontSize: 10, color: '#fff', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        {g.event_type === 'penalty' && <span style={{ fontSize: 9, color: 'rgba(255, 255, 255, 0.6)' }}>(P)</span>}
+                        {g.event_type === 'own_goal' && <span style={{ fontSize: 9, color: 'rgba(255, 255, 255, 0.6)' }}>(OG)</span>}
+                        <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontWeight: 500 }}>{formatGameMinute(g.minute)}&apos;</span>
                         <span
                           onClick={() => handlePlayerClick(g.player?.uuid)}
-                          style={{ fontWeight: 500, cursor: 'pointer' }}
+                          style={{ fontWeight: 600, cursor: 'pointer', textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}
                         >
                           {g.player?.name || 'Pemain'}
                         </span>
@@ -342,6 +352,7 @@ export default function MatchDetailPage({ params }) {
                 </div>
               );
             })()}
+            </div>
           </div>
 
             {/* Tabs */}

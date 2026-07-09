@@ -186,7 +186,8 @@ function Home() {
   const [banners, setBanners] = useState([]);
   const [bannerIdx, setBannerIdx] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [initialDateSet, setInitialDateSet] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedMatchId, setSelectedMatchId] = useState(null);
   const [activeTournament, setActiveTournament] = useState(null);
@@ -261,9 +262,21 @@ function Home() {
           api.get('/news', { params: { limit: 3 } })
         ]);
         const mData = mRes.data.success ? (mRes.data.data || []) : [];
-        setMatches(mData);
+        const tData = tRes.data.success ? (tRes.data.data || []) : [];
+        
+        // Enrich match tournament data with full tournament info (logo_path, sport, etc.)
+        const tournamentMap = {};
+        tData.forEach(t => { tournamentMap[t.id] = t; });
+        const enrichedMatches = mData.map(m => {
+          if (m.tournament_id && tournamentMap[m.tournament_id]) {
+            return { ...m, tournament: { ...m.tournament, ...tournamentMap[m.tournament_id] } };
+          }
+          return m;
+        });
+        
+        setMatches(enrichedMatches);
         setLastFetchTime(Date.now());
-        if (tRes.data.success) setTournaments(tRes.data.data || []);
+        setTournaments(tData);
         if (sRes.data.success) setSports(sRes.data.data || []);
         if (nRes?.data?.success) setLatestNews(nRes.data.data || []);
 
@@ -288,6 +301,34 @@ function Home() {
     const iv = setInterval(fetchData, 60000);
     return () => clearInterval(iv);
   }, []);
+
+  useEffect(() => {
+    if (!loading && !initialDateSet) {
+      if (matches.length > 0) {
+        const todayStr = new Date().toLocaleDateString('en-CA');
+        const upcomingMatches = matches.filter(m => m.scheduled_at && new Date(m.scheduled_at).toLocaleDateString('en-CA') >= todayStr);
+        let targetDate;
+        if (upcomingMatches.length > 0) {
+          upcomingMatches.sort((a, b) => new Date(a.scheduled_at) - new Date(b.scheduled_at));
+          targetDate = new Date(upcomingMatches[0].scheduled_at);
+        } else {
+          const pastMatches = matches.filter(m => m.scheduled_at).sort((a, b) => new Date(b.scheduled_at) - new Date(a.scheduled_at));
+          if (pastMatches.length > 0) {
+            targetDate = new Date(pastMatches[0].scheduled_at);
+          } else {
+            targetDate = new Date();
+          }
+        }
+        setSelectedDate(targetDate);
+        setCalendarMonth(targetDate);
+      } else {
+        const today = new Date();
+        setSelectedDate(today);
+        setCalendarMonth(today);
+      }
+      setInitialDateSet(true);
+    }
+  }, [loading, matches, initialDateSet]);
 
   // Auto-slide banner
   useEffect(() => {
@@ -984,7 +1025,7 @@ function Home() {
                 >
                   <img
                     src={getImageUrl(group.tournament?.logo_path || group.tournament?.logo) || avatar(name, '3b82f6')}
-                    style={{ width: 28, height: 28, borderRadius: 6, objectFit: 'cover', background: '#3b82f6' }}
+                    style={{ width: 28, height: 28, borderRadius: 6, objectFit: 'contain', background: (group.tournament?.logo_path || group.tournament?.logo) ? 'transparent' : '#3b82f6' }}
                     alt=""
                   />
                   <span style={{ fontSize: 16, fontWeight: 700, color: '#0f172a' }}>{name}</span>

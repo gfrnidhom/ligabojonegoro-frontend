@@ -258,26 +258,32 @@ export default function PlayerDetailPage({ params }) {
     <div className="player-layout">
        
        {/* Hero Banner (Full Width on Desktop) */}
-       <div className="hero-banner" style={{ background: '#1e293b', padding: '64px 32px 0 32px', position: 'relative', overflow: 'hidden', marginBottom: 24, borderRadius: 16, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}>
+       <div className="hero-banner" style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)', padding: '64px 32px 0 32px', position: 'relative', overflow: 'hidden', marginBottom: 24, borderRadius: 32, boxShadow: '0 20px 40px -10px rgba(79, 70, 229, 0.4)' }}>
+          {/* Decorative background circles */}
+          <div style={{ position: 'absolute', top: -50, right: -50, width: 250, height: 250, background: 'linear-gradient(135deg, #a855f7 0%, transparent 100%)', borderRadius: '50%', opacity: 0.5, filter: 'blur(40px)', zIndex: 0 }} />
+          <div style={{ position: 'absolute', bottom: -50, left: -50, width: 200, height: 200, background: 'linear-gradient(135deg, #ec4899 0%, transparent 100%)', borderRadius: '50%', opacity: 0.5, filter: 'blur(40px)', zIndex: 0 }} />
+
           <div className="back-btn-container" style={{ position: 'absolute', top: 16, left: 16, zIndex: 10 }}>
-             <button className="back-btn" onClick={() => router.back()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, background: 'rgba(255,255,255,0.1)', color: '#fff', borderRadius: '50%', border: 'none', cursor: 'pointer' }}>
+             <button className="back-btn" onClick={() => router.back()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, background: 'rgba(255,255,255,0.2)', color: '#fff', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.3)', cursor: 'pointer', backdropFilter: 'blur(10px)', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
                 <ArrowLeft size={18} />
              </button>
           </div>
           
-          <div className="hero-inner" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 20 }}>
+          <div className="hero-inner" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 20, position: 'relative', zIndex: 1 }}>
              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 24 }}>
-                <img src={getImageUrl(player.photo_path) || avatar(player.name)} className="hero-photo" alt="" style={{ width: 90, height: 110, objectFit: 'cover', borderRadius: '12px 12px 0 0', background: '#fff', display: 'block' }} />
+                <div style={{ padding: 4, background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', borderRadius: '16px 16px 0 0', border: '1px solid rgba(255,255,255,0.3)', borderBottom: 'none' }}>
+                  <img src={getImageUrl(player.photo_path) || avatar(player.name)} className="hero-photo" alt="" style={{ width: 90, height: 110, objectFit: 'cover', borderRadius: '12px 12px 0 0', background: '#fff', display: 'block' }} />
+                </div>
                 <div style={{ paddingBottom: 20 }}>
-                   <h1 className="hero-name" style={{ fontSize: 18, fontWeight: 700, margin: '0 0 4px 0', color: '#fff' }}>{player.name}</h1>
-                   <div className="hero-team" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: '#e2e8f0' }}>
-                     <img src={getImageUrl(player.team?.logo_path) || avatar(player.team?.name)} style={{ width: 16, height: 16, borderRadius: '50%', background: '#fff' }} alt="" />
+                   <h1 className="hero-name" style={{ fontSize: 24, fontWeight: 900, margin: '0 0 8px 0', color: '#fff', textShadow: '0 2px 4px rgba(0,0,0,0.1)', letterSpacing: '-0.02em' }}>{player.name}</h1>
+                   <div className="hero-team" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>
+                     <img src={getImageUrl(player.team?.logo_path) || avatar(player.team?.name)} style={{ width: 18, height: 18, borderRadius: '50%', background: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} alt="" />
                      {player.team?.name}
                    </div>
                 </div>
              </div>
              <div style={{ paddingBottom: 20 }}>
-                <button className="follow-btn" style={{ background: '#fff', color: '#172554', border: 'none', borderRadius: 20, padding: '6px 20px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Follow</button>
+                <button className="follow-btn" style={{ background: '#fff', color: '#4f46e5', border: 'none', borderRadius: 20, padding: '8px 24px', fontSize: 12, fontWeight: 800, cursor: 'pointer', boxShadow: '0 8px 20px rgba(0,0,0,0.15)', letterSpacing: '0.02em' }}>Ikuti Pemain</button>
              </div>
           </div>
        </div>
