@@ -223,6 +223,16 @@ function Home() {
       }
     }
   }, [filterParam]);
+
+  const sportParam = searchParams.get('sport');
+  useEffect(() => {
+    if (sportParam) {
+      setActiveSport(parseInt(sportParam));
+      setActiveTournament(null);
+    } else {
+      setActiveSport(null);
+    }
+  }, [sportParam]);
   const handleMatchClick = (matchId) => {
     router.push(`/matches/${matchId}`);
   };
@@ -493,151 +503,6 @@ function Home() {
 
   return (
     <div style={{ minHeight: 'calc(100vh - 56px)' }}>
-      {/* ═══ Mobile Header ═══ */}
-      {isMounted && typeof window !== 'undefined' && window.innerWidth < 1024 && (
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '14px 16px', 
-          background: 'rgba(255, 255, 255, 0.85)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.02)',
-          position: 'sticky', top: 0, zIndex: 60
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ display: 'flex', alignItems: 'center' }}>
-              <img src="/Logo%20Vertical.png" alt="Liga Bojonegoro" style={{ height: 46, width: 'auto' }} />
-            </span>
-            <button
-              onClick={() => setMobileSportsOpen(true)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                background: 'rgba(0, 0, 0, 0.04)', 
-                padding: '6px 12px', borderRadius: 20,
-                color: 'var(--text-primary)', fontSize: 10, fontWeight: 700, cursor: 'pointer',
-                transition: 'background 0.2s ease',
-              }}
-            >
-              {(() => {
-                const currentSportObj = sports.find(s => s.id === activeSport);
-                const label = currentSportObj ? (SPORT_LABELS[currentSportObj.slug] || currentSportObj.name) : 'Semua Olahraga';
-                const icon = currentSportObj ? (SPORT_ICONS[currentSportObj.slug] || <Trophy size={13} />) : <Trophy size={13} />;
-                return (
-                  <>
-                    <span style={{ display: 'flex', alignItems: 'center', color: 'var(--primary)' }}>{icon}</span>
-                    <span>{label}</span>
-                    <ChevronDown size={12} style={{ opacity: 0.7, marginLeft: 2 }} />
-                  </>
-                );
-              })()}
-            </button>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {liveCount > 0 && (
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 4,
-                background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239,68,68,0.15)',
-                padding: '5px 10px', borderRadius: 20, fontSize: 9, fontWeight: 800, color: '#ef4444',
-              }}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444', animation: 'pulseDot 1.2s infinite' }}></span>
-                {liveCount} Live
-              </div>
-            )}
-            <button 
-              onClick={() => router.push('/search')}
-              style={{
-                width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: 'rgba(0, 0, 0, 0.04)', color: 'var(--text-primary)',
-                transition: 'background 0.2s ease',
-                cursor: 'pointer'
-              }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ── Mobile Sports Dropdown Drawer ── */}
-      <AnimatePresence>
-        {mobileSportsOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setMobileSportsOpen(false)}
-              style={{
-                position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.3)',
-                backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', zIndex: 1000
-              }}
-            />
-            {/* Drawer */}
-            <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              style={{
-                position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1001,
-                background: '#ffffff', borderTop: '1px solid rgba(0, 0, 0, 0.05)',
-                borderTopLeftRadius: 24, borderTopRightRadius: 24,
-                padding: '24px 16px 40px',
-                maxHeight: '60vh', overflowY: 'auto',
-                boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.06)'
-              }}
-            >
-              {/* Top notch */}
-              <div style={{ width: 40, height: 4, background: 'rgba(0, 0, 0, 0.1)', borderRadius: 2, margin: '0 auto 20px' }} />
-              <div style={{ fontSize: 14, fontWeight: 800, color: '#0f172a', marginBottom: 16 }}>Pilih Olahraga</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <button
-                  onClick={() => { setActiveSport(null); setActiveTournament(null); setMobileSportsOpen(false); }}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderRadius: 16,
-                    background: !activeSport ? 'rgba(59,130,246,0.08)' : '#f8fafc',
-                    border: '1px solid', borderColor: !activeSport ? 'rgba(59,130,246,0.15)' : 'rgba(0,0,0,0.03)',
-                    color: !activeSport ? '#3b82f6' : '#334155', cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                  }}
-                >
-                  <Trophy size={20} />
-                  <span style={{ fontSize: 12, fontWeight: 700 }}>Semua Olahraga</span>
-                </button>
-                {sports.map(sport => {
-                  const isActive = activeSport === sport.id;
-                  const label = SPORT_LABELS[sport.slug] || sport.name;
-                  return (
-                    <button
-                      key={sport.id}
-                      onClick={() => { setActiveSport(isActive ? null : sport.id); setActiveTournament(null); setMobileSportsOpen(false); }}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderRadius: 16,
-                        background: isActive ? 'rgba(59,130,246,0.08)' : '#f8fafc',
-                        border: '1px solid', borderColor: isActive ? 'rgba(59,130,246,0.15)' : 'rgba(0,0,0,0.03)',
-                        color: isActive ? '#3b82f6' : '#334155', cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                      }}
-                    >
-                      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24 }}>
-                        {SPORT_ICONS[sport.slug] ? (
-                          <div style={{ transform: 'scale(1.25)' }}>{SPORT_ICONS[sport.slug]}</div>
-                        ) : (
-                          <Trophy size={20} />
-                        )}
-                      </span>
-                      <span style={{ fontSize: 12, fontWeight: 700 }}>{label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
       {/* ── Mobile Calendar Dropdown Drawer ── */}
       <AnimatePresence>
         {mobileCalendarOpen && (

@@ -271,7 +271,7 @@ export default function TournamentDetailPage({ params }) {
           </div>
 
           {/* Tabs */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 24px', borderBottom: '1px solid var(--border-light)', overflowX: 'auto', msOverflowStyle: 'none', scrollbarWidth: 'none' }} className="hide-scrollbar">
+          <div style={{ display: 'flex', gap: 32, padding: '0 24px', borderBottom: '1px solid var(--border-light)', overflowX: 'auto', msOverflowStyle: 'none', scrollbarWidth: 'none' }} className="hide-scrollbar">
             {[
               { id: 'info', label: 'Ringkasan' },
               { id: 'matches', label: 'Pertandingan' },
@@ -287,12 +287,16 @@ export default function TournamentDetailPage({ params }) {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   style={{
-                    padding: '16px 20px', fontSize: 13, fontWeight: 600, border: 'none', background: 'transparent',
-                    cursor: 'pointer', position: 'relative', color: isActive ? '#111827' : '#6b7280', whiteSpace: 'nowrap'
+                    position: 'relative',
+                    display: 'flex', alignItems: 'center',
+                    padding: '0 0 16px 0', fontSize: 13, fontWeight: 600,
+                    color: isActive ? '#111827' : '#6b7280',
+                    whiteSpace: 'nowrap', transition: 'all 0.2s ease', cursor: 'pointer',
+                    background: 'none', border: 'none', outline: 'none'
                   }}
                 >
                   {tab.label}
-                  {isActive && <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, background: '#111827', borderRadius: '3px 3px 0 0' }} />}
+                  {isActive && <div style={{ position: 'absolute', bottom: -1, left: 0, right: 0, height: 3, background: '#111827', borderRadius: '4px 4px 0 0' }} />}
                 </button>
               )
             })}
@@ -371,7 +375,7 @@ export default function TournamentDetailPage({ params }) {
 
                   <div style={
                     viewMode === 'grid' 
-                    ? { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }
+                    ? { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: 16 }
                     : { display: 'flex', flexDirection: 'column', gap: 6 }
                   }>
                     {monthMatches.map(m => {
@@ -421,7 +425,7 @@ export default function TournamentDetailPage({ params }) {
                               </div>
 
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 0 }}>
                                   <div style={{ width: 56, height: 56, position: 'relative', marginBottom: 12 }}>
                                     <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = avatar(m.home_team?.name); }} style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.05))' }} alt="" />
                                   </div>
@@ -451,7 +455,7 @@ export default function TournamentDetailPage({ params }) {
                                   </div>
                                 </div>
 
-                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 0 }}>
                                   <div style={{ width: 56, height: 56, position: 'relative', marginBottom: 12 }}>
                                     <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name)} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = avatar(m.away_team?.name); }} style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.05))' }} alt="" />
                                   </div>
@@ -547,7 +551,7 @@ export default function TournamentDetailPage({ params }) {
 
                         {activeTab === 'teams' && (
                           <div style={{ padding: '8px 0' }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: 16 }}>
                               {tournament.teams?.length > 0 ? tournament.teams.map(team => (
                                 <div 
                                   key={team.id || team.uuid} 
@@ -592,7 +596,7 @@ export default function TournamentDetailPage({ params }) {
                       { player: { name: 'Andi Firman', team: 'Persela' }, mockValue: '8' },
                       { player: { name: 'Joko Anwar', team: 'Persebaya' }, mockValue: '7' }
                     ], valueKey: 'mock', isMock: true, isNegative: false },
-                    { key: 'rating', label: 'FotMob Rating', data: [
+                    { key: 'rating', label: 'Rating', data: [
                       { player: { name: 'Budi Santoso', team: 'Persibo' }, mockValue: '8.73' },
                       { player: { name: 'Joko Anwar', team: 'Persebaya' }, mockValue: '8.43' },
                       { player: { name: 'Ahmad Maulana', team: 'Gresik' }, mockValue: '8.24' }
@@ -630,7 +634,7 @@ export default function TournamentDetailPage({ params }) {
                           </h2>
                           <div style={{ height: 1, flex: 1, background: 'linear-gradient(270deg, transparent, var(--border-light))' }} />
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: 16 }}>
                           {availableStats.map(config => (
                             <PlayerStatCard 
                               key={config.key} 
@@ -727,7 +731,7 @@ export default function TournamentDetailPage({ params }) {
                           </h2>
                           <div style={{ height: 1, flex: 1, background: 'linear-gradient(270deg, transparent, var(--border-light))' }} />
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: 16 }}>
                           {availableStats.map(config => (
                             <TeamStatCard 
                               key={config.key} 
@@ -754,7 +758,7 @@ export default function TournamentDetailPage({ params }) {
           <div className="animate-fade-in" style={{ padding: '0 4px', display: 'flex', flexDirection: 'column', gap: 32 }}>
             
             {/* Player Stats Highlights */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: 16 }}>
               <PlayerStatCard 
                 title="Pencetak Gol" 
                 data={playerStats?.top_scorers} 
@@ -816,7 +820,7 @@ export default function TournamentDetailPage({ params }) {
                 Turnamen <strong>{tournament.name}</strong> diselenggarakan resmi di Bojonegoro. Turnamen ini merupakan ajang bergengsi yang memfasilitasi persaingan sportif bagi tim-tim di daerah Bojonegoro.
               </p>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: 16 }}>
                 <div style={{ background: 'var(--bg-subtle)', padding: '16px', borderRadius: 16, border: '1px solid var(--border-light)' }}>
                   <span style={{ fontSize: 9, color: 'var(--text-secondary)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Olahraga</span>
                   <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}><Trophy size={14} color="currentColor" /> {tournament.sport?.name || 'Multi-Sport'}</span>
@@ -888,7 +892,7 @@ function KlasemenTab({ standings, match, sport, compact = false }) {
                 <div key={gi}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                     <div style={{ width: 4, height: 18, borderRadius: 2, background: 'var(--primary)' }} />
-                    <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{g.group?.name}</span>
+                    <span style={{ fontSize: 16, fontWeight: 800, color: '#0f172a' }}>{g.group?.name}</span>
                   </div>
                   <StandingsTable rows={g.standings} match={match} sport={sport} compact={compact} />
                 </div>
@@ -900,8 +904,9 @@ function KlasemenTab({ standings, match, sport, compact = false }) {
         <div style={{ display: 'flex', flexDirection: 'column', background: '#fff', borderRadius: 16, border: '1px solid var(--border-light)', overflow: 'hidden' }}>
           {standings.groups.map((g, i) => (
             <div key={i}>
-              <div style={{ padding: '16px 16px 12px', borderBottom: '1px solid var(--border-light)', background: '#fafafa' }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{g.group?.name}</span>
+              <div style={{ padding: '16px 16px 12px', borderBottom: '1px solid var(--border-light)', background: '#fafafa', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 4, height: 18, borderRadius: 2, background: 'var(--primary)' }} />
+                <span style={{ fontSize: 16, fontWeight: 800, color: '#0f172a' }}>{g.group?.name}</span>
               </div>
               <StandingsTable rows={g.standings} match={match} sport={sport} isGrouped={true} compact={compact} />
             </div>
@@ -960,7 +965,7 @@ function StandingsTable({ rows = [], match, sport, isGrouped, compact = false })
         <div style={{ width: 28, textAlign: 'center' }}>#</div>
         <div style={{ flex: 1, paddingLeft: 8, minWidth: 80 }}>Tim</div>
         {cols.map(c => (
-          <div key={c.key} style={{ width: c.key === 'points' ? 34 : 28, textAlign: 'center', flexShrink: 0 }}>{c.label}</div>
+          <div key={c.key} style={{ width: c.key === 'points' ? 34 : c.key === 'plus_minus' ? 42 : 28, textAlign: 'center', flexShrink: 0 }}>{c.label}</div>
         ))}
         {!compact && <div style={{ width: 90, textAlign: 'center', flexShrink: 0 }}>Form</div>}
       </div>
@@ -1031,11 +1036,12 @@ function StandingsTable({ rows = [], match, sport, isGrouped, compact = false })
                   const gdColor = isGD ? (val > 0 ? '#22c55e' : val < 0 ? '#ef4444' : 'var(--text-secondary)') : null;
                   return (
                     <div key={c.key} style={{
-                      width: isPts ? 34 : 28, textAlign: 'center', flexShrink: 0,
+                      width: isPts ? 34 : c.key === 'plus_minus' ? 42 : 28, textAlign: 'center', flexShrink: 0,
                       fontSize: isPts ? 13 : 11,
                       fontWeight: isPts ? 900 : 600,
                       color: isPts ? 'var(--text-primary)' : gdColor || 'var(--text-secondary)',
                       fontVariantNumeric: 'tabular-nums',
+                      whiteSpace: 'nowrap'
                     }}>
                       {isGD && val > 0 ? `+${val}` : val}
                     </div>

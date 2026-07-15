@@ -289,13 +289,15 @@ export default function TournamentBracket({ bracketData }) {
 
         {/* LEFT WING */}
         {leftRounds.map((round, ri) => {
-          if (!leftRefs.current[ri]) leftRefs.current[ri] = [];
           return (
             <div key={`left-${round.round}`} style={{ display: 'flex', flexDirection: 'column', gap: 16, position: 'relative', zIndex: 1 }}>
               <div style={{ textAlign: 'center', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>{round.label}</div>
               <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', flex: 1, gap: 24 }}>
                 {round.matches.map((m, mi) => (
-                  <div key={m.id} ref={el => leftRefs.current[ri][mi] = el}>
+                  <div key={m.id} ref={el => {
+                    if (!leftRefs.current[ri]) leftRefs.current[ri] = [];
+                    leftRefs.current[ri][mi] = el;
+                  }}>
                     <MatchCard m={m} />
                   </div>
                 ))}
@@ -331,13 +333,15 @@ export default function TournamentBracket({ bracketData }) {
         {[...rightRounds].reverse().map((round, reverseIndex) => {
           // ri is the original index in rightRounds array
           const ri = rightRounds.length - 1 - reverseIndex;
-          if (!rightRefs.current[ri]) rightRefs.current[ri] = [];
           return (
             <div key={`right-${round.round}`} style={{ display: 'flex', flexDirection: 'column', gap: 16, position: 'relative', zIndex: 1 }}>
               <div style={{ textAlign: 'center', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>{round.label}</div>
               <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', flex: 1, gap: 24 }}>
                 {round.matches.map((m, mi) => (
-                  <div key={m.id} ref={el => rightRefs.current[ri][mi] = el}>
+                  <div key={m.id} ref={el => {
+                    if (!rightRefs.current[ri]) rightRefs.current[ri] = [];
+                    rightRefs.current[ri][mi] = el;
+                  }}>
                     <MatchCard m={m} />
                   </div>
                 ))}

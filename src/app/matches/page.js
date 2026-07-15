@@ -168,7 +168,7 @@ export default function MatchesPage() {
                     {dateLabel}
                   </h2>
                   
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: 16 }}>
                     {dayMatches.map(m => {
                       const isLive = ['live', 'first_half', 'half_time', 'second_half', 'extra_time_1', 'extra_time_ht', 'extra_time_2', 'penalty_shootout', 'ongoing'].includes(m.status);
                       const isFinished = m.status === 'finished';
@@ -217,7 +217,7 @@ export default function MatchesPage() {
                           </div>
 
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 0 }}>
                               <div style={{ width: 56, height: 56, position: 'relative', marginBottom: 12 }}>
                                 <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }} alt="" />
                               </div>
@@ -247,7 +247,7 @@ export default function MatchesPage() {
                               </div>
                             </div>
 
-                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 0 }}>
                               <div style={{ width: 56, height: 56, position: 'relative', marginBottom: 12 }}>
                                 <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name, 'ef4444')} style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }} alt="" />
                               </div>
@@ -293,7 +293,7 @@ export default function MatchesPage() {
         .form-select-dark option { background: #0f172a; color: #f1f5f9; }
         
         @media (max-width: 640px) {
-          .page-container { margin: 0 !important; padding: 0 12px 40px !important; max-width: 100% !important; }
+          .page-container { margin: 0 !important; padding: 16px 12px 76px !important; max-width: 100% !important; overflow-x: hidden !important; }
         }
       `}} />
     </div>
