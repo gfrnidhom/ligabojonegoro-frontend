@@ -219,10 +219,23 @@ export default function TournamentDetailPage({ params }) {
 
   let totalTeams = tournament.teams?.length || 0;
   if (totalTeams === 0 && standings) {
+    const uniqueTeams = new Set();
     if (standings.type === 'grouped_phases') {
-      totalTeams = standings.phases?.reduce((acc, phase) => acc + (phase.groups?.reduce((gAcc, g) => gAcc + (g.standings?.length || 0), 0) || 0), 0) || 0;
+      standings.phases?.forEach(phase => {
+        phase.groups?.forEach(g => {
+          g.standings?.forEach(s => {
+            if (s.team_id || s.team?.id) uniqueTeams.add(s.team_id || s.team?.id);
+          });
+        });
+      });
+      totalTeams = uniqueTeams.size;
     } else if (standings.type === 'grouped') {
-      totalTeams = standings.groups?.reduce((acc, g) => acc + (g.standings?.length || 0), 0) || 0;
+      standings.groups?.forEach(g => {
+        g.standings?.forEach(s => {
+          if (s.team_id || s.team?.id) uniqueTeams.add(s.team_id || s.team?.id);
+        });
+      });
+      totalTeams = uniqueTeams.size;
     } else if (Array.isArray(standings)) {
       totalTeams = standings.length;
     } else if (standings.standings) {

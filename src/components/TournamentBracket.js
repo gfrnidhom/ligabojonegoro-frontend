@@ -25,69 +25,48 @@ function MatchCard({ m, badge }) {
   const homeScore = hasScore ? m.game?.home_score : '-';
   const awayScore = hasScore ? m.game?.away_score : '-';
 
-  const homeAbbr = getAbbr(m.home_team?.name);
-  const awayAbbr = getAbbr(m.away_team?.name);
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
       <div
         className="bracket-match-card"
         style={{
-          width: 120,
+          width: '100%',
+          minWidth: 120,
           background: '#fff',
           border: '1px solid var(--border-light)',
           borderRadius: 12,
-          padding: '8px 12px',
           boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
           position: 'relative',
           transition: 'all 0.2s ease',
           cursor: 'default',
+          overflow: 'hidden'
         }}
       >
-        {/* Logos */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginBottom: 8 }}>
-          <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'contain', border: '1px solid #f3f4f6' }} alt="" />
-          <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name)} style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'contain', border: '1px solid #f3f4f6' }} alt="" />
-        </div>
-
-        {/* Info Container */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 10, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' }}>
-          
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 16, padding: '12px 4px' }}>
           {/* Home */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 32 }}>
-            <span style={{ 
-              fontWeight: homeWinner ? 800 : (awayWinner ? 400 : 600), 
-              color: awayWinner ? '#9ca3af' : '#374151',
-              textDecoration: awayWinner ? 'line-through' : 'none',
-              letterSpacing: '0.5px'
-            }}>{homeAbbr}</span>
-            <span style={{ 
-              fontWeight: homeWinner ? 800 : (awayWinner ? 400 : 600),
-              color: awayWinner ? '#9ca3af' : '#111827',
-              marginTop: 4,
-              fontSize: 11
-            }}>{homeScore}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 44 }}>
+            <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'contain', border: '1px solid #f3f4f6', opacity: awayWinner ? 0.6 : 1 }} alt="" />
+            <span style={{ fontSize: 11, fontWeight: homeWinner ? 800 : 600, color: awayWinner ? '#9ca3af' : '#374151', marginTop: 6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%', textAlign: 'center' }}>
+              {m.home_team?.name || 'TBD'}
+            </span>
+            <span style={{ fontSize: 12, fontWeight: homeWinner ? 800 : 600, color: awayWinner ? '#9ca3af' : '#111827', marginTop: 2 }}>
+              {homeScore}
+            </span>
           </div>
 
           {/* Divider */}
-          <div style={{ fontSize: 10, color: '#d1d5db', marginBottom: -14 }}>-</div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: '#d1d5db', marginTop: 12 }}>-</div>
 
           {/* Away */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 32 }}>
-            <span style={{ 
-              fontWeight: awayWinner ? 800 : (homeWinner ? 400 : 600), 
-              color: homeWinner ? '#9ca3af' : '#374151',
-              textDecoration: homeWinner ? 'line-through' : 'none',
-              letterSpacing: '0.5px'
-            }}>{awayAbbr}</span>
-            <span style={{ 
-              fontWeight: awayWinner ? 800 : (homeWinner ? 400 : 600),
-              color: homeWinner ? '#9ca3af' : '#111827',
-              marginTop: 4,
-              fontSize: 11
-            }}>{awayScore}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 44 }}>
+            <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name)} style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'contain', border: '1px solid #f3f4f6', opacity: homeWinner ? 0.6 : 1 }} alt="" />
+            <span style={{ fontSize: 11, fontWeight: awayWinner ? 800 : 600, color: homeWinner ? '#9ca3af' : '#374151', marginTop: 6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%', textAlign: 'center' }}>
+              {m.away_team?.name || 'TBD'}
+            </span>
+            <span style={{ fontSize: 12, fontWeight: awayWinner ? 800 : 600, color: homeWinner ? '#9ca3af' : '#111827', marginTop: 2 }}>
+              {awayScore}
+            </span>
           </div>
-
         </div>
       </div>
 
@@ -265,32 +244,28 @@ export default function TournamentBracket({ bracketData }) {
 
   // --- DESKTOP: Symmetrical FotMob Layout ---
   return (
-    <div style={{ position: 'relative', width: '100%', overflowX: 'auto' }} className="hide-scrollbar">
+    <div style={{ position: 'relative', width: '100%', overflow: 'hidden' }}>
       <div
         ref={containerRef}
         style={{ 
           display: 'flex', 
           justifyContent: 'center', 
-          gap: 60, 
-          minWidth: 'max-content', 
-          padding: '24px 40px 60px', 
+          gap: '2vw', 
+          width: '100%', 
+          padding: '24px 10px 60px', 
           position: 'relative',
           margin: '0 auto'
         }}
       >
         <SymmetricalConnectors 
-          leftRounds={leftRounds} 
-          rightRounds={rightRounds} 
-          leftRefs={leftRefs} 
-          rightRefs={rightRefs} 
-          centerRefs={centerRefs} 
+          leftRounds={leftRounds} rightRounds={rightRounds} 
+          leftRefs={leftRefs} rightRefs={rightRefs} centerRefs={centerRefs} 
           containerRef={containerRef} 
         />
 
         {/* LEFT WING */}
-        {leftRounds.map((round, ri) => {
-          return (
-            <div key={`left-${round.round}`} style={{ display: 'flex', flexDirection: 'column', gap: 16, position: 'relative', zIndex: 1 }}>
+        {leftRounds.map((round, ri) => (
+          <div key={`left-${round.round}`} style={{ display: 'flex', flexDirection: 'column', gap: 16, position: 'relative', zIndex: 1, flex: 1 }}>
               <div style={{ textAlign: 'center', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>{round.label}</div>
               <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', flex: 1, gap: 24 }}>
                 {round.matches.map((m, mi) => (
@@ -303,11 +278,11 @@ export default function TournamentBracket({ bracketData }) {
                 ))}
               </div>
             </div>
-          );
-        })}
+        ))}
 
-        {/* CENTER (Finals) */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 1, padding: '0 20px' }}>
+        {/* CENTER FINAL */}
+        {finalsRound && (
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 32, position: 'relative', zIndex: 1, flex: 1.2 }}>
           {/* Champion Trophy Display */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 40, opacity: 0.8 }}>
             <Trophy size={48} color="#d1d5db" strokeWidth={1} style={{ marginBottom: 12 }} />
@@ -328,13 +303,14 @@ export default function TournamentBracket({ bracketData }) {
             </div>
           )}
         </div>
+        )}
 
         {/* RIGHT WING */}
         {[...rightRounds].reverse().map((round, reverseIndex) => {
           // ri is the original index in rightRounds array
           const ri = rightRounds.length - 1 - reverseIndex;
           return (
-            <div key={`right-${round.round}`} style={{ display: 'flex', flexDirection: 'column', gap: 16, position: 'relative', zIndex: 1 }}>
+            <div key={`right-${round.round}`} style={{ display: 'flex', flexDirection: 'column', gap: 16, position: 'relative', zIndex: 1, flex: 1 }}>
               <div style={{ textAlign: 'center', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>{round.label}</div>
               <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', flex: 1, gap: 24 }}>
                 {round.matches.map((m, mi) => (
