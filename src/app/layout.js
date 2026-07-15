@@ -14,7 +14,9 @@ export default function RootLayout({ children }) {
     <html lang="id">
       <body>
         <div className="app-wrapper">
-          <Navbar />
+          <Suspense fallback={null}>
+            <Navbar />
+          </Suspense>
           <main className="main-content">
             {children}
           </main>
