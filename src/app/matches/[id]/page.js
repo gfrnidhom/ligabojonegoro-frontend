@@ -222,85 +222,68 @@ export default function MatchDetailPage({ params }) {
         </div>
       ) : match ? (
         <>
-          {/* Navbar Khusus Detail Pertandingan */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-            <button onClick={() => router.back()} style={{ width: 40, height: 40, color: '#374151', background: '#ffffff', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s ease', zIndex: 10 }}>
-              <ArrowLeft size={20} />
-            </button>
+          {/* NEW Match Header matching Image 2 */}
+          <div style={{ 
+            background: 'radial-gradient(circle at top left, rgba(232, 245, 233, 0.8) 0%, transparent 40%), radial-gradient(circle at top right, rgba(219, 234, 254, 0.8) 0%, transparent 40%), #ffffff',
+            position: 'relative',
+            overflow: 'hidden',
+            paddingTop: 16
+          }}>
+            
+            {/* Top Navbar */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', marginBottom: 20 }}>
+              <button onClick={() => router.back()} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fff', border: '1px solid var(--border-light)', borderRadius: 24, padding: '6px 16px', fontSize: 13, fontWeight: 700, color: '#111827', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                <ChevronLeft size={16} /> Matches
+              </button>
+              
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 700, color: '#111827' }}>
+                {match.tournament?.logo_path && <img src={getImageUrl(match.tournament?.logo_path)} style={{ width: 16, height: 16, objectFit: 'contain' }} alt="" />}
+                {match.tournament?.name} {match.round ? `• ${match.round}` : ''}
+              </div>
 
-            {/* Top Info (Tournament Name, Round) */}
-            <div style={{ flex: 1, textAlign: 'center', fontSize: 9, fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '0 16px' }}>
-              {match.tournament?.name} {match.round ? `• Babak ${match.round}` : ''} {sched ? `• ${sched.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}` : ''}
+              <button style={{ background: '#111827', color: '#fff', border: 'none', borderRadius: 24, padding: '8px 20px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                Follow
+              </button>
             </div>
 
-            {!hideMaximize ? (
-              <Link href={`/matches/${matchId}`} style={{ width: 40, height: 40, color: '#374151', background: '#ffffff', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s ease', zIndex: 10 }}>
-                <Maximize2 size={18} />
-              </Link>
-            ) : (
-              <div style={{ width: 40, height: 40 }} />
-            )}
-          </div>
-
-          {/* Card dibawahnya arrow */}
-          <div style={{ position: 'relative', padding: '32px 0 40px', background: 'linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)', color: '#fff', borderRadius: 24, overflow: 'hidden', border: 'none', marginBottom: 24, boxShadow: '0 20px 40px -10px rgba(79, 70, 229, 0.4)' }}>
-            
-            {/* Decorative background circles */}
-            <div style={{ position: 'absolute', top: -50, right: -50, width: 200, height: 200, background: 'linear-gradient(135deg, #a855f7 0%, transparent 100%)', borderRadius: '50%', opacity: 0.5, filter: 'blur(40px)', zIndex: 0 }} />
-            <div style={{ position: 'absolute', bottom: -50, left: -50, width: 150, height: 150, background: 'linear-gradient(135deg, #ec4899 0%, transparent 100%)', borderRadius: '50%', opacity: 0.5, filter: 'blur(30px)', zIndex: 0 }} />
-            
-            <div style={{ position: 'relative', zIndex: 1 }}>
+            {/* Meta Info (Date, Stadium) */}
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 24, fontSize: 12, fontWeight: 500, color: '#6b7280', marginBottom: 32 }}>
+               {sched && (
+                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                   <CalendarDays size={14} /> {sched.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}, {sched.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                 </div>
+               )}
+            </div>
 
             {/* Teams & Score */}
-            <div className="match-header-flex" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 32, marginTop: 10, padding: '0 24px' }}>
-              {/* Home */}
-              <div className="team-column" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
-                <div style={{ width: 80, height: 80, borderRadius: 24, background: 'rgba(255, 255, 255, 0.2)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255, 255, 255, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 20px rgba(0,0,0,0.15)', padding: 12 }}>
-                  <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name, 'ffffff')} alt="" className="team-logo" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }} />
+            <div className="match-teams-grid" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 40, padding: '0 24px' }}>
+              
+              {/* Home Team */}
+              <div className="team-col-home" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 24 }}>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: 24, fontWeight: 500, color: '#111827', letterSpacing: '-0.02em' }}>{match.home_team?.name}</div>
+                  <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 4 }}>Home</div>
                 </div>
-                <span className="team-name-text" style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginTop: 16, textAlign: 'center', textShadow: '0 1px 3px rgba(0,0,0,0.2)' }}>{match.home_team?.name}</span>
+                <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name, 'ffffff')} style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'contain', background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', padding: 4 }} alt="" />
               </div>
 
-              {/* Score Center */}
-              <div className="score-center-column" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                {isLive && (
-                  <div style={{ background: '#ef4444', color: '#fff', fontSize: 9, fontWeight: 800, padding: '4px 12px', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em', boxShadow: '0 4px 10px rgba(239, 68, 68, 0.4)' }}>
-                    <Activity size={12} /> LIVE
-                  </div>
-                )}
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                  {isFinished || isLive ? (
-                    <>
-                      <span className="score-number" style={{ fontSize: 36, fontWeight: 800, color: '#fff', fontVariantNumeric: 'tabular-nums', lineHeight: 1, textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>{match.home_score}</span>
-                      <span className="score-divider" style={{ fontSize: 16, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>-</span>
-                      <span className="score-number" style={{ fontSize: 36, fontWeight: 800, color: '#fff', fontVariantNumeric: 'tabular-nums', lineHeight: 1, textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>{match.away_score}</span>
-                    </>
-                  ) : (
-                    <span className="score-time" style={{ fontSize: 26, fontWeight: 800, color: '#fff', textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-                      {sched?.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  )}
+              {/* Score */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ fontSize: 42, fontWeight: 600, color: '#111827', letterSpacing: '0.05em', lineHeight: 1 }}>
+                  {match.home_score} - {match.away_score}
                 </div>
-
-                {isLive && (
-                  <span style={{ fontSize: 13, fontWeight: 800, color: '#fff', background: 'rgba(255, 255, 255, 0.2)', border: '1px solid rgba(255, 255, 255, 0.3)', padding: '4px 12px', borderRadius: 6, marginTop: 12, fontVariantNumeric: 'tabular-nums', backdropFilter: 'blur(5px)' }}>
-                    <LiveMatchDetailClock match={match} lastFetchTime={lastFetchTime} />
-                  </span>
-                )}
-                {isFinished && !isLive && (
-                  <div className="status-text" style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: 10, fontWeight: 700, marginTop: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Waktu Penuh
-                  </div>
-                )}
+                <div style={{ fontSize: 13, fontWeight: 500, color: '#6b7280', marginTop: 8 }}>
+                  {isFinished ? 'Full time' : (isLive ? 'LIVE' : 'Terjadwal')}
+                </div>
               </div>
 
-              {/* Away */}
-              <div className="team-column" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
-                <div style={{ width: 80, height: 80, borderRadius: 24, background: 'rgba(255, 255, 255, 0.2)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255, 255, 255, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 20px rgba(0,0,0,0.15)', padding: 12 }}>
-                  <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name, 'ffffff')} alt="" className="team-logo" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }} />
+              {/* Away Team */}
+              <div className="team-col-away" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 24 }}>
+                <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name, 'ffffff')} style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'contain', background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', padding: 4 }} alt="" />
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontSize: 24, fontWeight: 500, color: '#111827', letterSpacing: '-0.02em' }}>{match.away_team?.name}</div>
+                  <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 4 }}>Away</div>
                 </div>
-                <span className="team-name-text" style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginTop: 16, textAlign: 'center', textShadow: '0 1px 3px rgba(0,0,0,0.2)' }}>{match.away_team?.name}</span>
               </div>
             </div>
 
@@ -312,57 +295,53 @@ export default function MatchDetailPage({ params }) {
               if (homeGoals.length === 0 && awayGoals.length === 0) return null;
               
               return (
-                <div className="scorers-container" style={{ marginTop: 32, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', gap: 16, padding: '0 24px' }}>
+                <div className="scorers-container" style={{ marginTop: 32, paddingBottom: 24, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', gap: 16, padding: '0 24px' }}>
                   {/* Home Scorers */}
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
                     {homeGoals.map((g, idx) => (
-                      <div key={idx} style={{ fontSize: 10, color: '#fff', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <span
-                          onClick={() => handlePlayerClick(g.player?.uuid)}
-                          style={{ fontWeight: 600, cursor: 'pointer', textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}
-                        >
-                          {g.player?.name || 'Pemain'}
-                        </span>
-                        <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontWeight: 500 }}>{formatGameMinute(g.minute)}&apos;</span>
-                        {g.event_type === 'penalty' && <span style={{ fontSize: 9, color: 'rgba(255, 255, 255, 0.6)' }}>(P)</span>}
-                        {g.event_type === 'own_goal' && <span style={{ fontSize: 9, color: 'rgba(255, 255, 255, 0.6)' }}>(OG)</span>}
-                      </div>
+                       <div key={idx} style={{ fontSize: 12, color: '#4b5563', display: 'flex', alignItems: 'center', gap: 6 }}>
+                         <span
+                           onClick={() => handlePlayerClick(g.player?.uuid)}
+                           style={{ fontWeight: 500, cursor: 'pointer' }}
+                         >
+                           {g.player?.name || 'Pemain'}
+                         </span>
+                         <span style={{ color: '#9ca3af', fontWeight: 500 }}>{formatGameMinute(g.minute)}&apos;</span>
+                         {g.event_type === 'penalty' && <span style={{ fontSize: 11, color: '#9ca3af' }}>(P)</span>}
+                         {g.event_type === 'own_goal' && <span style={{ fontSize: 11, color: '#9ca3af' }}>(OG)</span>}
+                       </div>
                     ))}
                   </div>
                   {/* Ball Icon */}
-                  <div className="ball-icon-divider" style={{ display: 'flex', alignItems: 'flex-start', paddingTop: 2, flexShrink: 0 }}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255, 255, 255, 0.8)" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+                  <div className="ball-icon-divider" style={{ display: 'flex', alignItems: 'flex-start', paddingTop: 2, flexShrink: 0, opacity: 0.5 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
                   </div>
                   {/* Away Scorers */}
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 8 }}>
                     {awayGoals.map((g, idx) => (
-                      <div key={idx} style={{ fontSize: 10, color: '#fff', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        {g.event_type === 'penalty' && <span style={{ fontSize: 9, color: 'rgba(255, 255, 255, 0.6)' }}>(P)</span>}
-                        {g.event_type === 'own_goal' && <span style={{ fontSize: 9, color: 'rgba(255, 255, 255, 0.6)' }}>(OG)</span>}
-                        <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontWeight: 500 }}>{formatGameMinute(g.minute)}&apos;</span>
-                        <span
-                          onClick={() => handlePlayerClick(g.player?.uuid)}
-                          style={{ fontWeight: 600, cursor: 'pointer', textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}
-                        >
-                          {g.player?.name || 'Pemain'}
-                        </span>
-                      </div>
+                       <div key={idx} style={{ fontSize: 12, color: '#4b5563', display: 'flex', alignItems: 'center', gap: 6 }}>
+                         {g.event_type === 'penalty' && <span style={{ fontSize: 11, color: '#9ca3af' }}>(P)</span>}
+                         {g.event_type === 'own_goal' && <span style={{ fontSize: 11, color: '#9ca3af' }}>(OG)</span>}
+                         <span style={{ color: '#9ca3af', fontWeight: 500 }}>{formatGameMinute(g.minute)}&apos;</span>
+                         <span
+                           onClick={() => handlePlayerClick(g.player?.uuid)}
+                           style={{ fontWeight: 500, cursor: 'pointer' }}
+                         >
+                           {g.player?.name || 'Pemain'}
+                         </span>
+                       </div>
                     ))}
                   </div>
                 </div>
               );
             })()}
-            </div>
-          </div>
 
             {/* Tabs */}
-            <div
-              style={{ position: 'sticky', top: 0, zIndex: 40, paddingTop: 16, paddingLeft: 24, paddingRight: 24, background: 'var(--bg-app)', borderBottom: '1px solid var(--border-light)' }}
-            >
+            <div style={{ marginTop: 24, paddingLeft: 24, paddingRight: 24 }}>
               {/* Scrollable Tabs */}
               <div
                 ref={tabsRef}
-                style={{ display: 'flex', gap: 32, overflowX: 'auto', paddingBottom: 0, scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                style={{ display: 'flex', gap: 32, overflowX: 'auto', paddingBottom: 0, scrollbarWidth: 'none', msOverflowStyle: 'none', borderBottom: '1px solid var(--border-light)' }}
                 className="hide-scrollbar"
               >
                 {TABS.map(tab => {
@@ -373,21 +352,20 @@ export default function MatchDetailPage({ params }) {
                       onClick={() => handleTabChange(tab.id)}
                       style={{
                         position: 'relative',
-                        display: 'flex', alignItems: 'center', gap: 6,
-                        padding: '0 0 16px 0', fontSize: 10, fontWeight: isActive ? 700 : 600,
-                        color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                        display: 'flex', alignItems: 'center',
+                        padding: '0 0 16px 0', fontSize: 13, fontWeight: 600,
+                        color: isActive ? '#111827' : '#6b7280',
                         whiteSpace: 'nowrap', transition: 'all 0.2s ease', cursor: 'pointer',
                         background: 'none', border: 'none'
                       }}
                     >
-                      <tab.icon size={14} />
                       {tab.label}
                       {isActive && (
                         <motion.div
                           layoutId="activeTabIndicator"
                           style={{
                             position: 'absolute', bottom: -1, left: 0, right: 0,
-                            height: 3, background: 'var(--primary)', borderRadius: '4px 4px 0 0'
+                            height: 3, background: '#111827', borderRadius: '4px 4px 0 0'
                           }}
                         />
                       )}
@@ -396,10 +374,11 @@ export default function MatchDetailPage({ params }) {
                 })}
               </div>
             </div>
+          </div>
 
           {/* Content */}
-          <div style={{ padding: '24px 0' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="match-content-grid" style={{ padding: '24px 0', display: 'flex', gap: 32, alignItems: 'flex-start' }}>
+            <div className="match-main-col" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
               {activeTab === 'ringkasan' && <RingkasanTab match={match} />}
               {activeTab === 'rincian' && <RincianTab match={match} />}
               {activeTab === 'lineup' && (
@@ -423,6 +402,13 @@ export default function MatchDetailPage({ params }) {
                 </div>
               )}
             </div>
+            
+            {/* Sidebar Kanan */}
+            {activeTab === 'rincian' && (
+              <div className="match-sidebar-col" style={{ width: 340, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <RincianSidebar match={match} />
+              </div>
+            )}
           </div>
         </>
       ) : (
@@ -433,6 +419,14 @@ export default function MatchDetailPage({ params }) {
       </div>
 
       <style jsx global>{`
+        @media (max-width: 900px) {
+          .match-content-grid {
+            flex-direction: column !important;
+          }
+          .match-sidebar-col {
+            width: 100% !important;
+          }
+        }
         @media (max-width: 640px) {
           .match-header-flex { 
             flex-direction: row !important;
@@ -613,144 +607,81 @@ function GoalDetailSection({ match }) {
   );
 }
 
-/* ─── Rincian ─── */
 function RincianTab({ match }) {
-  const d = match.scheduled_at ? new Date(match.scheduled_at) : null;
+  const h2h = match.h2h || [];
+  const formHome = match.form_home || [];
+  const formAway = match.form_away || [];
 
-  const InfoCard = ({ icon: Icon, label, value, color = '#3b82f6', span2 = false }) => (
-    <div className="info-card" style={{
-      display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px',
-      background: 'var(--bg-subtle)', borderRadius: 14,
-      border: '1px solid var(--border)',
-      gridColumn: span2 ? 'span 2' : 'auto',
-    }}>
-      <div style={{
-        width: 36, height: 36, borderRadius: 10,
-        background: `${color}12`, border: `1px solid ${color}30`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-      }}>
-        <Icon size={16} color={color} />
+  const homeId = match.home_team?.id;
+  const awayId = match.away_team?.id;
+  const totalH2H = h2h.length;
+  let homeWins = 0, awayWins = 0, draws = 0;
+  h2h.forEach(m => {
+    const isHome = m.home_team_id === homeId;
+    if (m.home_score === m.away_score) draws++;
+    else if ((isHome && m.home_score > m.away_score) || (!isHome && m.away_score > m.home_score)) homeWins++;
+    else awayWins++;
+  });
+
+  const getOutcome = (m, perspectiveId) => {
+    if (m.home_score === m.away_score) return 'D';
+    const isHome = m.home_team_id === perspectiveId;
+    if (isHome) return m.home_score > m.away_score ? 'W' : 'L';
+    return m.away_score > m.home_score ? 'W' : 'L';
+  };
+  
+  const FormRow = ({ matches, teamId, teamName, teamLogo, color }) => (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: '#fff', borderRadius: 12, border: '1px solid rgba(0,0,0,0.05)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <img src={teamLogo} alt="" style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'contain' }} />
+        <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{teamName}</span>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
-        <span className="info-card-label" style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</span>
-        <span className="info-card-value" style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{value}</span>
+      <div style={{ display: 'flex', gap: 4 }}>
+        {matches.slice(0, 5).map((m, i) => {
+          const outcome = getOutcome(m, teamId);
+          const bg = outcome === 'W' ? '#10b981' : outcome === 'D' ? '#f59e0b' : '#ef4444';
+          return (
+            <div key={i} style={{ width: 20, height: 20, borderRadius: 4, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: '#fff' }}>
+              {outcome}
+            </div>
+          );
+        })}
+        {matches.length === 0 && <span style={{ fontSize: 11, color: '#9ca3af' }}>No data</span>}
       </div>
     </div>
   );
 
-  // Event type config
-  const evConfig = (type) => {
-    if (type === 'goal' || type === 'penalty' || type === 'own_goal') return { color: '#22c55e', label: 'Gol' };
-    if (type === 'yellow_card') return { color: '#eab308', label: 'Kartu Kuning' };
-    if (type === 'red_card') return { color: '#ef4444', label: 'Kartu Merah' };
-    if (type === 'substitution') return { color: '#8b92a5', label: 'Pergantian' };
-    return { color: '#3b82f6', label: type };
-  };
-
-  const EventIcon = ({ type }) => {
-    if (type === 'goal' || type === 'penalty' || type === 'own_goal')
-      return <svg width="14" height="14" viewBox="0 0 24 24" fill="#e8eaed" stroke="#111" strokeWidth="1"><circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" /></svg>;
-    if (type === 'yellow_card') return <div style={{ width: 10, height: 14, background: '#eab308', borderRadius: 2, border: '1px solid #ca8a04' }} />;
-    if (type === 'red_card') return <div style={{ width: 10, height: 14, background: '#ef4444', borderRadius: 2, border: '1px solid #b91c1c' }} />;
-    if (type === 'substitution') return (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path d="M9 8h5v3l4-4-4-4v3H9z" fill="#22c55e" />
-        <path d="M15 16h-5v-3l-4 4 4 4v-3h5z" fill="#ef4444" />
-      </svg>
-    );
-    return <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#3b82f6' }} />;
-  };
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-
-      {/* Info Pertandingan (Match Info Cards) */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {/* Top Card: Venue, Attendance, Weather */}
-        <div style={{ background: '#ffffff', borderRadius: 16, padding: '0 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.05)' }}>
-          {/* Venue Row */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-            <MapPin size={20} color="#4b5563" />
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#111827' }}>{match.venue?.name || match.field_court || 'Venue Belum Ditentukan'}</div>
-              {match.venue?.city && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{match.venue?.city}</div>}
-            </div>
-            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#ffffff', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <MapPin size={14} color="#10b981" />
-            </div>
-          </div>
-
-          {/* Attendance Row */}
-          {match.statistics?.attendance && (
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, padding: '16px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-              <Users size={20} color="#4b5563" style={{ marginTop: 2 }} />
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginBottom: 12 }}>
-                  {match.venue?.capacity && (
-                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                      <span style={{ fontSize: 12, color: '#111827' }}>Kapasitas</span>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: '#111827' }}>{match.venue?.capacity}</span>
-                    </div>
-                  )}
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <span style={{ fontSize: 12, color: '#111827' }}>Penonton</span>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: '#111827' }}>{match.statistics.attendance}</span>
-                  </div>
-                </div>
-                {/* Progress Bar (Mocked 100% or calculated) */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{ flex: 1, height: 4, background: '#10b981', borderRadius: 2 }} />
-                  <div style={{ background: '#10b981', color: '#ffffff', fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 10 }}>
-                    {match.venue?.capacity ? Math.min(100, Math.round((parseInt(match.statistics.attendance) / parseInt(match.venue?.capacity)) * 100)) : 100}%
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Weather Row */}
-          {match.statistics?.weather && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 0' }}>
-              <CloudSun size={20} color="#4b5563" />
-              <div style={{ flex: 1, fontSize: 12, fontWeight: 700, color: '#111827' }}>
-                Cuaca
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 12, color: '#111827' }}>{match.statistics.weather}</span>
-              </div>
-            </div>
-          )}
+  const MatchRow = ({ m, perspectiveId }) => {
+    const d = new Date(m.match_date || m.scheduled_at);
+    const outcome = getOutcome(m, perspectiveId);
+    const isW = outcome === 'W', isD = outcome === 'D';
+    
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: '#fff', borderRadius: 12, border: '1px solid rgba(0,0,0,0.05)' }}>
+        <div style={{ width: 44, flexShrink: 0, textAlign: 'center' }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af' }}>{d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}</div>
+          <div style={{ fontSize: 9, color: '#d1d5db' }}>{d.getFullYear()}</div>
         </div>
-
-        {/* Bottom Card: Date, Tournament, Referee */}
-        <div style={{ background: '#ffffff', borderRadius: 16, padding: '8px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.05)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 0' }}>
-            <CalendarDays size={20} color="#4b5563" />
-            <div style={{ fontSize: 12, color: '#6b7280' }}>
-              {d?.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}, {d?.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) || '-'}
-            </div>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+          <div style={{ flex: 1, textAlign: 'right', fontSize: 12, fontWeight: m.home_score > m.away_score ? 800 : 500, color: '#111827' }}>{m.home_team?.name}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--bg-app)', padding: '4px 10px', borderRadius: 8 }}>
+            <span style={{ fontSize: 12, fontWeight: 900, color: isW ? '#10b981' : isD ? '#f59e0b' : '#ef4444' }}>{m.home_score}</span>
+            <span style={{ fontSize: 10, color: '#9ca3af' }}>-</span>
+            <span style={{ fontSize: 12, fontWeight: 900, color: isW ? '#10b981' : isD ? '#f59e0b' : '#ef4444' }}>{m.away_score}</span>
           </div>
-          {match.round && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 0' }}>
-              <Trophy size={20} color="#4b5563" />
-              <div style={{ fontSize: 12, color: '#6b7280' }}>
-                Pekan / Babak {match.round}
-              </div>
-            </div>
-          )}
-          {match.referee && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 0' }}>
-              <Target size={20} color="#4b5563" />
-              <div style={{ fontSize: 12, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span>{match.referee.name}</span>
-              </div>
-            </div>
-          )}
+          <div style={{ flex: 1, textAlign: 'left', fontSize: 12, fontWeight: m.away_score > m.home_score ? 800 : 500, color: '#111827' }}>{m.away_team?.name}</div>
         </div>
       </div>
+    );
+  };
 
+  const avatar = (name, bg = '3b82f6') => `https://ui-avatars.com/api/?name=${encodeURIComponent(name || '?')}&size=40&background=${bg}&color=fff`;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       {/* Detail Gol */}
       {match.events?.some(e => ['goal', 'own_goal', 'penalty'].includes(e.event_type)) && (
-        <div style={{ background: 'var(--bg-app)', borderRadius: 16, padding: '20px 16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+        <div style={{ background: '#ffffff', borderRadius: 16, padding: '20px 16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
             <div style={{ width: 4, height: 18, borderRadius: 2, background: '#22c55e' }} />
             <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Detail Gol</span>
@@ -759,9 +690,9 @@ function RincianTab({ match }) {
         </div>
       )}
 
-      {/* ── Mini Stats (Possession & Key Events) ── */}
+      {/* Mini Stats (Possession) */}
       {match.statistics && (
-        <div style={{ background: 'var(--bg-app)', borderRadius: 16, padding: '20px 16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+        <div style={{ background: '#ffffff', borderRadius: 16, padding: '20px 16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
           <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-primary)', fontWeight: 600, marginBottom: 16 }}>
             Persentase Penguasaan Bola
           </div>
@@ -775,6 +706,25 @@ function RincianTab({ match }) {
           </div>
         </div>
       )}
+      
+      {/* 5 Laga Terakhir (Form) */}
+      <div style={{ background: '#ffffff', borderRadius: 16, padding: '20px 16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: '#8b92a5', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Form - 5 Laga Terakhir</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <FormRow
+            matches={formHome} teamId={homeId}
+            teamName={match.home_team?.name}
+            teamLogo={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name, '3b82f6')}
+            color="#3b82f6"
+          />
+          <FormRow
+            matches={formAway} teamId={awayId}
+            teamName={match.away_team?.name}
+            teamLogo={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name, 'eab308')}
+            color="#eab308"
+          />
+        </div>
+      </div>
 
       {/* Kejadian Pertandingan */}
       {match.events && match.events.length > 0 ? (
@@ -880,67 +830,171 @@ function RincianTab({ match }) {
       )}
       
       <SubstitutesBlock match={match} />
-      
-      <NextMatchSection match={match} />
     </div>
   );
 }
 
-function NextMatchSection({ match }) {
+/* ─── Rincian Sidebar ─── */
+function RincianSidebar({ match }) {
+  const d = match.scheduled_at ? new Date(match.scheduled_at) : null;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+      {/* Match Info Card */}
+      <div style={{ background: '#ffffff', borderRadius: 16, padding: '16px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.05)' }}>
+        
+        {/* Venue Row */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, paddingBottom: 16, borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+          <MapPin size={18} color="#111827" style={{ marginTop: 2 }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: '#111827' }}>{match.venue?.name || match.field_court || 'Venue Belum Ditentukan'}</div>
+            {match.venue?.city && <div style={{ fontSize: 13, color: '#6b7280', marginTop: 2 }}>{match.venue?.city}</div>}
+          </div>
+        </div>
+
+        {/* Attendance Row */}
+        {(match.statistics?.attendance || match.venue?.capacity) && (
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, padding: '16px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+            <Users size={18} color="#111827" style={{ marginTop: 2 }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 6 }}>
+                {match.venue?.capacity && (
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, color: '#111827' }}>Capacity</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>{parseInt(match.venue.capacity).toLocaleString('id-ID')}</span>
+                  </div>
+                )}
+              </div>
+              {match.statistics?.attendance && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 12 }}>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, color: '#111827' }}>Attendance</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>{parseInt(match.statistics.attendance).toLocaleString('id-ID')}</span>
+                  </div>
+                </div>
+              )}
+              {match.venue?.capacity && match.statistics?.attendance && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ flex: 1, height: 4, background: '#10b981', borderRadius: 2 }} />
+                  <div style={{ background: '#10b981', color: '#ffffff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 12 }}>
+                    {Math.min(100, Math.round((parseInt(match.statistics.attendance) / parseInt(match.venue.capacity)) * 100))}%
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Surface Row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111827" strokeWidth="2"><path d="M4 14l6-6M10 20l6-6M16 20l4-4"/></svg>
+          <div style={{ flex: 1, fontSize: 13, color: '#111827', display: 'flex', gap: 8 }}>
+            <span>Surface</span>
+            <span style={{ fontWeight: 600 }}>{match.venue?.surface || 'Grass'}</span>
+          </div>
+        </div>
+
+        {/* Weather Row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, paddingTop: 16 }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111827" strokeWidth="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+          <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#111827' }}>
+            Weather conditions
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#111827' }}>
+            {match.statistics?.weather ? `${match.statistics.weather}°C` : '30°C'}
+            <CloudSun size={18} color="#f59e0b" fill="#fef3c7" />
+          </div>
+        </div>
+      </div>
+
+      {/* Tournament Card */}
+      <div style={{ background: '#ffffff', borderRadius: 16, padding: '16px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.05)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 600, color: '#111827' }}>{match.tournament?.name}</div>
+            {match.round && <div style={{ fontSize: 13, color: '#6b7280', marginTop: 2 }}>Round of {match.round}</div>}
+          </div>
+          {match.tournament?.logo_path ? (
+            <img src={getImageUrl(match.tournament?.logo_path)} style={{ width: 36, height: 36, objectFit: 'contain' }} alt="" />
+          ) : (
+            <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+               <Trophy size={16} color="#6b7280" />
+            </div>
+          )}
+        </div>
+        
+        {/* Next/Previous Match Simulation inside Tournament */}
+        <NextMatchSection match={match} hideTitle />
+      </div>
+    </div>
+  );
+}
+function NextMatchSection({ match, hideTitle }) {
   const homeNext = match.home_next_match || null;
   const awayNext = match.away_next_match || null;
 
   if (!homeNext && !awayNext) return null;
 
-  // Deduplicate: if both teams have the same next match, show only once
   const isSameMatch = homeNext && awayNext && homeNext.id === awayNext.id;
 
-  const renderMatchRow = (teamMatch, targetTeam) => {
+  const renderMatchRow = (teamMatch) => {
     if (!teamMatch) return null;
     const mDate = new Date(teamMatch.match_date || teamMatch.scheduled_at);
-    
-    // Fallback logo handling
     const avatar = (name, bg = '3b82f6') => `https://ui-avatars.com/api/?name=${encodeURIComponent(name || '?')}&size=40&background=${bg}&color=fff`;
 
+    const statusText = teamMatch.status === 'finished' ? 'FT' 
+                     : teamMatch.status === 'half_time' ? 'HT' 
+                     : mDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', padding: '16px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-          <span style={{ fontSize: 11, color: '#6b7280' }}>{teamMatch.tournament?.name || 'Friendly'}</span>
-          <img src={getImageUrl(teamMatch.tournament?.logo_path) || avatar(teamMatch.tournament?.name, 'e5e7eb')} style={{ width: 16, height: 16, borderRadius: '50%', objectFit: 'contain' }} alt="" />
-        </div>
+      <div style={{ display: 'flex', alignItems: 'center', padding: '16px 0', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
         
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-            <img src={getImageUrl(teamMatch.home_team?.logo_path) || avatar(teamMatch.home_team?.name)} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'contain' }} alt="" />
-            <span style={{ fontSize: 12, fontWeight: 500, color: '#111827', textAlign: 'center' }}>{teamMatch.home_team?.name}</span>
-          </div>
-
-          <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-            <span style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>
-              {mDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
-            </span>
-            <span style={{ fontSize: 11, color: '#6b7280' }}>
-              {mDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {/* Home Team */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <img src={getImageUrl(teamMatch.home_team?.logo_path) || avatar(teamMatch.home_team?.name)} style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'contain' }} alt="" />
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#111827' }}>{teamMatch.home_team?.name}</span>
+            </div>
+            <span style={{ fontSize: 13, fontWeight: teamMatch.home_score > teamMatch.away_score ? 700 : 500, color: '#111827' }}>
+              {teamMatch.home_score !== null ? teamMatch.home_score : '-'}
             </span>
           </div>
 
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-            <img src={getImageUrl(teamMatch.away_team?.logo_path) || avatar(teamMatch.away_team?.name, 'ef4444')} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'contain' }} alt="" />
-            <span style={{ fontSize: 12, fontWeight: 500, color: '#111827', textAlign: 'center' }}>{teamMatch.away_team?.name}</span>
+          {/* Away Team */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <img src={getImageUrl(teamMatch.away_team?.logo_path) || avatar(teamMatch.away_team?.name, 'ef4444')} style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'contain' }} alt="" />
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#111827' }}>{teamMatch.away_team?.name}</span>
+            </div>
+            <span style={{ fontSize: 13, fontWeight: teamMatch.away_score > teamMatch.home_score ? 700 : 500, color: '#111827' }}>
+              {teamMatch.away_score !== null ? teamMatch.away_score : '-'}
+            </span>
           </div>
+        </div>
+
+        {/* Status / Time */}
+        <div style={{ width: 60, flexShrink: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', borderLeft: '1px solid rgba(0,0,0,0.05)', height: '100%' }}>
+          <span style={{ fontSize: 13, fontWeight: 500, color: '#6b7280' }}>
+            {statusText}
+          </span>
         </div>
       </div>
     );
   };
 
   return (
-    <div style={{ background: '#ffffff', borderRadius: 16, padding: '20px 24px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.05)', marginTop: 16 }}>
-      <div style={{ textAlign: 'center', fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 8 }}>
-        Next match
+    <div style={hideTitle ? { paddingTop: 0 } : { background: '#ffffff', borderRadius: 16, padding: '20px 24px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.05)', marginTop: 16 }}>
+      {!hideTitle && (
+        <div style={{ textAlign: 'center', fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 8 }}>
+          Next match
+        </div>
+      )}
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {renderMatchRow(homeNext)}
+        {!isSameMatch && renderMatchRow(awayNext)}
       </div>
-      {renderMatchRow(homeNext, match.home_team)}
-      {!isSameMatch && homeNext && awayNext && <div style={{ height: 1, background: 'rgba(0,0,0,0.05)' }} />}
-      {!isSameMatch && renderMatchRow(awayNext, match.away_team)}
     </div>
   );
 }
@@ -2186,8 +2240,17 @@ function PlayerStatsPanel({ playerStat, match, onClose }) {
 /* ─── Statistik ─── */
 function StatistikTab({ match }) {
   const [period, setPeriod] = useState('all');
+  const [playerTab, setPlayerTab] = useState('top_stats');
   let stats = match.statistics || {};
   const pStats = match.player_statistics || [];
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const pTab = params.get('playerTab');
+      if (pTab) setPlayerTab(pTab);
+    }
+  }, []);
 
   if (pStats.length > 0) {
     const computed = { ...stats };
@@ -2198,8 +2261,12 @@ function StatistikTab({ match }) {
       const suffix = isHome ? '_home' : '_away';
       if (ps.statistics && typeof ps.statistics === 'object') {
         Object.entries(ps.statistics).forEach(([key, val]) => {
-          const num = parseFloat(val) || 0;
-          computed[`${key}${suffix}`] = (computed[`${key}${suffix}`] || 0) + num;
+          // Do not double-count stats that are already aggregated by the backend.
+          // We only aggregate stats here if they are missing from the team's match statistics.
+          if (computed[`${key}${suffix}`] === undefined || computed[`${key}${suffix}`] === null) {
+            const num = parseFloat(val) || 0;
+            computed[`${key}${suffix}`] = (computed[`${key}${suffix}`] || 0) + num;
+          }
         });
       }
     });
@@ -2252,25 +2319,25 @@ function StatistikTab({ match }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0' }}>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
           {hWin ? (
-            <div style={{ background: '#27345b', color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 14px', borderRadius: 16, textAlign: 'center' }}>
+            <div style={{ background: '#ef4444', color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 14px', borderRadius: 16, textAlign: 'center' }}>
               {hStr}
             </div>
           ) : (
-            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', padding: '4px 14px', textAlign: 'center' }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', padding: '4px 14px', textAlign: 'center' }}>
               {hStr}
             </div>
           )}
         </div>
-        <div style={{ flex: 2, textAlign: 'center', fontSize: 12, fontWeight: 500, color: 'var(--text-primary)' }}>
+        <div style={{ flex: 2, textAlign: 'center', fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)' }}>
           {label}
         </div>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
           {aWin ? (
-            <div style={{ background: '#df9a0f', color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 14px', borderRadius: 16, textAlign: 'center' }}>
+            <div style={{ background: '#1e293b', color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 14px', borderRadius: 16, textAlign: 'center' }}>
               {aStr}
             </div>
           ) : (
-            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', padding: '4px 14px', textAlign: 'center' }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', padding: '4px 14px', textAlign: 'center' }}>
               {aStr}
             </div>
           )}
@@ -2313,48 +2380,91 @@ function StatistikTab({ match }) {
 
   const SPORT_STATS = {
     football: [
-      { key: 'possession', label: 'Penguasaan Bola', type: 'percentage' },
-      { key: 'shots', label: 'Total Tembakan' },
-      { key: 'shots_on_target', label: 'Tembakan Tepat Sasaran' },
-      { key: 'corners', label: 'Tendangan Sudut' },
-      { key: 'fouls', label: 'Pelanggaran', lowerIsBetter: true },
-      { key: 'offsides', label: 'Offside', lowerIsBetter: true },
-      { key: 'yellow_cards', label: 'Kartu Kuning', lowerIsBetter: true },
-      { key: 'red_cards', label: 'Kartu Merah', lowerIsBetter: true },
-    ],
-    futsal: [
-      { key: 'possession', label: 'Penguasaan Bola', type: 'percentage' },
-      { key: 'shots', label: 'Total Tembakan' },
-      { key: 'shots_on_target', label: 'Tembakan Tepat Sasaran' },
-      { key: 'corners', label: 'Tendangan Sudut' },
-      { key: 'fouls', label: 'Pelanggaran', lowerIsBetter: true },
-      { key: 'yellow_cards', label: 'Kartu Kuning', lowerIsBetter: true },
-      { key: 'red_cards', label: 'Kartu Merah', lowerIsBetter: true },
+      {
+        title: 'Statistik Utama',
+        stats: [
+          { key: 'possession', label: 'Penguasaan Bola', type: 'percentage' },
+          { key: 'shots', label: 'Tembakan' },
+          { key: 'shots_on_target', label: 'Tembakan Tepat Sasaran' },
+          { key: 'corners', label: 'Tendangan Sudut' },
+          { key: 'rating', label: 'Rating' },
+        ]
+      },
+      {
+        title: 'Distribusi & Umpan',
+        stats: [
+          { key: 'pass_accuracy', label: 'Akurasi Umpan (%)' },
+          { key: 'total_passes', label: 'Total Umpan' },
+          { key: 'successful_passes', label: 'Umpan Sukses' },
+          { key: 'accurate_passes', label: 'Umpan Akurat' },
+          { key: 'failed_passes', label: 'Umpan Gagal', lowerIsBetter: true },
+          { key: 'key_passes', label: 'Umpan Kunci' },
+          { key: 'successful_crosses', label: 'Umpan Silang Sukses' },
+        ]
+      },
+      {
+        title: 'Pertahanan',
+        stats: [
+          { key: 'clean_sheets', label: 'Clean Sheet' },
+          { key: 'saves', label: 'Penyelamatan' },
+          { key: 'tackles', label: 'Tekel' },
+          { key: 'successful_tackles', label: 'Tekel Sukses' },
+          { key: 'clearances', label: 'Sapuan' },
+          { key: 'interceptions', label: 'Intersepsi' },
+        ]
+      },
+      {
+        title: 'Pelanggaran & Disiplin',
+        stats: [
+          { key: 'fouls', label: 'Pelanggaran', lowerIsBetter: true },
+          { key: 'fouls_committed', label: 'Melanggar', lowerIsBetter: true },
+          { key: 'was_fouled', label: 'Dilanggar' },
+          { key: 'offsides', label: 'Offside', lowerIsBetter: true },
+          { key: 'yellow_cards', label: 'Kartu Kuning', lowerIsBetter: true },
+          { key: 'red_cards', label: 'Kartu Merah', lowerIsBetter: true },
+        ]
+      }
     ],
     basketball: [
-      { key: 'points', label: 'Poin' },
-      { key: 'rebounds', label: 'Rebounds' },
-      { key: 'assists', label: 'Assists' },
-      { key: 'steals', label: 'Steals' },
-      { key: 'blocks', label: 'Blocks' },
-      { key: 'turnovers', label: 'Turnovers', lowerIsBetter: true },
-      { key: 'fouls', label: 'Pelanggaran', lowerIsBetter: true },
+      {
+        title: 'Statistik Utama',
+        stats: [
+          { key: 'points', label: 'Poin' },
+          { key: 'rebounds', label: 'Rebounds' },
+          { key: 'assists', label: 'Assists' },
+          { key: 'steals', label: 'Steals' },
+          { key: 'blocks', label: 'Blocks' },
+          { key: 'turnovers', label: 'Turnovers', lowerIsBetter: true },
+          { key: 'fouls', label: 'Pelanggaran', lowerIsBetter: true },
+        ]
+      }
     ],
     volleyball: [
-      { key: 'service', label: 'Service' },
-      { key: 'block', label: 'Block' },
-      { key: 'smash', label: 'Smash / Kills' },
-      { key: 'dig', label: 'Digs / Penyelamatan' },
-      { key: 'assist', label: 'Assists / Umpan' },
-      { key: 'error', label: 'Errors', lowerIsBetter: true },
+      {
+        title: 'Statistik Utama',
+        stats: [
+          { key: 'service', label: 'Service' },
+          { key: 'block', label: 'Block' },
+          { key: 'smash', label: 'Smash / Kills' },
+          { key: 'dig', label: 'Digs / Penyelamatan' },
+          { key: 'assist', label: 'Assists / Umpan' },
+          { key: 'error', label: 'Errors', lowerIsBetter: true },
+        ]
+      }
     ],
     badminton: [
-      { key: 'aces', label: 'Service Aces' },
-      { key: 'smashes', label: 'Smashes' },
-      { key: 'net_wins', label: 'Net Play Wins' },
-      { key: 'errors', label: 'Unforced Errors', lowerIsBetter: true },
+      {
+        title: 'Statistik Utama',
+        stats: [
+          { key: 'aces', label: 'Service Aces' },
+          { key: 'smashes', label: 'Smashes' },
+          { key: 'net_wins', label: 'Net Play Wins' },
+          { key: 'errors', label: 'Unforced Errors', lowerIsBetter: true },
+        ]
+      }
     ]
   };
+  SPORT_STATS.futsal = SPORT_STATS.football;
 
   const statConfig = SPORT_STATS[sportSlug] || SPORT_STATS.football;
 
@@ -2362,55 +2472,200 @@ function StatistikTab({ match }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       {/* Sub-tabs */}
       {isFootballOrFutsal && (
-        <div style={{ display: 'flex', gap: 0, borderRadius: 10, overflow: 'hidden', border: '1px solid var(--border)' }}>
-          {periods.map(p => (
-            <button
-              key={p.id}
-              onClick={() => setPeriod(p.id)}
-              style={{
-                flex: 1, padding: '8px 0', fontSize: 10, fontWeight: 700,
-                border: 'none', cursor: 'pointer', transition: 'all 0.2s ease',
-                background: period === p.id ? 'var(--primary)' : 'var(--bg-subtle)',
-                color: period === p.id ? 'var(--bg-app)' : 'var(--text-secondary)',
-              }}
-            >
-              {p.label}
-            </button>
-          ))}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+          {periods.map(p => {
+             const isActive = period === p.id;
+             let lbl = p.label;
+             if (lbl === 'Semua') lbl = 'All';
+             else if (lbl === 'Babak 1') lbl = '1st';
+             else if (lbl === 'Babak 2') lbl = '2nd';
+             return (
+              <button
+                key={p.id}
+                onClick={() => setPeriod(p.id)}
+                style={{
+                  padding: '6px 20px', fontSize: 12, fontWeight: 600,
+                  borderRadius: 20, cursor: 'pointer', transition: 'all 0.2s ease',
+                  border: isActive ? '1px solid #111827' : '1px solid #e5e7eb',
+                  background: isActive ? '#111827' : '#ffffff',
+                  color: isActive ? '#ffffff' : '#374151',
+                }}
+              >
+                {lbl}
+              </button>
+            )
+          })}
         </div>
       )}
 
       <div style={{ marginTop: 16 }}>
-        {statConfig.map(config => {
-          if (config.type === 'percentage') {
-            const hVal = parseInt(s(`${config.key}_home`)) || 50;
-            const aVal = parseInt(s(`${config.key}_away`)) || 50;
-            return (
-              <div key={config.key} style={{ textAlign: 'center', marginBottom: 16 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 20 }}>Statistik Utama</div>
-                <div style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 16 }}>Persentase {config.label}</div>
-                <div style={{ display: 'flex', alignItems: 'center', height: 36, gap: 2 }}>
-                  <div style={{ flex: hVal, background: '#27345b', height: '100%', borderRadius: '18px 0 0 18px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 16, transition: 'flex 1s ease' }}>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: '#fff' }}>{hVal}%</span>
-                  </div>
-                  <div style={{ flex: aVal, background: '#df9a0f', height: '100%', borderRadius: '0 18px 18px 0', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 16, transition: 'flex 1s ease' }}>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: '#fff' }}>{aVal}%</span>
-                  </div>
-                </div>
-              </div>
-            );
-          }
+        {statConfig.map((group, gIdx) => {
           return (
-            <StatRow 
-              key={config.key} 
-              label={config.label} 
-              homeVal={s(`${config.key}_home`)} 
-              awayVal={s(`${config.key}_away`)} 
-              lowerIsBetter={config.lowerIsBetter} 
-            />
+            <div key={gIdx} style={{ marginBottom: 24 }}>
+              <div style={{ 
+                fontSize: 14, fontWeight: 800, color: 'var(--text-primary)', 
+                marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                {group.title}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {group.stats.map(config => {
+                  if (config.type === 'percentage') {
+                    const hVal = parseInt(s(`${config.key}_home`)) || 50;
+                    const aVal = parseInt(s(`${config.key}_away`)) || 50;
+                    return (
+                      <div key={config.key} style={{ textAlign: 'center', marginBottom: 16 }}>
+                        <div style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 16 }}>Persentase {config.label}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', height: 36, gap: 2 }}>
+                          <div style={{ flex: hVal, background: '#27345b', height: '100%', borderRadius: '18px 0 0 18px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 16, transition: 'flex 1s ease' }}>
+                            <span style={{ fontSize: 11, fontWeight: 600, color: '#fff' }}>{hVal}%</span>
+                          </div>
+                          <div style={{ flex: aVal, background: '#df9a0f', height: '100%', borderRadius: '0 18px 18px 0', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 16, transition: 'flex 1s ease' }}>
+                            <span style={{ fontSize: 11, fontWeight: 600, color: '#fff' }}>{aVal}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return (
+                    <StatRow 
+                      key={config.key} 
+                      label={config.label} 
+                      homeVal={s(`${config.key}_home`)} 
+                      awayVal={s(`${config.key}_away`)} 
+                      lowerIsBetter={config.lowerIsBetter} 
+                    />
+                  );
+                })}
+              </div>
+            </div>
           );
         })}
       </div>
+
+      {/* Player Stats Section */}
+      {pStats.length > 0 && (
+        <div style={{ marginTop: 32, background: 'var(--bg-card)', borderRadius: 16, padding: '24px 20px', border: '1px solid var(--border-light)' }}>
+          <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 20 }}>Player stats</h3>
+          
+          <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 12, marginBottom: 12 }}>
+            {[
+              { id: 'top_stats', label: 'Top stats' },
+              { id: 'attack', label: 'Attack' },
+              { id: 'passes', label: 'Passes' },
+              { id: 'defence', label: 'Defence' },
+              { id: 'duels', label: 'Duels' },
+              { id: 'goalkeeping', label: 'Goalkeeping' }
+            ].map(tab => {
+              const isActive = playerTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setPlayerTab(tab.id);
+                    if (typeof window !== 'undefined') {
+                      const url = new URL(window.location);
+                      url.searchParams.set('playerTab', tab.id);
+                      window.history.replaceState(null, '', url.toString());
+                    }
+                  }}
+                  style={{
+                    padding: '8px 16px', fontSize: 12, fontWeight: 700, borderRadius: 20, whiteSpace: 'nowrap',
+                    border: isActive ? '1px solid var(--text-primary)' : '1px solid var(--border)',
+                    background: isActive ? 'var(--text-primary)' : 'transparent',
+                    color: isActive ? 'var(--bg-app)' : 'var(--text-primary)',
+                    cursor: 'pointer', transition: 'all 0.2s'
+                  }}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', minWidth: 600, borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--border-light)' }}>
+                  <th style={{ textAlign: 'left', padding: '12px 0', fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)' }}>Player</th>
+                  {(() => {
+                    const cols = [
+                      { id: 'top_stats', cols: [{k: 'rating', l: 'Rating'}, {k: 'minutes_played', l: 'Minutes played'}, {k: 'goals', l: 'Goals'}, {k: 'assists', l: 'Assists'}, {k: 'yellow_cards', l: 'Yellow cards'}, {k: 'red_cards', l: 'Red cards'}] },
+                      { id: 'attack', cols: [{k: 'shots', l: 'Shots'}, {k: 'shots_on_target', l: 'Shots on target'}, {k: 'offsides', l: 'Offsides'}, {k: 'successful_crosses', l: 'Succ. crosses'}] },
+                      { id: 'passes', cols: [{k: 'total_passes', l: 'Total passes'}, {k: 'accurate_passes', l: 'Accurate passes'}, {k: 'key_passes', l: 'Key passes'}, {k: 'pass_accuracy', l: 'Accuracy'}] },
+                      { id: 'defence', cols: [{k: 'tackles', l: 'Tackles'}, {k: 'interceptions', l: 'Interceptions'}, {k: 'clearances', l: 'Clearances'}, {k: 'successful_tackles', l: 'Succ. tackles'}] },
+                      { id: 'duels', cols: [{k: 'fouls_committed', l: 'Fouls'}, {k: 'was_fouled', l: 'Was fouled'}] },
+                      { id: 'goalkeeping', cols: [{k: 'saves', l: 'Saves'}, {k: 'clean_sheets', l: 'Clean sheets'}] }
+                    ].find(t => t.id === playerTab)?.cols || [];
+                    return cols.map(c => (
+                      <th key={c.k} style={{ textAlign: 'center', padding: '12px 8px', fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)' }}>
+                        {c.l}
+                      </th>
+                    ));
+                  })()}
+                </tr>
+              </thead>
+              <tbody>
+                {pStats.sort((a, b) => {
+                  const sA = a.statistics || {};
+                  const sB = b.statistics || {};
+                  let key = 'rating';
+                  if (playerTab === 'attack') key = 'shots';
+                  else if (playerTab === 'passes') key = 'total_passes';
+                  else if (playerTab === 'defence') key = 'tackles';
+                  else if (playerTab === 'duels') key = 'fouls_committed';
+                  else if (playerTab === 'goalkeeping') key = 'saves';
+
+                  const valA = parseFloat(sA[key]) || 0;
+                  const valB = parseFloat(sB[key]) || 0;
+                  
+                  if (valB !== valA) return valB - valA;
+                  return (parseFloat(sB.rating) || 0) - (parseFloat(sA.rating) || 0);
+                }).map((ps, i) => {
+                  const s = ps.statistics || {};
+                  const rating = parseFloat(s.rating) || 0;
+                  let ratingColor = '#ef4444';
+                  if (rating >= 8.0) ratingColor = '#3b82f6';
+                  else if (rating >= 7.0) ratingColor = '#10b981';
+                  else if (rating >= 6.0) ratingColor = '#f59e0b';
+
+                  const cols = [
+                      { id: 'top_stats', cols: ['rating', 'minutes_played', 'goals', 'assists', 'yellow_cards', 'red_cards'] },
+                      { id: 'attack', cols: ['shots', 'shots_on_target', 'offsides', 'successful_crosses'] },
+                      { id: 'passes', cols: ['total_passes', 'accurate_passes', 'key_passes', 'pass_accuracy'] },
+                      { id: 'defence', cols: ['tackles', 'interceptions', 'clearances', 'successful_tackles'] },
+                      { id: 'duels', cols: ['fouls_committed', 'was_fouled'] },
+                      { id: 'goalkeeping', cols: ['saves', 'clean_sheets'] }
+                  ].find(t => t.id === playerTab)?.cols || [];
+
+                  return (
+                    <tr key={ps.player?.id || i} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                      <td style={{ padding: '12px 0', display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div style={{ position: 'relative' }}>
+                          <img src={getImageUrl(ps.player?.photo_path) || avatar(ps.player?.name)} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} alt="" />
+                          <img src={getImageUrl(ps.player?.team?.logo_path)} style={{ width: 14, height: 14, borderRadius: '50%', position: 'absolute', bottom: -2, right: -2, border: '1px solid var(--bg-card)', background: '#fff' }} alt="" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                        </div>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{ps.player?.name}</span>
+                      </td>
+                      {cols.map(k => (
+                        <td key={k} style={{ textAlign: 'center', padding: '12px 8px', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+                          {k === 'rating' && rating > 0 ? (
+                            <div style={{ display: 'inline-flex', background: ratingColor, color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 8px', borderRadius: 6 }}>
+                              {rating.toFixed(1)}
+                            </div>
+                          ) : (
+                            s[k] || (k === 'rating' ? '-' : '0')
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
     </div>
   );
@@ -2490,5 +2745,3 @@ function RingkasanTab({ match }) {
     </div>
   );
 }
-
-
