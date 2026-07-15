@@ -178,7 +178,7 @@ const getSportSkills = (sportId) => {
   ];
 };
 
-function Home() {
+function HomeContent() {
   const [matches, setMatches] = useState([]);
   const [lastFetchTime, setLastFetchTime] = useState(Date.now());
   const [tournaments, setTournaments] = useState([]);
@@ -1395,10 +1395,15 @@ function Home() {
   );
 }
 
-export default function HomePage() {
+export default function Home() {
   return (
-    <Suspense fallback={<div className="loader"></div>}>
-      <Home />
+    <Suspense fallback={
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '100px 0' }}>
+        <div className="loader"></div>
+        <span style={{ marginTop: 16, color: '#64748b', fontSize: 12, fontWeight: 500 }}>Memuat...</span>
+      </div>
+    }>
+      <HomeContent />
     </Suspense>
   );
 }
