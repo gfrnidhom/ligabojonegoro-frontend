@@ -17,7 +17,7 @@ export async function generateMetadata({ params }) {
         const score = m.status === 'finished' || m.status === 'live' ? `(${m.home_score} - ${m.away_score})` : '';
         const title = `${home} vs ${away} ${score} | Pertandingan`;
         const description = `Skor langsung, hasil akhir, statistik, formasi tim, dan detail pertandingan antara ${home} melawan ${away} dalam kompetisi ${m.tournament?.name || 'Liga Bojonegoro'}.`;
-        const imgPath = getImageUrl(m.tournament?.logo || m.home_team?.logo || m.away_team?.logo) || `${siteUrl}/favicon.ico`;
+        const imgPath = getImageUrl(m.tournament?.logo_path || m.home_team?.logo_path || m.away_team?.logo_path || m.tournament?.logo || m.home_team?.logo || m.away_team?.logo) || `${siteUrl}/og-image.png`;
 
         return {
           title,
@@ -34,6 +34,7 @@ export async function generateMetadata({ params }) {
                 width: 1200,
                 height: 630,
                 alt: `${home} vs ${away}`,
+                type: 'image/png',
               },
             ],
           },
@@ -118,4 +119,5 @@ export default async function MatchDetailLayout({ children, params }) {
     </>
   );
 }
+
 

@@ -43,10 +43,11 @@ export const metadata = {
     type: 'website',
     images: [
       {
-        url: '/favicon.ico',
-        width: 800,
-        height: 600,
+        url: `${siteUrl}/og-image.png`,
+        width: 1200,
+        height: 630,
         alt: 'Liga Bojonegoro Logo & Preview',
+        type: 'image/png',
       },
     ],
   },
@@ -54,7 +55,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Liga Bojonegoro | Skor Langsung & Jadwal Turnamen',
     description: 'Pusat informasi resmi Liga Bojonegoro. Skor langsung, klasemen, statistik, dan berita turnamen terkini.',
-    images: ['/favicon.ico'],
+    images: [`${siteUrl}/og-image.png`],
   },
   robots: {
     index: true,
@@ -101,7 +102,7 @@ export default function RootLayout({ children }) {
         url: siteUrl,
         logo: {
           '@type': 'ImageObject',
-          url: `${siteUrl}/favicon.ico`,
+          url: `${siteUrl}/og-image.png`,
         },
         sameAs: [
           'https://instagram.com/ligabojonegoro',

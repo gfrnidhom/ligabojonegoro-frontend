@@ -14,7 +14,7 @@ export async function generateMetadata({ params }) {
         const team = data.data;
         const title = `${team.name} | Profil Tim`;
         const description = `Profil lengkap klub ${team.name}, daftar pemain skuad terbaru, rekor pertandingan, dan statistik performa di turnamen Liga Bojonegoro.`;
-        const imgPath = getImageUrl(team.logo || team.image) || `${siteUrl}/favicon.ico`;
+        const imgPath = getImageUrl(team.logo_path || team.image_path || team.logo || team.image) || `${siteUrl}/og-image.png`;
 
         return {
           title,
@@ -31,6 +31,7 @@ export async function generateMetadata({ params }) {
                 width: 800,
                 height: 800,
                 alt: `${team.name} Logo`,
+                type: 'image/png',
               },
             ],
           },
@@ -77,7 +78,7 @@ export default async function TeamDetailLayout({ children, params }) {
           '@type': 'SportsTeam',
           name: team.name,
           url: `${siteUrl}/teams/${id}`,
-          logo: getImageUrl(team.logo || team.image) || `${siteUrl}/favicon.ico`,
+          logo: getImageUrl(team.logo_path || team.image_path || team.logo || team.image) || `${siteUrl}/og-image.png`,
           sport: 'Football',
           memberOf: {
             '@type': 'SportsOrganization',
@@ -100,4 +101,5 @@ export default async function TeamDetailLayout({ children, params }) {
     </>
   );
 }
+
 

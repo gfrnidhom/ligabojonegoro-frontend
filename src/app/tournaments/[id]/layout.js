@@ -14,7 +14,7 @@ export async function generateMetadata({ params }) {
         const t = data.data;
         const title = `${t.name} | Turnamen`;
         const description = t.description || `Klasemen terbaru, jadwal pertandingan, hasil lengkap, dan daftar tim turnamen ${t.name} di Liga Bojonegoro.`;
-        const imgPath = getImageUrl(t.logo || t.banner || t.image) || `${siteUrl}/favicon.ico`;
+        const imgPath = getImageUrl(t.logo_path || t.banner_path || t.image_path || t.logo || t.banner || t.image) || `${siteUrl}/og-image.png`;
 
         return {
           title,
@@ -31,6 +31,7 @@ export async function generateMetadata({ params }) {
                 width: 1200,
                 height: 630,
                 alt: `${t.name} Logo`,
+                type: 'image/png',
               },
             ],
           },
@@ -78,7 +79,7 @@ export default async function TournamentDetailLayout({ children, params }) {
           name: t.name,
           description: t.description || `Turnamen ${t.name} Liga Bojonegoro`,
           url: `${siteUrl}/tournaments/${id}`,
-          image: getImageUrl(t.logo || t.banner || t.image) || `${siteUrl}/favicon.ico`,
+          image: getImageUrl(t.logo_path || t.banner_path || t.image_path || t.logo || t.banner || t.image) || `${siteUrl}/og-image.png`,
           organizer: {
             '@type': 'Organization',
             name: 'Liga Bojonegoro',
@@ -101,4 +102,5 @@ export default async function TournamentDetailLayout({ children, params }) {
     </>
   );
 }
+
 

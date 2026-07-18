@@ -24,7 +24,7 @@ export async function generateMetadata({ params }) {
     if (news) {
       const title = `${news.title} | Berita`;
       const description = news.excerpt || news.content?.slice(0, 160) || `Baca liputan dan berita lengkap tentang ${news.title} di turnamen Liga Bojonegoro.`;
-      const imgPath = getImageUrl(news.image || news.thumbnail) || `${siteUrl}/favicon.ico`;
+      const imgPath = getImageUrl(news.image_path || news.thumbnail_path || news.image || news.thumbnail) || `${siteUrl}/og-image.png`;
 
       return {
         title,
@@ -44,6 +44,7 @@ export async function generateMetadata({ params }) {
               width: 1200,
               height: 630,
               alt: news.title,
+              type: 'image/png',
             },
           ],
         },
@@ -99,7 +100,7 @@ export default async function NewsDetailLayout({ children, params }) {
         '@type': 'NewsArticle',
         headline: news.title,
         description: news.excerpt || news.content?.slice(0, 160) || news.title,
-        image: [getImageUrl(news.image || news.thumbnail) || `${siteUrl}/favicon.ico`],
+        image: [getImageUrl(news.image_path || news.thumbnail_path || news.image || news.thumbnail) || `${siteUrl}/og-image.png`],
         datePublished: news.created_at || news.date || new Date().toISOString(),
         dateModified: news.updated_at || news.created_at || news.date || new Date().toISOString(),
         author: [
@@ -114,7 +115,7 @@ export default async function NewsDetailLayout({ children, params }) {
           name: 'Liga Bojonegoro',
           logo: {
             '@type': 'ImageObject',
-            url: `${siteUrl}/favicon.ico`,
+            url: `${siteUrl}/og-image.png`,
           },
         },
         mainEntityOfPage: {
@@ -137,4 +138,5 @@ export default async function NewsDetailLayout({ children, params }) {
     </>
   );
 }
+
 

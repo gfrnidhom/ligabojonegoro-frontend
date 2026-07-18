@@ -14,7 +14,7 @@ export async function generateMetadata({ params }) {
         const player = data.data;
         const title = `${player.name} | Profil Pemain`;
         const description = `Profil, biodata, rekor gol, assist, dan statistik performa ${player.name} dari tim ${player.team?.name || '-'} di Liga Bojonegoro.`;
-        const imgPath = getImageUrl(player.photo || player.image) || `${siteUrl}/favicon.ico`;
+        const imgPath = getImageUrl(player.photo_path || player.image_path || player.photo || player.image) || `${siteUrl}/og-image.png`;
 
         return {
           title,
@@ -31,6 +31,7 @@ export async function generateMetadata({ params }) {
                 width: 800,
                 height: 800,
                 alt: `${player.name} Foto`,
+                type: 'image/png',
               },
             ],
           },
@@ -77,7 +78,7 @@ export default async function PlayerDetailLayout({ children, params }) {
           '@type': 'Person',
           name: player.name,
           url: `${siteUrl}/players/${id}`,
-          image: getImageUrl(player.photo || player.image) || `${siteUrl}/favicon.ico`,
+          image: getImageUrl(player.photo_path || player.image_path || player.photo || player.image) || `${siteUrl}/og-image.png`,
           jobTitle: 'Football Player',
           memberOf: player.team ? {
             '@type': 'SportsTeam',
@@ -100,4 +101,5 @@ export default async function PlayerDetailLayout({ children, params }) {
     </>
   );
 }
+
 
