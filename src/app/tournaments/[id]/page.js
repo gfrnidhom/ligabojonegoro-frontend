@@ -702,7 +702,7 @@ export default function TournamentDetailPage({ params }) {
 
                         {activeTab === 'standings' && (
           <div className="animate-fade-in" style={{ padding: '0 4px' }}>
-            <KlasemenTab standings={standings} />
+            <KlasemenTab standings={standings} sport={tournament.sport} />
           </div>
         )}
 
@@ -924,6 +924,8 @@ function KlasemenTab({ standings, match, sport, compact = false }) {
     );
   }
 
+  const scoringInfo = standings.scoring_info || null;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       {standings.type === 'grouped_phases' ? (
@@ -962,7 +964,7 @@ function KlasemenTab({ standings, match, sport, compact = false }) {
                     <div style={{ width: 4, height: 18, borderRadius: 2, background: 'var(--primary)' }} />
                     <span style={{ fontSize: 16, fontWeight: 800, color: '#0f172a' }}>{g.group?.name}</span>
                   </div>
-                  <StandingsTable rows={g.standings} match={match} sport={sport} compact={compact} />
+                  <StandingsTable rows={g.standings} match={match} sport={sport} scoringInfo={scoringInfo} compact={compact} />
                 </div>
               ))}
             </div>
@@ -976,18 +978,18 @@ function KlasemenTab({ standings, match, sport, compact = false }) {
                 <div style={{ width: 4, height: 18, borderRadius: 2, background: 'var(--primary)' }} />
                 <span style={{ fontSize: 16, fontWeight: 800, color: '#0f172a' }}>{g.group?.name}</span>
               </div>
-              <StandingsTable rows={g.standings} match={match} sport={sport} isGrouped={true} compact={compact} />
+              <StandingsTable rows={g.standings} match={match} sport={sport} scoringInfo={scoringInfo} isGrouped={true} compact={compact} />
             </div>
           ))}
         </div>
       ) : (
-        <StandingsTable rows={standings.standings} match={match} sport={sport} compact={compact} />
+        <StandingsTable rows={standings.standings} match={match} sport={sport} scoringInfo={scoringInfo} compact={compact} />
       )}
     </div>
   );
 }
 
-function StandingsTable({ rows = [], match, sport, isGrouped, compact = false }) {
+function StandingsTable({ rows = [], match, sport, scoringInfo, isGrouped, compact = false }) {
   if (!Array.isArray(rows) || rows.length === 0) {
     return <div style={{ padding: '16px 0', textAlign: 'center', fontSize: 10, color: '#9ca3af' }}>Belum ada data klasemen.</div>;
   }
@@ -1001,17 +1003,33 @@ function StandingsTable({ rows = [], match, sport, isGrouped, compact = false })
     return 'transparent';
   };
 
-  const isVolleyball = sport?.slug === 'volleyball';
-  const isBadminton = sport?.slug === 'badminton';
+  const slug = String(sport?.slug || '').toLowerCase();
+  const isFootball = slug === 'football' || slug === 'futsal' || slug === '';
+  const isVolleyball = slug === 'volleyball';
+  const isBadminton = slug === 'badminton';
 
-  // Column definitions
+  // Use scoring_info labels from backend if available, fallback to defaults
+  const goalsLabel = scoringInfo?.goals_label || {};
+  const labelFor = goalsLabel.for || 'GF';
+  const labelAgainst = goalsLabel.against || 'GA';
+  const labelDiff = goalsLabel.diff || 'GD';
+
+  // Tooltip text based on sport
+  const tipFor = isVolleyball ? 'Set Menang' : isBadminton ? 'Poin Menang' : 'Gol Memasukkan';
+  const tipAgainst = isVolleyball ? 'Set Kalah' : isBadminton ? 'Poin Kalah' : 'Gol Kemasukan';
+  const tipDiff = isVolleyball ? 'Selisih Set' : isBadminton ? 'Selisih Poin' : 'Selisih Gol';
+
+  // For non-football sports, hide "drawn" column since draws are rare/impossible
+  const showDrawn = isFootball;
+
+  // Column definitions - dynamic per sport
   const allCols = [
     { key: 'played', label: 'M', tip: 'Main' },
     { key: 'won', label: 'M', tip: 'Menang' },
-    { key: 'drawn', label: 'S', tip: 'Seri' },
+    ...(showDrawn ? [{ key: 'drawn', label: 'S', tip: 'Seri' }] : []),
     { key: 'lost', label: 'K', tip: 'Kalah' },
-    { key: 'plus_minus', label: '+/-', tip: 'Gol Memasukkan - Kemasukan' },
-    { key: 'goal_difference', label: 'SG', tip: 'Selisih Gol' },
+    { key: 'plus_minus', label: `${labelFor}/${labelAgainst}`, tip: `${tipFor} - ${tipAgainst}` },
+    { key: 'goal_difference', label: labelDiff, tip: tipDiff },
     { key: 'points', label: 'PTS', tip: 'Poin' },
   ];
 

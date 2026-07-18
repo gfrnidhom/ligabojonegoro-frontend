@@ -63,6 +63,10 @@ export default function StandingsPage() {
   const scoringInfo = standings?.scoring_info || {};
   const goalsLabel = scoringInfo.goals_label || { for: 'GF', against: 'GA', diff: 'GD' };
 
+  // Determine if Draw column should be shown based on sport
+  const sportSlug = String(selectedTournament?.sport?.slug || '').toLowerCase();
+  const showDrawn = sportSlug === 'football' || sportSlug === 'futsal' || sportSlug === '';
+
   // Map labels to Indonesian for legend
   const goalsLabelMap = {
     'GF': 'Gol Memasukkan', 'GA': 'Gol Kemasukan', 'GD': 'Selisih Gol',
@@ -94,7 +98,7 @@ export default function StandingsPage() {
                 <th style={{ ...thStyle, textAlign: 'left' }}>Tim</th>
                 <th style={thStyle}>M</th>
                 <th style={thStyle}>M</th>
-                <th style={thStyle}>S</th>
+                {showDrawn && <th style={thStyle}>S</th>}
                 <th style={thStyle}>K</th>
                 <th style={thStyle}>{goalsLabel.for}</th>
                 <th style={thStyle}>{goalsLabel.against}</th>
@@ -145,7 +149,7 @@ export default function StandingsPage() {
                     </td>
                     <td style={tdStyle}>{row.played || 0}</td>
                     <td style={{ ...tdStyle, color: '#10b981' }}>{row.won || 0}</td>
-                    <td style={tdStyle}>{row.drawn || 0}</td>
+                    {showDrawn && <td style={tdStyle}>{row.drawn || 0}</td>}
                     <td style={{ ...tdStyle, color: '#ef4444' }}>{row.lost || 0}</td>
                     <td style={tdStyle}>{row.goals_for || 0}</td>
                     <td style={tdStyle}>{row.goals_against || 0}</td>
