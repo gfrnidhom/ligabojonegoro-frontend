@@ -1161,7 +1161,6 @@ function StandingsTable({ rows = [], match, sport, scoringInfo, isGrouped, compa
 }
 /* ─── Statistik ─── */
 function StatistikTab({ match }) {
-
   const [period, setPeriod] = useState('all');
   const stats = match.statistics;
   if (!stats || Object.keys(stats).length === 0) {
@@ -1174,17 +1173,6 @@ function StatistikTab({ match }) {
 
   const prefix = period === 'all' ? '' : period === 'h1' ? 'h1_' : 'h2_';
   const s = (key) => stats[`${prefix}${key}`];
-
-  const Badge = ({ value, color }) => (
-    <div style={{
-      width: 32, height: 32, borderRadius: '50%',
-      border: `2px solid ${color}`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: 11, fontWeight: 800, color: color, flexShrink: 0,
-      background: `${color}15`,
-    }}>
-      {value}
-    </div>
-  );
 
   const StatRow = ({ label, homeVal, awayVal, lowerIsBetter = false }) => {
     const hStr = homeVal != null ? String(homeVal) : '0';
@@ -1231,11 +1219,35 @@ function StatistikTab({ match }) {
     );
   };
 
+  const sportSlug = String(match.tournament?.sport?.slug || '').toLowerCase();
+  const isVolleyball = sportSlug === 'volleyball';
+  const isBadminton = sportSlug === 'badminton';
+
+  if (isVolleyball) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 8 }}>
+        <StatRow label="Service" homeVal={s('service_home')} awayVal={s('service_away')} />
+        <StatRow label="Block" homeVal={s('block_home')} awayVal={s('block_away')} />
+        <StatRow label="Smash / Kills" homeVal={s('smash_home')} awayVal={s('smash_away')} />
+        <StatRow label="Digs / Penyelamatan" homeVal={s('dig_home')} awayVal={s('dig_away')} />
+        <StatRow label="Errors" homeVal={s('error_home')} awayVal={s('error_away')} lowerIsBetter />
+      </div>
+    );
+  }
+
+  if (isBadminton) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 8 }}>
+        <StatRow label="Service Aces" homeVal={s('aces_home')} awayVal={s('aces_away')} />
+        <StatRow label="Smashes" homeVal={s('smashes_home')} awayVal={s('smashes_away')} />
+        <StatRow label="Net Play Wins" homeVal={s('net_wins_home')} awayVal={s('net_wins_away')} />
+        <StatRow label="Unforced Errors" homeVal={s('errors_home')} awayVal={s('errors_away')} lowerIsBetter />
+      </div>
+    );
+  }
+
   const possHome = parseInt(s('possession_home')) || 50;
   const possAway = parseInt(s('possession_away')) || 50;
-
-  const avatar = (name, bg) =>
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(name || '?')}&size=24&background=${bg}&color=fff`;
 
   const periods = [
     { id: 'all', label: 'Semua' },
@@ -1245,7 +1257,6 @@ function StatistikTab({ match }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-
       {/* Sub-tabs */}
       <div style={{ display: 'flex', gap: 0, borderRadius: 10, overflow: 'hidden', border: '1px solid var(--border)' }}>
         {periods.map(p => (

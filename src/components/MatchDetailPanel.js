@@ -527,41 +527,97 @@ function RincianTab({ match }) {
       <GoalDetailSection match={match} />
 
       {/* ── Mini Stats (Possession & Key Events) ── */}
-      {match.statistics && (
-        <div style={{ background: '#18181b', borderRadius: 16, padding: '20px', marginTop: 8 }}>
-          <div style={{ textAlign: 'center', fontSize: 10, color: '#a1a1aa', fontWeight: 600, marginBottom: 16 }}>
-            Persentase Penguasaan Bola
-          </div>
+      {match.statistics && (() => {
+        const sportSlug = String(match.tournament?.sport?.slug || '').toLowerCase();
+        const isVolleyball = sportSlug === 'volleyball';
+        const isBadminton = sportSlug === 'badminton';
 
-          <div style={{ display: 'flex', height: 32, borderRadius: 6, overflow: 'hidden' }}>
-            {/* Home Bar */}
-            <div style={{ flex: parseInt(match.statistics.possession_home) || 50, background: '#1d4ed8', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px' }}>
-              <img src={getImageUrl(match.home_team?.logo_path) || `https://ui-avatars.com/api/?name=${encodeURIComponent(match.home_team?.name || '?')}`} style={{ width: 20, height: 20, borderRadius: '50%' }} alt="" />
-              <span style={{ color: '#fff', fontWeight: 800, fontSize: 11 }}>{match.statistics.possession_home || 50}%</span>
-            </div>
-            {/* Away Bar */}
-            <div style={{ flex: parseInt(match.statistics.possession_away) || 50, background: '#78350f', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px' }}>
-              <span style={{ color: '#fff', fontWeight: 800, fontSize: 11 }}>{match.statistics.possession_away || 50}%</span>
-              <img src={getImageUrl(match.away_team?.logo_path) || `https://ui-avatars.com/api/?name=${encodeURIComponent(match.away_team?.name || '?')}`} style={{ width: 20, height: 20, borderRadius: '50%' }} alt="" />
-            </div>
-          </div>
+        return (
+          <div style={{ background: '#18181b', borderRadius: 16, padding: '20px', marginTop: 8 }}>
+            {isVolleyball ? (
+              <div>
+                <div style={{ textAlign: 'center', fontSize: 11, color: '#a1a1aa', fontWeight: 600, marginBottom: 16 }}>
+                  Statistik Utama Voli
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
+                  <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: 20, padding: '6px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#3b82f6' }}>{match.statistics.service_home || 0}</span>
+                    <span style={{ fontSize: 10, color: '#a1a1aa' }}>Service</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#eab308' }}>{match.statistics.service_away || 0}</span>
+                  </div>
+                  <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: 20, padding: '6px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#3b82f6' }}>{match.statistics.block_home || 0}</span>
+                    <span style={{ fontSize: 10, color: '#a1a1aa' }}>Block</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#eab308' }}>{match.statistics.block_away || 0}</span>
+                  </div>
+                  <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: 20, padding: '6px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#3b82f6' }}>{match.statistics.smash_home || 0}</span>
+                    <span style={{ fontSize: 10, color: '#a1a1aa' }}>Smash</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#eab308' }}>{match.statistics.smash_away || 0}</span>
+                  </div>
+                </div>
+              </div>
+            ) : isBadminton ? (
+              <div>
+                <div style={{ textAlign: 'center', fontSize: 11, color: '#a1a1aa', fontWeight: 600, marginBottom: 16 }}>
+                  Statistik Utama Bulu Tangkis
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
+                  <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: 20, padding: '6px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#3b82f6' }}>{match.statistics.aces_home || 0}</span>
+                    <span style={{ fontSize: 10, color: '#a1a1aa' }}>Aces</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#eab308' }}>{match.statistics.aces_away || 0}</span>
+                  </div>
+                  <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: 20, padding: '6px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#3b82f6' }}>{match.statistics.smashes_home || 0}</span>
+                    <span style={{ fontSize: 10, color: '#a1a1aa' }}>Smashes</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#eab308' }}>{match.statistics.smashes_away || 0}</span>
+                  </div>
+                  <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: 20, padding: '6px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#3b82f6' }}>{match.statistics.net_wins_home || 0}</span>
+                    <span style={{ fontSize: 10, color: '#a1a1aa' }}>Net Wins</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#eab308' }}>{match.statistics.net_wins_away || 0}</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div style={{ textAlign: 'center', fontSize: 10, color: '#a1a1aa', fontWeight: 600, marginBottom: 16 }}>
+                  Persentase Penguasaan Bola
+                </div>
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 24 }}>
-            {/* Corners Pill */}
-            <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: 20, padding: '6px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ fontSize: 11, fontWeight: 800, color: '#fff' }}>{match.statistics.corners_home || 0}</span>
-              <span style={{ fontSize: 11 }}>⛳️</span>
-              <span style={{ fontSize: 11, fontWeight: 800, color: '#fff' }}>{match.statistics.corners_away || 0}</span>
-            </div>
-            {/* Yellow Cards Pill */}
-            <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: 20, padding: '6px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ fontSize: 11, fontWeight: 800, color: '#fff' }}>{match.statistics.yellow_cards_home || 0}</span>
-              <div style={{ width: 10, height: 14, background: '#eab308', borderRadius: 2 }}></div>
-              <span style={{ fontSize: 11, fontWeight: 800, color: '#fff' }}>{match.statistics.yellow_cards_away || 0}</span>
-            </div>
+                <div style={{ display: 'flex', height: 32, borderRadius: 6, overflow: 'hidden' }}>
+                  {/* Home Bar */}
+                  <div style={{ flex: parseInt(match.statistics.possession_home) || 50, background: '#1d4ed8', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px' }}>
+                    <img src={getImageUrl(match.home_team?.logo_path) || `https://ui-avatars.com/api/?name=${encodeURIComponent(match.home_team?.name || '?')}`} style={{ width: 20, height: 20, borderRadius: '50%' }} alt="" />
+                    <span style={{ color: '#fff', fontWeight: 800, fontSize: 11 }}>{match.statistics.possession_home || 50}%</span>
+                  </div>
+                  {/* Away Bar */}
+                  <div style={{ flex: parseInt(match.statistics.possession_away) || 50, background: '#78350f', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px' }}>
+                    <span style={{ color: '#fff', fontWeight: 800, fontSize: 11 }}>{match.statistics.possession_away || 50}%</span>
+                    <img src={getImageUrl(match.away_team?.logo_path) || `https://ui-avatars.com/api/?name=${encodeURIComponent(match.away_team?.name || '?')}`} style={{ width: 20, height: 20, borderRadius: '50%' }} alt="" />
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 24 }}>
+                  {/* Corners Pill */}
+                  <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: 20, padding: '6px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#fff' }}>{match.statistics.corners_home || 0}</span>
+                    <span style={{ fontSize: 11 }}>⛳️</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#fff' }}>{match.statistics.corners_away || 0}</span>
+                  </div>
+                  {/* Yellow Cards Pill */}
+                  <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: 20, padding: '6px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#fff' }}>{match.statistics.yellow_cards_home || 0}</span>
+                    <div style={{ width: 10, height: 14, background: '#eab308', borderRadius: 2 }}></div>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#fff' }}>{match.statistics.yellow_cards_away || 0}</span>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Kejadian Pertandingan */}
       {match.events && match.events.length > 0 ? (
