@@ -13,6 +13,150 @@ const avatar = (name, bg = '3b82f6') => {
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=${bg}&color=fff&bold=true`;
 };
 
+/**
+ * Returns grouped player stat configs based on sport slug.
+ * The backend always returns: top_scorers (goals, assists), top_cards (yellow_cards, red_cards),
+ * top_clean_sheets, top_minutes — so we filter/relabel per sport.
+ */
+const getPlayerStatGroups = (sportSlug, playerStats) => {
+  const slug = String(sportSlug || '').toLowerCase();
+
+  if (slug === 'volleyball') {
+    return [
+      {
+        title: 'Statistik Pemain',
+        stats: [
+          { key: 'points', label: 'Poin Tertinggi', data: playerStats?.top_scorers, valueKey: 'goals', isNegative: false },
+          { key: 'minutes_played', label: 'Menit Bermain', data: playerStats?.top_minutes, valueKey: 'minutes_played', isNegative: false }
+        ]
+      }
+    ];
+  }
+
+  if (slug === 'badminton') {
+    return [
+      {
+        title: 'Statistik Pemain',
+        stats: [
+          { key: 'minutes_played', label: 'Menit Bermain', data: playerStats?.top_minutes, valueKey: 'minutes_played', isNegative: false }
+        ]
+      }
+    ];
+  }
+
+  // Default: Football / Futsal
+  return [
+    {
+      title: 'Statistik Utama',
+      stats: [
+        { key: 'goals', label: 'Pencetak Gol', data: playerStats?.top_scorers, valueKey: 'goals', isNegative: false },
+        { key: 'assists', label: 'Assists', data: playerStats?.top_scorers ? [...playerStats.top_scorers].sort((a, b) => (b.assists || 0) - (a.assists || 0)) : [], valueKey: 'assists', isNegative: false },
+        { key: 'minutes_played', label: 'Menit Bermain', data: playerStats?.top_minutes, valueKey: 'minutes_played', isNegative: false }
+      ]
+    },
+    {
+      title: 'Pertahanan',
+      stats: [
+        { key: 'clean_sheets', label: 'Tanpa Kebobolan', data: playerStats?.top_clean_sheets, valueKey: 'clean_sheets', isNegative: false }
+      ]
+    },
+    {
+      title: 'Pelanggaran & Disiplin',
+      stats: [
+        { key: 'yellow_cards', label: 'Kartu Kuning', data: playerStats?.top_cards ? [...playerStats.top_cards].sort((a,b) => (b.yellow_cards || 0) - (a.yellow_cards || 0)) : [], valueKey: 'yellow_cards', isNegative: true },
+        { key: 'red_cards', label: 'Kartu Merah', data: playerStats?.top_cards ? [...playerStats.top_cards].sort((a,b) => (b.red_cards || 0) - (a.red_cards || 0)) : [], valueKey: 'red_cards', isNegative: true }
+      ]
+    }
+  ];
+};
+
+/**
+ * Returns grouped team stat configs based on sport slug.
+ * Backend team-stats keys: goals, shots, shots_on_target, corners, yellow_cards, red_cards, conceded, matches_played
+ */
+const getTeamStatGroups = (sportSlug) => {
+  const slug = String(sportSlug || '').toLowerCase();
+
+  if (slug === 'volleyball') {
+    return [
+      {
+        title: 'Statistik Utama',
+        stats: [
+          { key: 'goals', label: 'Poin', isNegative: false },
+          { key: 'conceded', label: 'Poin Kemasukan', isNegative: true },
+          { key: 'matches_played', label: 'Pertandingan Dimainkan', isNegative: false },
+        ]
+      }
+    ];
+  }
+
+  if (slug === 'badminton') {
+    return [
+      {
+        title: 'Statistik Utama',
+        stats: [
+          { key: 'goals', label: 'Poin', isNegative: false },
+          { key: 'conceded', label: 'Poin Kemasukan', isNegative: true },
+          { key: 'matches_played', label: 'Pertandingan Dimainkan', isNegative: false },
+        ]
+      }
+    ];
+  }
+
+  // Default: Football / Futsal
+  return [
+    {
+      title: 'Statistik Utama',
+      stats: [
+        { key: 'goals', label: 'Gol', isNegative: false },
+        { key: 'shots', label: 'Tembakan', isNegative: false },
+        { key: 'shots_on_target', label: 'Tembakan Tepat Sasaran', isNegative: false },
+        { key: 'corners', label: 'Tendangan Sudut', isNegative: false },
+      ]
+    },
+    {
+      title: 'Pertahanan',
+      stats: [
+        { key: 'conceded', label: 'Gol Kebobolan', isNegative: true },
+        { key: 'matches_played', label: 'Pertandingan Dimainkan', isNegative: false },
+      ]
+    },
+    {
+      title: 'Pelanggaran & Disiplin',
+      stats: [
+        { key: 'yellow_cards', label: 'Kartu Kuning', isNegative: true },
+        { key: 'red_cards', label: 'Kartu Merah', isNegative: true },
+      ]
+    }
+  ];
+};
+
+/**
+ * Returns info tab player stat highlight configs based on sport slug.
+ */
+const getInfoPlayerStatHighlights = (sportSlug, playerStats) => {
+  const slug = String(sportSlug || '').toLowerCase();
+
+  if (slug === 'volleyball') {
+    return [
+      { title: 'Poin Tertinggi', data: playerStats?.top_scorers, valueKey: 'goals' },
+      { title: 'Menit Bermain', data: playerStats?.top_minutes, valueKey: 'minutes_played' },
+    ];
+  }
+
+  if (slug === 'badminton') {
+    return [
+      { title: 'Menit Bermain', data: playerStats?.top_minutes, valueKey: 'minutes_played' },
+    ];
+  }
+
+  // Default: Football / Futsal
+  return [
+    { title: 'Pencetak Gol', data: playerStats?.top_scorers, valueKey: 'goals' },
+    { title: 'Assists', data: playerStats?.top_scorers ? [...playerStats.top_scorers].sort((a, b) => (b.assists || 0) - (a.assists || 0)) : [], valueKey: 'assists' },
+  ];
+};
+
 function PlayerStatCard({ title, data, valueKey, labelKey = 'goals', isMock = false, isNegative = false }) {
   return (
     <div style={{ background: '#fff', borderRadius: 16, border: '1px solid var(--border-light)', overflow: 'hidden' }}>
@@ -598,44 +742,12 @@ export default function TournamentDetailPage({ params }) {
         {activeTab === 'players' && (
           <div className="animate-fade-in" style={{ padding: '0 4px', display: 'flex', flexDirection: 'column', gap: 32 }}>
             {(() => {
-              const playerGroupedStats = [
-                {
-                  title: 'Statistik Utama',
-                  stats: [
-                    { key: 'goals', label: 'Pencetak Gol', data: playerStats?.top_scorers, valueKey: 'goals', isNegative: false },
-                    { key: 'assists', label: 'Assists', data: playerStats?.top_scorers ? [...playerStats.top_scorers].sort((a, b) => (b.assists || 0) - (a.assists || 0)) : [], valueKey: 'assists', isNegative: false },
-                    { key: 'goals_assists', label: 'Gol + Assists', data: [
-                      { player: { name: 'Budi Santoso', team: 'Persibo' }, mockValue: '11' },
-                      { player: { name: 'Andi Firman', team: 'Persela' }, mockValue: '8' },
-                      { player: { name: 'Joko Anwar', team: 'Persebaya' }, mockValue: '7' }
-                    ], valueKey: 'mock', isMock: true, isNegative: false },
-                    { key: 'rating', label: 'Rating', data: [
-                      { player: { name: 'Budi Santoso', team: 'Persibo' }, mockValue: '8.73' },
-                      { player: { name: 'Joko Anwar', team: 'Persebaya' }, mockValue: '8.43' },
-                      { player: { name: 'Ahmad Maulana', team: 'Gresik' }, mockValue: '8.24' }
-                    ], valueKey: 'mock', isMock: true, isNegative: false },
-                    { key: 'minutes_played', label: 'Menit Bermain', data: playerStats?.top_minutes, valueKey: 'minutes_played', isNegative: false }
-                  ]
-                },
-                {
-                  title: 'Pertahanan',
-                  stats: [
-                    { key: 'clean_sheets', label: 'Tanpa Kebobolan', data: playerStats?.top_clean_sheets, valueKey: 'clean_sheets', isNegative: false }
-                  ]
-                },
-                {
-                  title: 'Pelanggaran & Disiplin',
-                  stats: [
-                    { key: 'yellow_cards', label: 'Kartu Kuning', data: playerStats?.top_cards ? [...playerStats.top_cards].sort((a,b) => (b.yellow_cards || 0) - (a.yellow_cards || 0)) : [], valueKey: 'yellow_cards', isNegative: true },
-                    { key: 'red_cards', label: 'Kartu Merah', data: playerStats?.top_cards ? [...playerStats.top_cards].sort((a,b) => (b.red_cards || 0) - (a.red_cards || 0)) : [], valueKey: 'red_cards', isNegative: true }
-                  ]
-                }
-              ];
+              const playerGroupedStats = getPlayerStatGroups(tournament.sport?.slug, playerStats);
 
               return (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
                   {playerGroupedStats.map((group, gIdx) => {
-                    const availableStats = group.stats.filter(config => (config.data && config.data.length > 0) || config.isMock);
+                    const availableStats = group.stats.filter(config => config.data && config.data.length > 0);
                     if (availableStats.length === 0) return null;
 
                     return (
@@ -654,7 +766,6 @@ export default function TournamentDetailPage({ params }) {
                               title={config.label} 
                               data={config.data} 
                               valueKey={config.valueKey} 
-                              isMock={config.isMock}
                               isNegative={config.isNegative} 
                             />
                           ))}
@@ -662,6 +773,9 @@ export default function TournamentDetailPage({ params }) {
                       </div>
                     );
                   })}
+                  {playerGroupedStats.every(g => g.stats.every(s => !s.data || s.data.length === 0)) && (
+                    <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)' }}>Belum ada statistik pemain tersedia</div>
+                  )}
                 </div>
               );
             })()}
@@ -677,54 +791,7 @@ export default function TournamentDetailPage({ params }) {
         {activeTab === 'stats' && (
           <div className="animate-fade-in" style={{ padding: '0 4px', display: 'flex', flexDirection: 'column', gap: 32 }}>
             {(() => {
-              const groupedStats = [
-                {
-                  title: 'Statistik Utama',
-                  stats: [
-                    { key: 'goals', label: 'Gol', isNegative: false },
-                    { key: 'possession', label: 'Penguasaan Bola (%)', isNegative: false },
-                    { key: 'shots', label: 'Tembakan', isNegative: false },
-                    { key: 'shots_on_target', label: 'Tembakan Tepat Sasaran', isNegative: false },
-                    { key: 'corners', label: 'Tendangan Sudut', isNegative: false },
-                    { key: 'rating', label: 'Rating', isNegative: false },
-                  ]
-                },
-                {
-                  title: 'Distribusi & Umpan',
-                  stats: [
-                    { key: 'pass_accuracy', label: 'Akurasi Umpan (%)', isNegative: false },
-                    { key: 'total_passes', label: 'Total Umpan', isNegative: false },
-                    { key: 'successful_passes', label: 'Umpan Sukses', isNegative: false },
-                    { key: 'accurate_passes', label: 'Umpan Akurat', isNegative: false },
-                    { key: 'failed_passes', label: 'Umpan Gagal', isNegative: true },
-                    { key: 'key_passes', label: 'Umpan Kunci', isNegative: false },
-                    { key: 'successful_crosses', label: 'Umpan Silang Sukses', isNegative: false },
-                  ]
-                },
-                {
-                  title: 'Pertahanan',
-                  stats: [
-                    { key: 'clean_sheets', label: 'Clean Sheet', isNegative: false },
-                    { key: 'saves', label: 'Penyelamatan', isNegative: false },
-                    { key: 'tackles', label: 'Tekel', isNegative: false },
-                    { key: 'successful_tackles', label: 'Tekel Sukses', isNegative: false },
-                    { key: 'clearances', label: 'Sapuan', isNegative: false },
-                    { key: 'interceptions', label: 'Intersepsi', isNegative: false },
-                    { key: 'conceded', label: 'Gol Kebobolan', isNegative: true },
-                  ]
-                },
-                {
-                  title: 'Pelanggaran & Disiplin',
-                  stats: [
-                    { key: 'fouls', label: 'Pelanggaran', isNegative: true },
-                    { key: 'fouls_committed', label: 'Melanggar', isNegative: true },
-                    { key: 'was_fouled', label: 'Dilanggar', isNegative: false },
-                    { key: 'offsides', label: 'Offside', isNegative: true },
-                    { key: 'yellow_cards', label: 'Kartu Kuning', isNegative: true },
-                    { key: 'red_cards', label: 'Kartu Merah', isNegative: true },
-                  ]
-                }
-              ];
+              const groupedStats = getTeamStatGroups(tournament.sport?.slug);
 
               let hasAnyData = false;
 
@@ -759,7 +826,7 @@ export default function TournamentDetailPage({ params }) {
                     );
                   })}
                   {!hasAnyData && (
-                    <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)' }}>Belum ada statistik tim yang dikelompokkan</div>
+                    <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)' }}>Belum ada statistik tim tersedia</div>
                   )}
                 </div>
               );
@@ -770,28 +837,16 @@ export default function TournamentDetailPage({ params }) {
         {activeTab === 'info' && (
           <div className="animate-fade-in" style={{ padding: '0 4px', display: 'flex', flexDirection: 'column', gap: 32 }}>
             
-            {/* Player Stats Highlights */}
+            {/* Player Stats Highlights - Sport Aware */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: 16 }}>
-              <PlayerStatCard 
-                title="Pencetak Gol" 
-                data={playerStats?.top_scorers} 
-                valueKey="goals" 
-              />
-              <PlayerStatCard 
-                title="Assists" 
-                data={playerStats?.top_scorers ? [...playerStats.top_scorers].sort((a, b) => (b.assists || 0) - (a.assists || 0)) : []} 
-                valueKey="assists" 
-              />
-              <PlayerStatCard 
-                title="FotMob Rating" 
-                data={[
-                  { player: { name: 'Budi Santoso', team: 'Persibo' }, mockValue: '8.73' },
-                  { player: { name: 'Joko Anwar', team: 'Persebaya' }, mockValue: '8.43' },
-                  { player: { name: 'Ahmad Maulana', team: 'Gresik' }, mockValue: '8.24' }
-                ]} 
-                valueKey="mock" 
-                isMock 
-              />
+              {getInfoPlayerStatHighlights(tournament.sport?.slug, playerStats).map((config, idx) => (
+                <PlayerStatCard 
+                  key={idx}
+                  title={config.title} 
+                  data={config.data} 
+                  valueKey={config.valueKey} 
+                />
+              ))}
             </div>
 
             {/* Knockout Bracket or Standings Highlight */}
