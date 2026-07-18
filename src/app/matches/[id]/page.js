@@ -763,21 +763,46 @@ function RincianTab({ match }) {
       )}
 
       {/* Mini Stats */}
-      {stats && (Object.keys(stats).length > 0 || pStats.length > 0) && (
-        <div className="match-card" style={{ background: '#ffffff', borderRadius: 16, padding: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
-          <div style={{ textAlign: 'center', fontSize: 16, color: '#0f172a', fontWeight: 800, marginBottom: 24 }}>
-            Statistik Pertandingan
+      {stats && (Object.keys(stats).length > 0 || pStats.length > 0) && (() => {
+        const sportSlug = String(match.tournament?.sport?.slug || '').toLowerCase();
+        const isVolleyball = sportSlug === 'volleyball';
+        const isBadminton = sportSlug === 'badminton';
+
+        return (
+          <div className="match-card" style={{ background: '#ffffff', borderRadius: 16, padding: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+            <div style={{ textAlign: 'center', fontSize: 16, color: '#0f172a', fontWeight: 800, marginBottom: 24 }}>
+              Statistik Pertandingan
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {isVolleyball ? (
+                <>
+                  <MiniStatRow label="Service" homeVal={stats.service_home || 0} awayVal={stats.service_away || 0} />
+                  <MiniStatRow label="Block" homeVal={stats.block_home || 0} awayVal={stats.block_away || 0} />
+                  <MiniStatRow label="Smash / Kills" homeVal={stats.smash_home || 0} awayVal={stats.smash_away || 0} />
+                  <MiniStatRow label="Digs / Penyelamatan" homeVal={stats.dig_home || 0} awayVal={stats.dig_away || 0} />
+                  <MiniStatRow label="Errors" homeVal={stats.error_home || 0} awayVal={stats.error_away || 0} lowerIsBetter />
+                </>
+              ) : isBadminton ? (
+                <>
+                  <MiniStatRow label="Service Aces" homeVal={stats.aces_home || 0} awayVal={stats.aces_away || 0} />
+                  <MiniStatRow label="Smashes" homeVal={stats.smashes_home || 0} awayVal={stats.smashes_away || 0} />
+                  <MiniStatRow label="Net Play Wins" homeVal={stats.net_wins_home || 0} awayVal={stats.net_wins_away || 0} />
+                  <MiniStatRow label="Unforced Errors" homeVal={stats.errors_home || 0} awayVal={stats.errors_away || 0} lowerIsBetter />
+                </>
+              ) : (
+                <>
+                  <MiniStatRow label="Penguasaan Bola (%)" homeVal={stats.possession_home || 50} awayVal={stats.possession_away || 50} />
+                  {(stats.shots_home != null || stats.shots_away != null) && <MiniStatRow label="Tembakan" homeVal={stats.shots_home} awayVal={stats.shots_away} />}
+                  {(stats.shots_on_target_home != null || stats.shots_on_target_away != null) && <MiniStatRow label="Tepat Sasaran" homeVal={stats.shots_on_target_home} awayVal={stats.shots_on_target_away} />}
+                  {(stats.corners_home != null || stats.corners_away != null) && <MiniStatRow label="Tendangan Sudut" homeVal={stats.corners_home} awayVal={stats.corners_away} />}
+                  {(stats.fouls_home != null || stats.fouls_away != null) && <MiniStatRow label="Pelanggaran" homeVal={stats.fouls_home} awayVal={stats.fouls_away} lowerIsBetter />}
+                </>
+              )}
+            </div>
           </div>
-          
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <MiniStatRow label="Penguasaan Bola (%)" homeVal={stats.possession_home || 50} awayVal={stats.possession_away || 50} />
-            {(stats.shots_home != null || stats.shots_away != null) && <MiniStatRow label="Tembakan" homeVal={stats.shots_home} awayVal={stats.shots_away} />}
-            {(stats.shots_on_target_home != null || stats.shots_on_target_away != null) && <MiniStatRow label="Tepat Sasaran" homeVal={stats.shots_on_target_home} awayVal={stats.shots_on_target_away} />}
-            {(stats.corners_home != null || stats.corners_away != null) && <MiniStatRow label="Tendangan Sudut" homeVal={stats.corners_home} awayVal={stats.corners_away} />}
-            {(stats.fouls_home != null || stats.fouls_away != null) && <MiniStatRow label="Pelanggaran" homeVal={stats.fouls_home} awayVal={stats.fouls_away} lowerIsBetter />}
-          </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Kejadian Pertandingan */}
       {match.events && match.events.length > 0 ? (
@@ -2024,8 +2049,65 @@ function PlayerStatsPanel({ playerStat, match, onClose }) {
   // Determine what stats are available
   const hasVal = (key) => stats[key] !== undefined && stats[key] !== null;
 
-  // All categories with Indonesian labels - matched to backend fields
-  const categories = [
+  const sportSlug = String(match.tournament?.sport?.slug || '').toLowerCase();
+  const isVolleyball = sportSlug === 'volleyball';
+  const isBadminton = sportSlug === 'badminton';
+
+  // All categories with Indonesian labels - matched to backend fields & sport
+  const categories = isVolleyball ? [
+    {
+      title: 'Statistik Utama',
+      icon: <Star size={16} strokeWidth={2.5} />,
+      color: '#f59e0b',
+      items: [
+        { label: 'Menit Bermain', value: g('minutes_played', '-'), show: true },
+        { label: 'Rating', value: g('rating', '-'), show: hasVal('rating') },
+        { label: 'Poin', value: g('points', g('goals', 0)), show: true },
+        { label: 'Service', value: g('service', 0), show: true },
+        { label: 'Block', value: g('block', 0), show: true },
+        { label: 'Smash / Kills', value: g('smash', 0), show: true },
+      ],
+    },
+    {
+      title: 'Penyelamatan & Umpan',
+      icon: <Shield size={16} strokeWidth={2.5} />,
+      color: '#10b981',
+      items: [
+        { label: 'Digs / Penyelamatan', value: g('dig', 0), show: true },
+        { label: 'Assists / Umpan', value: g('assist', 0), show: true },
+      ],
+    },
+    {
+      title: 'Kesalahan',
+      icon: <Activity size={16} strokeWidth={2.5} />,
+      color: '#ef4444',
+      items: [
+        { label: 'Errors', value: g('error', 0), show: true },
+      ],
+    }
+  ] : isBadminton ? [
+    {
+      title: 'Statistik Utama',
+      icon: <Star size={16} strokeWidth={2.5} />,
+      color: '#f59e0b',
+      items: [
+        { label: 'Menit Bermain', value: g('minutes_played', '-'), show: true },
+        { label: 'Rating', value: g('rating', '-'), show: hasVal('rating') },
+        { label: 'Poin', value: g('points', g('goals', 0)), show: true },
+        { label: 'Service Aces', value: g('aces', 0), show: true },
+        { label: 'Smashes', value: g('smashes', 0), show: true },
+        { label: 'Net Play Wins', value: g('net_wins', 0), show: true },
+      ],
+    },
+    {
+      title: 'Kesalahan',
+      icon: <Activity size={16} strokeWidth={2.5} />,
+      color: '#ef4444',
+      items: [
+        { label: 'Unforced Errors', value: g('errors', 0), show: true },
+      ],
+    }
+  ] : [
     {
       title: 'Statistik Utama',
       icon: <Star size={16} strokeWidth={2.5} />,
@@ -2070,7 +2152,7 @@ function PlayerStatsPanel({ playerStat, match, onClose }) {
       icon: <Activity size={16} strokeWidth={2.5} />,
       color: '#ef4444',
       items: [
-        { label: 'Melanggar', value: g('fouls_committed', g('fouls', 0)), show: true },
+        { label: 'Pelanggaran', value: g('fouls_committed', g('fouls', 0)), show: true },
         { label: 'Dilanggar', value: g('was_fouled', 0), show: true },
         { label: 'Offside', value: g('offsides', 0), show: true },
         { label: 'Kartu Kuning', value: g('yellow_cards', 0), show: true },
