@@ -1030,11 +1030,12 @@ function StandingsTable({ rows = [], match, sport, scoringInfo, isGrouped, compa
     { key: 'lost', label: 'K', tip: 'Kalah' },
     { key: 'plus_minus', label: `${labelFor}/${labelAgainst}`, tip: `${tipFor} - ${tipAgainst}` },
     { key: 'goal_difference', label: labelDiff, tip: tipDiff },
+    ...((isVolleyball || isBadminton) ? [{ key: 'points_akumulasi', label: 'Poin', tip: 'Poin Akumulasi (PF-PA)' }] : []),
     { key: 'points', label: 'PTS', tip: 'Poin' },
   ];
 
   const cols = compact 
-    ? allCols.filter(c => ['played', 'plus_minus', 'goal_difference', 'points'].includes(c.key))
+    ? allCols.filter(c => ['played', 'plus_minus', 'points_akumulasi', 'points'].includes(c.key))
     : allCols;
 
   return (
@@ -1051,7 +1052,7 @@ function StandingsTable({ rows = [], match, sport, scoringInfo, isGrouped, compa
         <div style={{ width: 28, textAlign: 'center' }}>#</div>
         <div style={{ flex: 1, paddingLeft: 8, minWidth: 80 }}>Tim</div>
         {cols.map(c => (
-          <div key={c.key} style={{ width: c.key === 'points' ? 34 : c.key === 'plus_minus' ? 42 : 28, textAlign: 'center', flexShrink: 0 }}>{c.label}</div>
+          <div key={c.key} style={{ width: c.key === 'points' ? 34 : (c.key === 'plus_minus' || c.key === 'points_akumulasi') ? 50 : 28, textAlign: 'center', flexShrink: 0 }}>{c.label}</div>
         ))}
         {!compact && <div style={{ width: 90, textAlign: 'center', flexShrink: 0 }}>Form</div>}
       </div>
@@ -1113,6 +1114,8 @@ function StandingsTable({ rows = [], match, sport, scoringInfo, isGrouped, compa
                   let val;
                   if (c.key === 'plus_minus') {
                     val = `${r.goals_for || 0}-${r.goals_against || 0}`;
+                  } else if (c.key === 'points_akumulasi') {
+                    val = `${r.points_for || 0}-${r.points_against || 0}`;
                   } else {
                     val = r[c.key];
                   }
@@ -1122,7 +1125,7 @@ function StandingsTable({ rows = [], match, sport, scoringInfo, isGrouped, compa
                   const gdColor = isGD ? (val > 0 ? '#22c55e' : val < 0 ? '#ef4444' : 'var(--text-secondary)') : null;
                   return (
                     <div key={c.key} style={{
-                      width: isPts ? 34 : c.key === 'plus_minus' ? 42 : 28, textAlign: 'center', flexShrink: 0,
+                      width: isPts ? 34 : (c.key === 'plus_minus' || c.key === 'points_akumulasi') ? 50 : 28, textAlign: 'center', flexShrink: 0,
                       fontSize: isPts ? 13 : 11,
                       fontWeight: isPts ? 900 : 600,
                       color: isPts ? 'var(--text-primary)' : gdColor || 'var(--text-secondary)',

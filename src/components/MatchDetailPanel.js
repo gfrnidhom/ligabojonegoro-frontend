@@ -1391,6 +1391,7 @@ function StandingsTable({ rows = [], match, sport }) {
       label: isVolleyball ? 'SS' : isBadminton ? 'MS' : 'SG', 
       tip: isVolleyball ? 'Selisih Set' : isBadminton ? 'Selisih Match' : 'Selisih Gol' 
     },
+    ...((isVolleyball || isBadminton) ? [{ key: 'points_akumulasi', label: 'Poin', tip: 'Poin Akumulasi (PF-PA)' }] : []),
     { key: 'points', label: 'PTS', tip: 'Poin' },
   ];
 
@@ -1409,7 +1410,7 @@ function StandingsTable({ rows = [], match, sport }) {
         <div style={{ width: 44, textAlign: 'left', paddingLeft: 4 }}>#</div>
         <div style={{ flex: 1, paddingLeft: 8, minWidth: 80 }}>Tim</div>
         {cols.map(c => (
-          <div key={c.key} style={{ width: c.key === 'points' ? 34 : 28, textAlign: 'center', flexShrink: 0 }}>{c.label}</div>
+          <div key={c.key} style={{ width: c.key === 'points' ? 34 : c.key === 'points_akumulasi' ? 50 : 28, textAlign: 'center', flexShrink: 0 }}>{c.label}</div>
         ))}
         <div style={{ width: 90, textAlign: 'center', flexShrink: 0 }}>Form</div>
       </div>
@@ -1482,13 +1483,18 @@ function StandingsTable({ rows = [], match, sport }) {
 
                 {/* Stats */}
                 {cols.map(c => {
-                  const val = r[c.key];
+                  let val;
+                  if (c.key === 'points_akumulasi') {
+                    val = `${r.points_for || 0}-${r.points_against || 0}`;
+                  } else {
+                    val = r[c.key];
+                  }
                   const isPts = c.key === 'points';
                   const isGD = c.key === 'goal_difference';
                   const gdColor = isGD ? (val > 0 ? '#22c55e' : val < 0 ? '#ef4444' : '#8b92a5') : null;
                   return (
                     <div key={c.key} style={{
-                      width: isPts ? 34 : 28, textAlign: 'center', flexShrink: 0,
+                      width: isPts ? 34 : c.key === 'points_akumulasi' ? 50 : 28, textAlign: 'center', flexShrink: 0,
                       fontSize: isPts ? 13 : 11,
                       fontWeight: isPts ? 900 : 600,
                       color: isPts ? '#f1f5f9' : gdColor || '#8b92a5',
