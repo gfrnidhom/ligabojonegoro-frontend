@@ -50,6 +50,7 @@ export default function MatchDetailPanel({ matchId, onClose, hideMaximize = fals
   const [standings, setStandings] = useState(null);
   const [activeTab, setActiveTab] = useState('rincian');
   const [loading, setLoading] = useState(true);
+  const [localMinute, setLocalMinute] = useState(null);
   const [tabHovered, setTabHovered] = useState(false);
   const tabsRef = useRef(null);
   const prevMatchIdRef = useRef(null);
@@ -104,6 +105,30 @@ export default function MatchDetailPanel({ matchId, onClose, hideMaximize = fals
       clearInterval(intervalId);
     };
   }, [matchId]);
+
+  // Sync localMinute when API returns a new minute
+  useEffect(() => {
+    if (match?.minute !== undefined) {
+      setLocalMinute(match.minute);
+    }
+  }, [match?.minute]);
+
+  // Tick localMinute every second if match is live and minute is numeric
+  useEffect(() => {
+    if (!matchId || !match) return;
+    const isPlaying = ['first_half', 'second_half', 'extra_time_1', 'extra_time_2', 'penalty_shootout'].includes(match.status);
+    
+    let intervalId;
+    if (isPlaying && typeof localMinute === 'number') {
+      intervalId = setInterval(() => {
+        setLocalMinute((prev) => (typeof prev === 'number' ? prev + (1 / 60) : prev));
+      }, 1000);
+    }
+    
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [match?.status, matchId, typeof localMinute === 'number']);
 
   if (!matchId) return null;
 
@@ -166,11 +191,23 @@ export default function MatchDetailPanel({ matchId, onClose, hideMaximize = fals
                   )}
                 </div>
 
-                {isLive && match.minute && (
+                {isLive && localMinute !== null && (
                   <span style={{ fontSize: 11, fontWeight: 700, color: '#3b82f6', background: 'rgba(59,130,246,0.1)', padding: '2px 8px', borderRadius: 4, marginTop: 12 }}>
-                    {formatGameMinute(match.minute)}{match.minute !== 'HT' && match.minute !== 'FT' ? "'" : ""}
+                    {formatGameMinute(localMinute)}{localMinute !== 'HT' && localMinute !== 'FT' ? "'" : ""}
                   </span>
                 )}
+                
+                {/* Sets Scores */}
+                {match.score_detail?.sets && match.score_detail.sets.length > 0 && (
+                  <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 12, flexWrap: 'wrap' }}>
+                    {match.score_detail.sets.map((set, i) => (
+                      <span key={i} style={{ fontSize: 11, fontWeight: 700, color: '#8b92a5' }}>
+                        S{i+1}: {set.home}-{set.away}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
                 {isFinished && !isLive && (
                   <div style={{ color: '#8b92a5', fontSize: 10, fontWeight: 700, marginTop: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     Waktu Penuh
@@ -449,6 +486,7 @@ function GoalDetailSection({ match }) {
 
 /* ─── Rincian ─── */
 function RincianTab({ match }) {
+  const [activeSet, setActiveSet] = useState('all');
   const d = match.scheduled_at ? new Date(match.scheduled_at) : null;
 
   const InfoCard = ({ icon: Icon, label, value, color = '#f59e0b' }) => (
@@ -620,24 +658,75 @@ function RincianTab({ match }) {
       })()}
 
       {/* Kejadian Pertandingan */}
-      {match.events && match.events.length > 0 ? (
+      {(match.events && match.events.length > 0) || (match.score_detail?.sets && match.score_detail.sets.length > 0) ? (
         <div style={{ marginTop: 8 }}>
+          {match.score_detail?.sets && match.score_detail.sets.length > 0 && (
+            <div style={{ padding: '16px 0', marginBottom: 16 }}>
+              <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 8, justifyContent: 'center' }} className="hide-scrollbar">
+                <button 
+                  onClick={() => setActiveSet('all')} 
+                  style={{ padding: '6px 14px', borderRadius: 20, fontSize: 11, fontWeight: 700, border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer', transition: 'all 0.2s', background: activeSet === 'all' ? '#f59e0b' : 'transparent', color: activeSet === 'all' ? '#000' : '#8b92a5' }}
+                >
+                  Semua
+                </button>
+                {match.score_detail.sets.map((_, i) => (
+                  <button 
+                    key={i}
+                    onClick={() => setActiveSet(i + 1)} 
+                    style={{ padding: '6px 14px', borderRadius: 20, fontSize: 11, fontWeight: 700, border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer', transition: 'all 0.2s', background: activeSet === i + 1 ? '#f59e0b' : 'transparent', color: activeSet === i + 1 ? '#000' : '#8b92a5' }}
+                  >
+                    Set {i + 1}
+                  </button>
+                ))}
+              </div>
+              <div style={{ marginTop: 16, textAlign: 'center' }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  SKOR {activeSet === 'all' ? 'KESELURUHAN' : `SET ${activeSet}`}
+                </div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: '#f8fafc', marginTop: 4, letterSpacing: '0.05em' }}>
+                  {activeSet === 'all' 
+                    ? `${match.home_score} - ${match.away_score}` 
+                    : `${match.score_detail.sets[activeSet - 1]?.home || 0} - ${match.score_detail.sets[activeSet - 1]?.away || 0}`}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div style={{ textAlign: 'center', fontSize: 13, fontWeight: 700, color: '#f8fafc', marginBottom: 20 }}>
+            Events
+          </div>
+
           <div style={{ position: 'relative' }}>
             {/* Center line */}
             <div style={{ position: 'absolute', left: '50%', top: 12, bottom: 0, width: 1, background: '#27272a', transform: 'translateX(-50%)' }} />
 
             {/* Top Score Marker */}
-            <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', zIndex: 10, marginBottom: 24 }}>
-              <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: 20, padding: '4px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 12, fontWeight: 800, color: '#f8fafc' }}>{formatGameMinute(match.minute) + (typeof match.minute === 'number' || (typeof match.minute === 'string' && !['HT','FT','PEN'].includes(match.minute) && !match.minute.includes('+')) ? "'" : "") || 'LIVE'}</span>
-                <span style={{ fontSize: 12, fontWeight: 800, color: '#eab308' }}>{match.home_score}</span>
-                <span style={{ fontSize: 12, fontWeight: 800, color: '#eab308' }}>-</span>
-                <span style={{ fontSize: 12, fontWeight: 800, color: '#eab308' }}>{match.away_score}</span>
+            {activeSet === 'all' && (
+              <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', zIndex: 10, marginBottom: 24 }}>
+                <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: 20, padding: '4px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: 12, fontWeight: 800, color: '#f8fafc' }}>{formatGameMinute(match.minute) + (typeof match.minute === 'number' || (typeof match.minute === 'string' && !['HT','FT','PEN'].includes(match.minute) && !match.minute.includes('+')) ? "'" : "") || 'LIVE'}</span>
+                  <span style={{ fontSize: 12, fontWeight: 800, color: '#eab308' }}>{match.home_score}</span>
+                  <span style={{ fontSize: 12, fontWeight: 800, color: '#eab308' }}>-</span>
+                  <span style={{ fontSize: 12, fontWeight: 800, color: '#eab308' }}>{match.away_score}</span>
+                </div>
               </div>
-            </div>
+            )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 16 }}>
-              {match.events.map((ev, i) => {
+              {(() => {
+                const filteredEvents = [...(match.events || [])]
+                  .filter(ev => activeSet === 'all' || ev.set === activeSet || ev.period === activeSet || ev.set_number === activeSet || (ev.event_data && ev.event_data.set === activeSet))
+                  .sort((a, b) => (a.minute || 0) - (b.minute || 0));
+
+                if (filteredEvents.length === 0) {
+                  return (
+                    <div style={{ textAlign: 'center', fontSize: 11, color: '#a1a1aa', padding: '20px 0', position: 'relative', zIndex: 2, background: '#18181b', width: 'max-content', margin: '0 auto', borderRadius: 8 }}>
+                      Belum ada events untuk set ini.
+                    </div>
+                  );
+                }
+
+                return filteredEvents.map((ev, i) => {
                 const isHome = ev.team_id === match.home_team?.id;
 
                 const EventIconCircle = ({ type }) => {
@@ -719,13 +808,14 @@ function RincianTab({ match }) {
                     </div>
                   </div>
                 );
-              })}
+              });
+            })()}
             </div>
           </div>
         </div>
       ) : (
         <div style={{ padding: '24px 0', textAlign: 'center', fontSize: 10, color: '#555d75', fontWeight: 600 }}>
-          Belum ada kejadian pertandingan.
+          Belum ada detail set atau kejadian pertandingan.
         </div>
       )}
     </div>

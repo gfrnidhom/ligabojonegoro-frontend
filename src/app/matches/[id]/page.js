@@ -277,6 +277,17 @@ export default function MatchDetailPage({ params }) {
                 <div style={{ fontSize: 13, fontWeight: 500, color: '#6b7280', marginTop: 8 }}>
                   {isFinished ? 'Full time' : (isLive ? 'LIVE' : 'Terjadwal')}
                 </div>
+                {/* Sets Scores as Pill Badges */}
+                {match.score_detail?.sets && match.score_detail.sets.length > 0 && (
+                  <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 20, flexWrap: 'wrap' }}>
+                    {match.score_detail.sets.map((set, i) => (
+                      <div key={i} style={{ background: '#ffffff', border: '1px solid #e5e7eb', padding: '6px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700, color: '#111827', display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                        <span style={{ color: '#9ca3af' }}>S{i+1}</span>
+                        <span>{set.home}-{set.away}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Away Team */}
@@ -339,7 +350,7 @@ export default function MatchDetailPage({ params }) {
             })()}
 
             {/* Tabs */}
-            <div style={{ marginTop: 24, paddingLeft: 24, paddingRight: 24 }}>
+            <div style={{ marginTop: 48, paddingLeft: 24, paddingRight: 24 }}>
               {/* Scrollable Tabs */}
               <div
                 ref={tabsRef}
@@ -616,6 +627,7 @@ function GoalDetailSection({ match }) {
 }
 
 function RincianTab({ match }) {
+  const [activeSet, setActiveSet] = useState('all');
   const h2h = match.h2h || [];
   const formHome = match.form_home || [];
   const formAway = match.form_away || [];
@@ -805,8 +817,40 @@ function RincianTab({ match }) {
       })()}
 
       {/* Kejadian Pertandingan */}
-      {match.events && match.events.length > 0 ? (
+      {(match.events && match.events.length > 0) || (match.score_detail?.sets && match.score_detail.sets.length > 0) ? (
         <div className="match-card" style={{ marginTop: 16, background: '#ffffff', borderRadius: 16, padding: '24px 0', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.05)' }}>
+          {match.score_detail?.sets && match.score_detail.sets.length > 0 && (
+            <div style={{ padding: '0 24px', marginBottom: 24 }}>
+              <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 8, justifyContent: 'center' }} className="hide-scrollbar">
+                <button 
+                  onClick={() => setActiveSet('all')} 
+                  style={{ padding: '6px 16px', borderRadius: 20, fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.2s', background: activeSet === 'all' ? '#111827' : '#f3f4f6', color: activeSet === 'all' ? '#fff' : '#6b7280' }}
+                >
+                  Semua
+                </button>
+                {match.score_detail.sets.map((_, i) => (
+                  <button 
+                    key={i}
+                    onClick={() => setActiveSet(i + 1)} 
+                    style={{ padding: '6px 16px', borderRadius: 20, fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.2s', background: activeSet === i + 1 ? '#111827' : '#f3f4f6', color: activeSet === i + 1 ? '#fff' : '#6b7280' }}
+                  >
+                    Set {i + 1}
+                  </button>
+                ))}
+              </div>
+              <div style={{ marginTop: 20, textAlign: 'center' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  SKOR {activeSet === 'all' ? 'KESELURUHAN' : `SET ${activeSet}`}
+                </div>
+                <div style={{ fontSize: 32, fontWeight: 800, color: '#111827', marginTop: 4, letterSpacing: '0.05em' }}>
+                  {activeSet === 'all' 
+                    ? `${match.home_score} - ${match.away_score}` 
+                    : `${match.score_detail.sets[activeSet - 1]?.home || 0} - ${match.score_detail.sets[activeSet - 1]?.away || 0}`}
+                </div>
+              </div>
+            </div>
+          )}
+
           <div style={{ textAlign: 'center', fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 24 }}>
             Events
           </div>
@@ -818,8 +862,18 @@ function RincianTab({ match }) {
             {(() => {
               let hScore = 0;
               let aScore = 0;
-              const sortedEvents = [...match.events].sort((a,b) => (a.minute || 0) - (b.minute || 0));
+              const sortedEvents = [...(match.events || [])]
+                .filter(ev => activeSet === 'all' || ev.set === activeSet || ev.period === activeSet || ev.set_number === activeSet || (ev.event_data && ev.event_data.set === activeSet))
+                .sort((a,b) => (a.minute || 0) - (b.minute || 0));
               
+              if (sortedEvents.length === 0) {
+                return (
+                  <div style={{ textAlign: 'center', fontSize: 12, color: '#6b7280', padding: '20px 0', position: 'relative', zIndex: 2, background: '#ffffff', width: 'max-content', margin: '0 auto' }}>
+                    Belum ada events untuk set ini.
+                  </div>
+                );
+              }
+
               return sortedEvents.map((ev, i) => {
                 const isHome = ev.team_id === match.home_team?.id;
                 
@@ -905,7 +959,7 @@ function RincianTab({ match }) {
         </div>
       ) : (
         <div style={{ padding: '24px 0', textAlign: 'center', fontSize: 10, color: '#555d75', fontWeight: 600 }}>
-          Belum ada kejadian pertandingan.
+          Belum ada detail set atau kejadian pertandingan.
         </div>
       )}
       
