@@ -116,7 +116,7 @@ export default function MatchDetailPanel({ matchId, onClose, hideMaximize = fals
   // Tick localMinute every second if match is live and minute is numeric
   useEffect(() => {
     if (!matchId || !match) return;
-    const isPlaying = ['first_half', 'second_half', 'extra_time_1', 'extra_time_2', 'penalty_shootout'].includes(match.status);
+    const isPlaying = ['first_half', 'second_half', 'extra_time_1', 'extra_time_2', 'penalty_shootout', 'playing_set'].includes(match.status);
     
     let intervalId;
     if (isPlaying && typeof localMinute === 'number') {
@@ -132,7 +132,7 @@ export default function MatchDetailPanel({ matchId, onClose, hideMaximize = fals
 
   if (!matchId) return null;
 
-  const isLive = ['live', 'first_half', 'half_time', 'second_half', 'extra_time_1', 'extra_time_ht', 'extra_time_2', 'penalty_shootout', 'ongoing'].includes(match?.status);
+  const isLive = ['live', 'first_half', 'half_time', 'second_half', 'extra_time_1', 'extra_time_ht', 'extra_time_2', 'penalty_shootout', 'ongoing', 'playing_set', 'set_break'].includes(match?.status);
   const isFinished = match?.status === 'finished';
   const sched = match?.scheduled_at ? new Date(match.scheduled_at) : null;
 
