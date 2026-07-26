@@ -1,8 +1,25 @@
 "use client";
 import Link from 'next/link';
 import { Trophy } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import api from '../api';
 
 export default function Footer() {
+  const [sponsors, setSponsors] = useState([]);
+
+  useEffect(() => {
+    const fetchSponsors = async () => {
+      try {
+        const res = await api.get('/sponsors');
+        if (res.data && (res.data.success || res.data.status === 'success')) {
+          setSponsors(res.data.data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching sponsors:', error);
+      }
+    };
+    fetchSponsors();
+  }, []);
 
   return (
     <footer style={{
@@ -46,15 +63,40 @@ export default function Footer() {
               Supported by
             </span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <img
-              src="/sponsors.png"
-              alt="Supported by"
-              style={{
-                maxWidth: '100%', height: 'auto', maxHeight: 48,
-                objectFit: 'contain', opacity: 0.85,
-              }}
-            />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 24 }}>
+            {sponsors.length > 0 ? sponsors.map(sponsor => (
+              sponsor.url ? (
+                <a key={sponsor.id} href={sponsor.url} target="_blank" rel="noopener noreferrer">
+                  <img
+                    src={sponsor.logo_url}
+                    alt={sponsor.name}
+                    style={{
+                      maxWidth: '100%', height: 'auto', maxHeight: 48,
+                      objectFit: 'contain', opacity: 0.85,
+                    }}
+                  />
+                </a>
+              ) : (
+                <img
+                  key={sponsor.id}
+                  src={sponsor.logo_url}
+                  alt={sponsor.name}
+                  style={{
+                    maxWidth: '100%', height: 'auto', maxHeight: 48,
+                    objectFit: 'contain', opacity: 0.85,
+                  }}
+                />
+              )
+            )) : (
+              <img
+                src="/sponsors.png"
+                alt="Supported by"
+                style={{
+                  maxWidth: '100%', height: 'auto', maxHeight: 48,
+                  objectFit: 'contain', opacity: 0.85,
+                }}
+              />
+            )}
           </div>
         </div>
 

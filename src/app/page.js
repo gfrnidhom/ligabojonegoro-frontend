@@ -200,6 +200,7 @@ function HomeContent() {
   const [selectedPlayerId, setSelectedPlayerId] = useState(null);
   const [playerDetail, setPlayerDetail] = useState(null);
   const [latestNews, setLatestNews] = useState([]);
+  const [sponsors, setSponsors] = useState([]);
   const [mobileTab, setMobileTab] = useState('matches');
   const [mobileSportsOpen, setMobileSportsOpen] = useState(false);
   const [mobileCalendarOpen, setMobileCalendarOpen] = useState(false);
@@ -265,11 +266,12 @@ function HomeContent() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [mRes, tRes, sRes, nRes] = await Promise.all([
+        const [mRes, tRes, sRes, nRes, spRes] = await Promise.all([
           api.get('/matches', { params: { per_page: 100 } }),
           api.get('/tournaments'),
           api.get('/sports'),
-          api.get('/news', { params: { limit: 3 } })
+          api.get('/news', { params: { limit: 3 } }),
+          api.get('/sponsors').catch(() => null)
         ]);
         const mData = mRes.data.success ? (mRes.data.data || []) : [];
         const tData = tRes.data.success ? (tRes.data.data || []) : [];
@@ -289,6 +291,9 @@ function HomeContent() {
         setTournaments(tData);
         if (sRes.data.success) setSports(sRes.data.data || []);
         if (nRes?.data?.success) setLatestNews(nRes.data.data || []);
+        if (spRes?.data && (spRes.data.success || spRes.data.status === 'success')) {
+          setSponsors(spRes.data.data || []);
+        }
 
         // Fetch banners (graceful fallback)
         try {
@@ -597,7 +602,19 @@ function HomeContent() {
         <div style={{ fontSize: 9, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 12 }}>
           Supported by
         </div>
-        <img src="/sponsors.png" alt="Supported by" style={{ height: 32, objectFit: 'contain', margin: '0 auto', opacity: 0.85 }} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 16 }}>
+          {sponsors.length > 0 ? sponsors.map(sponsor => (
+            sponsor.url ? (
+              <a key={sponsor.id} href={sponsor.url} target="_blank" rel="noopener noreferrer">
+                <img src={sponsor.logo_url} alt={sponsor.name} style={{ height: 28, objectFit: 'contain', opacity: 0.85 }} />
+              </a>
+            ) : (
+              <img key={sponsor.id} src={sponsor.logo_url} alt={sponsor.name} style={{ height: 28, objectFit: 'contain', opacity: 0.85 }} />
+            )
+          )) : (
+            <img src="/sponsors.png" alt="Supported by" style={{ height: 32, objectFit: 'contain', margin: '0 auto', opacity: 0.85 }} />
+          )}
+        </div>
       </div>
 
       {/* HERO SLIDER (Above all, but matching center column width on desktop) */}
