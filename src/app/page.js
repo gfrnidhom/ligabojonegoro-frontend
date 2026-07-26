@@ -91,7 +91,7 @@ const LiveMatchClock = ({ match, lastFetchTime }) => {
 
   let totalSeconds = 0;
   if (match.minute != null && !isNaN(parseFloat(match.minute))) {
-    totalSeconds = (Math.floor(parseFloat(match.minute)) * 60) + Math.floor((now - lastFetchTime) / 1000);
+    totalSeconds = Math.floor(parseFloat(match.minute) * 60) + Math.floor((now - lastFetchTime) / 1000);
   } else {
     // fallback if minute is somehow missing but status is known
     const baseMinute = match.status === 'second_half' ? period : 0;
