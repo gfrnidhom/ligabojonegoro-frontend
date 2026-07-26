@@ -597,8 +597,8 @@ function HomeContent() {
         )}
       </AnimatePresence>
 
-      {/* MOBILE SUPPORTED BY LOGO */}
-      <div className="block lg:hidden" style={{ width: '100%', textAlign: 'center', padding: '20px 24px 0', marginBottom: '-4px' }}>
+      {/* SUPPORTED BY LOGO */}
+      <div style={{ width: '100%', textAlign: 'center', padding: '20px 24px 0', marginBottom: '-4px' }}>
         <div style={{ fontSize: 9, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 12 }}>
           Supported by
         </div>
