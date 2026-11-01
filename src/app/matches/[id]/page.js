@@ -595,7 +595,7 @@ function GoalDetailSection({ match }) {
               </div>
 
               {/* Divider */}
-              <div style={{ width: 1, height: 28, background: 'var(--border)' }} />
+              <div style={{ width: 1, minHeight: 28, alignSelf: 'stretch', background: 'var(--border)' }} />
 
               {/* Player Info */}
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
@@ -605,7 +605,7 @@ function GoalDetailSection({ match }) {
                 >
                   {isDisallowed ? (g.player?.name ? `${g.player.name} (Gol Dianulir)` : 'Gol Dianulir (-1)') : (g.player?.name || 'Pemain')}
                 </span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                   <img src={teamLogo} alt="" style={{ width: 14, height: 14, borderRadius: '50%', objectFit: 'contain' }} />
                   <span style={{ fontSize: 10, color: '#6b7280', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{teamName}</span>
                   {isDisallowed && g.event_data?.reason ? (
@@ -614,6 +614,26 @@ function GoalDetailSection({ match }) {
                     <span style={{ fontSize: 10, color: '#9ca3af', flexShrink: 0 }}>• Ast: {g.event_data.assist}</span>
                   ) : null}
                 </div>
+
+                {/* Full Commentary */}
+                {g.event_data?.commentary && (
+                  <div style={{
+                    fontSize: 11,
+                    color: isDisallowed ? '#b91c1c' : '#334155',
+                    marginTop: 4,
+                    lineHeight: '1.45',
+                    background: isDisallowed ? '#fef2f2' : '#f8fafc',
+                    padding: '6px 10px',
+                    borderRadius: 6,
+                    borderLeft: isDisallowed ? '3px solid #ef4444' : '3px solid #94a3b8',
+                    wordBreak: 'break-word',
+                  }}>
+                    <span style={{ fontWeight: 700, color: isDisallowed ? '#dc2626' : '#0f172a', marginRight: 4 }}>
+                      Komentar:
+                    </span>
+                    {g.event_data.commentary}
+                  </div>
+                )}
               </div>
 
               {/* Running Score */}
@@ -773,7 +793,7 @@ function RincianTab({ match }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       {/* Detail Gol */}
-      {match.events?.some(e => ['goal', 'own_goal', 'penalty'].includes(e.event_type)) && (
+      {match.events?.some(e => ['goal', 'own_goal', 'penalty', 'disallowed_goal'].includes(e.event_type)) && (
         <div className="match-card" style={{ background: '#ffffff', borderRadius: 16, padding: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
           <div style={{ textAlign: 'center', fontSize: 16, color: '#0f172a', fontWeight: 800, marginBottom: 24 }}>
             Detail Gol
@@ -949,7 +969,40 @@ function RincianTab({ match }) {
                             </span>
                             {isHome && isGoal && <span style={{ fontWeight: 800, color: isDisallowed ? '#ef4444' : '#374151', marginLeft: 4 }}>({runningScore})</span>}
                           </div>
-                          {subtext && <div style={{ color: isDisallowed ? '#ef4444' : '#9ca3af', marginTop: 2, lineHeight: '1.2' }} className="text-[10px] sm:text-[11px] md:text-xs">{subtext}</div>}
+
+                          {/* Reason or Type Badge */}
+                          {isDisallowed && ev.event_data?.reason ? (
+                            <div style={{ fontSize: 10, color: '#ef4444', fontWeight: 700, marginTop: 2, textAlign: isHome ? 'right' : 'left' }}>
+                              Alasan: {ev.event_data.reason}
+                            </div>
+                          ) : ev.event_type === 'own_goal' ? (
+                            <div style={{ color: '#ef4444', marginTop: 2, fontSize: 11, textAlign: isHome ? 'right' : 'left' }}>Own goal</div>
+                          ) : ev.event_type === 'penalty' ? (
+                            <div style={{ color: '#f59e0b', marginTop: 2, fontSize: 11, textAlign: isHome ? 'right' : 'left' }}>Penalty</div>
+                          ) : null}
+
+                          {/* Full Commentary */}
+                          {ev.event_data?.commentary && (
+                            <div style={{
+                              fontSize: 11,
+                              color: isDisallowed ? '#b91c1c' : '#334155',
+                              marginTop: 4,
+                              lineHeight: '1.4',
+                              background: isDisallowed ? '#fef2f2' : '#f8fafc',
+                              padding: '5px 8px',
+                              borderRadius: 6,
+                              borderLeft: isHome ? 'none' : (isDisallowed ? '3px solid #ef4444' : '3px solid #94a3b8'),
+                              borderRight: isHome ? (isDisallowed ? '3px solid #ef4444' : '3px solid #94a3b8') : 'none',
+                              textAlign: isHome ? 'right' : 'left',
+                              wordBreak: 'break-word',
+                              maxWidth: '100%',
+                            }}>
+                              <span style={{ fontWeight: 700, color: isDisallowed ? '#dc2626' : '#0f172a', marginRight: 4 }}>
+                                Komentar:
+                              </span>
+                              {ev.event_data.commentary}
+                            </div>
+                          )}
                         </>
                       )}
                     </div>
