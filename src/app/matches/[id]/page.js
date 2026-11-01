@@ -517,7 +517,7 @@ export default function MatchDetailPage({ params }) {
 
 /* ─── Goal Detail Section ─── */
 function GoalDetailSection({ match }) {
-  const goalTypes = ['goal', 'own_goal', 'penalty'];
+  const goalTypes = ['goal', 'own_goal', 'penalty', 'disallowed_goal'];
   const goals = (match.events || [])
     .filter(e => goalTypes.includes(e.event_type))
     .sort((a, b) => (a.minute || a.sequence || 0) - (b.minute || b.sequence || 0));
@@ -534,6 +534,7 @@ function GoalDetailSection({ match }) {
     `https://ui-avatars.com/api/?name=${encodeURIComponent(name || '?')}&size=40&background=${bg}&color=fff&bold=true`;
 
   const getTypeLabel = (type) => {
+    if (type === 'disallowed_goal') return { text: 'Dianulir (-1)', color: '#ef4444', bg: 'rgba(239,68,68,0.12)' };
     if (type === 'penalty') return { text: 'Penalti', color: '#eab308', bg: 'rgba(234,179,8,0.12)' };
     if (type === 'own_goal') return { text: 'Bunuh Diri', color: '#ef4444', bg: 'rgba(239,68,68,0.12)' };
     return { text: 'Gol', color: '#22c55e', bg: 'rgba(34,197,94,0.12)' };
@@ -547,9 +548,12 @@ function GoalDetailSection({ match }) {
       {goals.map((g, idx) => {
         const isHome = g.team_id === match.home_team?.id;
         const isOwnGoal = g.event_type === 'own_goal';
+        const isDisallowed = g.event_type === 'disallowed_goal';
 
         // For own goals, the scoring team is the opponent
-        if (isOwnGoal) {
+        if (isDisallowed) {
+          if (isHome) runHome = Math.max(0, runHome - 1); else runAway = Math.max(0, runAway - 1);
+        } else if (isOwnGoal) {
           if (isHome) runAway++; else runHome++;
         } else {
           if (isHome) runHome++; else runAway++;
@@ -578,6 +582,8 @@ function GoalDetailSection({ match }) {
                 </span>
                 {isOwnGoal ? (
                   <span style={{ fontSize: 9, fontWeight: 800, color: '#ef4444', background: '#fef2f2', padding: '2px 6px', borderRadius: 4 }}>OG</span>
+                ) : isDisallowed ? (
+                  <span style={{ fontSize: 8, fontWeight: 900, color: '#ef4444', background: '#fef2f2', padding: '2px 5px', borderRadius: 4 }}>-1</span>
                 ) : g.event_type === 'penalty' ? (
                   <span style={{ fontSize: 9, fontWeight: 800, color: '#f59e0b', background: '#fef3c7', padding: '2px 6px', borderRadius: 4 }}>PEN</span>
                 ) : (
@@ -595,16 +601,18 @@ function GoalDetailSection({ match }) {
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
                 <span
                   onClick={() => handlePlayerClick(g.player?.uuid)}
-                  style={{ fontSize: 13, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'pointer' }}
+                  style={{ fontSize: 13, fontWeight: 700, color: isDisallowed ? '#ef4444' : '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'pointer' }}
                 >
-                  {g.player?.name || 'Pemain'}
+                  {isDisallowed ? (g.player?.name ? `${g.player.name} (Gol Dianulir)` : 'Gol Dianulir (-1)') : (g.player?.name || 'Pemain')}
                 </span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <img src={teamLogo} alt="" style={{ width: 14, height: 14, borderRadius: '50%', objectFit: 'contain' }} />
                   <span style={{ fontSize: 10, color: '#6b7280', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{teamName}</span>
-                  {g.event_data?.assist && (
+                  {isDisallowed && g.event_data?.reason ? (
+                    <span style={{ fontSize: 10, color: '#ef4444', fontWeight: 700, flexShrink: 0 }}>• {g.event_data.reason}</span>
+                  ) : g.event_data?.assist ? (
                     <span style={{ fontSize: 10, color: '#9ca3af', flexShrink: 0 }}>• Ast: {g.event_data.assist}</span>
-                  )}
+                  ) : null}
                 </div>
               </div>
 
@@ -882,10 +890,18 @@ function RincianTab({ match }) {
                   if (isHome) hScore++; else aScore++;
                 } else if (ev.event_type === 'own_goal') {
                   if (isHome) aScore++; else hScore++;
+                } else if (ev.event_type === 'disallowed_goal') {
+                  if (isHome) hScore = Math.max(0, hScore - 1); else aScore = Math.max(0, aScore - 1);
                 }
                 const runningScore = `${hScore} - ${aScore}`;
 
                 const EventIconCircle = ({ type }) => {
+                  if (type === 'disallowed_goal')
+                    return (
+                      <div style={{ width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1.5px solid #ef4444', background: '#fef2f2' }}>
+                        <span style={{ fontSize: 9, fontWeight: 900, color: '#ef4444', lineHeight: 1 }}>-1</span>
+                      </div>
+                    );
                   if (type === 'goal' || type === 'penalty' || type === 'own_goal')
                     return <div style={{ width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: type === 'own_goal' ? '1.5px solid #ef4444' : '1.5px solid #111827' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={type === 'own_goal' ? '#ef4444' : '#111827'} strokeWidth="2.5"><circle cx="12" cy="12" r="10" /><path d="M12 9l3-3m-3 3L9 6m3 6l3 3m-3-3l-3 3" /></svg></div>;
                   if (type === 'yellow_card') return <div style={{ width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div style={{ width: 12, height: 16, background: '#facc15', borderRadius: 2 }} /></div>;
@@ -907,9 +923,12 @@ function RincianTab({ match }) {
                   </div>
                 );
 
-                const isGoal = ['goal', 'penalty', 'own_goal'].includes(ev.event_type);
+                const isGoal = ['goal', 'penalty', 'own_goal', 'disallowed_goal'].includes(ev.event_type);
+                const isDisallowed = ev.event_type === 'disallowed_goal';
                 const isSub = ev.event_type === 'substitution';
-                const subtext = ev.event_type === 'own_goal' ? 'Own goal' : ev.event_type === 'penalty' ? 'Penalty' : ev.event_data?.commentary;
+                const subtext = isDisallowed
+                  ? (ev.event_data?.reason ? `Gol Dianulir: ${ev.event_data.reason} (-1)` : 'Gol Dianulir (-1)')
+                  : (ev.event_type === 'own_goal' ? 'Own goal' : ev.event_type === 'penalty' ? 'Penalty' : ev.event_data?.commentary);
 
                 const EventContent = () => (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexDirection: isHome ? 'row' : 'row-reverse', maxWidth: '100%' }}>
@@ -923,12 +942,14 @@ function RincianTab({ match }) {
                         </>
                       ) : (
                         <>
-                          <div style={{ fontWeight: 600, color: '#111827', textAlign: isHome ? 'right' : 'left' }} className="text-[11px] sm:text-xs md:text-sm">
-                            {!isHome && isGoal && <span style={{ fontWeight: 800, color: '#374151', marginRight: 4 }}>({runningScore})</span>}
-                            <span onClick={() => handlePlayerClick(ev.player?.uuid)} style={{ cursor: 'pointer', lineHeight: '1.3' }}>{ev.player?.name || 'Pemain'}</span>
-                            {isHome && isGoal && <span style={{ fontWeight: 800, color: '#374151', marginLeft: 4 }}>({runningScore})</span>}
+                          <div style={{ fontWeight: 600, color: isDisallowed ? '#ef4444' : '#111827', textAlign: isHome ? 'right' : 'left' }} className="text-[11px] sm:text-xs md:text-sm">
+                            {!isHome && isGoal && <span style={{ fontWeight: 800, color: isDisallowed ? '#ef4444' : '#374151', marginRight: 4 }}>({runningScore})</span>}
+                            <span onClick={() => handlePlayerClick(ev.player?.uuid)} style={{ cursor: 'pointer', lineHeight: '1.3' }}>
+                              {isDisallowed ? (ev.player?.name ? `${ev.player.name} (Gol Dianulir)` : 'Gol Dianulir (-1)') : (ev.player?.name || 'Pemain')}
+                            </span>
+                            {isHome && isGoal && <span style={{ fontWeight: 800, color: isDisallowed ? '#ef4444' : '#374151', marginLeft: 4 }}>({runningScore})</span>}
                           </div>
-                          {subtext && <div style={{ color: '#9ca3af', marginTop: 2, lineHeight: '1.2' }} className="text-[10px] sm:text-[11px] md:text-xs">{subtext}</div>}
+                          {subtext && <div style={{ color: isDisallowed ? '#ef4444' : '#9ca3af', marginTop: 2, lineHeight: '1.2' }} className="text-[10px] sm:text-[11px] md:text-xs">{subtext}</div>}
                         </>
                       )}
                     </div>
