@@ -184,7 +184,6 @@ function HomeContent() {
   const [tournaments, setTournaments] = useState([]);
   const [sports, setSports] = useState([]);
   const [banners, setBanners] = useState([]);
-  const [bannerIdx, setBannerIdx] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(null);
   const [initialDateSet, setInitialDateSet] = useState(false);
@@ -266,12 +265,13 @@ function HomeContent() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [mRes, tRes, sRes, nRes, spRes] = await Promise.all([
+        const [mRes, tRes, sRes, nRes, spRes, bRes] = await Promise.all([
           api.get('/matches', { params: { per_page: 100 } }),
           api.get('/tournaments'),
           api.get('/sports'),
           api.get('/news', { params: { limit: 3 } }),
-          api.get('/sponsors').catch(() => null)
+          api.get('/sponsors').catch(() => null),
+          api.get('/banners').catch(() => null)
         ]);
         const mData = mRes.data.success ? (mRes.data.data || []) : [];
         const tData = tRes.data.success ? (tRes.data.data || []) : [];
@@ -295,17 +295,11 @@ function HomeContent() {
           setSponsors(spRes.data.data || []);
         }
 
-        // Fetch banners (graceful fallback)
-        try {
-          const bRes = await api.get('/banners');
-          if (bRes.data.success && bRes.data.data?.length > 0) setBanners(bRes.data.data);
-        } catch (e) {
-          // API might not exist yet — use fallback banners
-          setBanners([
-            { id: 1, title: 'Liga Bojonegoro 2026', subtitle: 'Musim baru telah dimulai! Saksikan pertandingan seru setiap minggu.', color: '#3b82f6' },
-            { id: 2, title: 'Daftar Tim Sekarang', subtitle: 'Pendaftaran tim untuk turnamen baru telah dibuka.', color: '#059669' },
-            { id: 3, title: 'Unduh Aplikasi', subtitle: 'Dapatkan notifikasi pertandingan langsung di ponselmu.', color: '#7c3aed' },
-          ]);
+        // Fetch banners - jika tidak ada data dari backend, biarkan kosong agar section tidak tampil/blank
+        if (bRes?.data && (bRes.data.success || bRes.data.status === 'success') && Array.isArray(bRes.data.data)) {
+          setBanners(bRes.data.data.filter(b => b && (b.image_path || b.image || b.banner_path)));
+        } else {
+          setBanners([]);
         }
 
         // Auto-select is now handled by a separate useEffect based on filteredMatches
@@ -344,13 +338,6 @@ function HomeContent() {
       setInitialDateSet(true);
     }
   }, [loading, matches, initialDateSet]);
-
-  // Auto-slide banner
-  useEffect(() => {
-    if (banners.length <= 1) return;
-    const iv = setInterval(() => setBannerIdx(p => (p + 1) % banners.length), 5000);
-    return () => clearInterval(iv);
-  }, [banners.length]);
 
   // Filter tournaments by selected sport
   const filteredTournaments = useMemo(() => {
@@ -617,20 +604,22 @@ function HomeContent() {
         </div>
       </div>
 
-      {/* HERO SLIDER (Above all, but matching center column width on desktop) */}
-      <div 
-        style={{
-          width: '100%', display: 'flex', gap: 24, maxWidth: 1340, margin: '0 auto', minWidth: 0,
-          padding: '24px 24px 0'
-        }} 
-        className="flex-col lg:flex-row"
-      >
-        <div className="hidden lg:block lg:w-[260px] flex-shrink-0" />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <HeroSlider />
+      {/* HERO SLIDER (Above all, but matching center column width on desktop - hanya muncul jika ada data banner) */}
+      {banners.length > 0 && (
+        <div 
+          style={{
+            width: '100%', display: 'flex', gap: 24, maxWidth: 1340, margin: '0 auto', minWidth: 0,
+            padding: '24px 24px 0'
+          }} 
+          className="flex-col lg:flex-row"
+        >
+          <div className="hidden lg:block lg:w-[260px] flex-shrink-0" />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <HeroSlider banners={banners} />
+          </div>
+          <div style={{ width: 320, flexShrink: 0 }} className="hidden lg:block" />
         </div>
-        <div style={{ width: 320, flexShrink: 0 }} className="hidden lg:block" />
-      </div>
+      )}
 
       {/* ═══ MAIN LAYOUT ═══ */}
       <div style={{ display: 'flex', gap: 0, padding: '0' }}>

@@ -1,81 +1,40 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Trophy } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import api, { getImageUrl } from '../api';
 
-export default function HeroSlider() {
-  const [banners, setBanners] = useState([]);
+export default function HeroSlider({ banners: propBanners }) {
+  const [internalBanners, setInternalBanners] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(propBanners === undefined);
 
   useEffect(() => {
+    if (propBanners !== undefined) return;
+
     const fetchBanners = async () => {
       try {
         const response = await api.get('/banners');
-        let fetchedBanners = [];
-        if (response.data.success && Array.isArray(response.data.data) && response.data.data.length > 0) {
-          fetchedBanners = response.data.data;
+        if (response.data?.success && Array.isArray(response.data.data)) {
+          setInternalBanners(response.data.data);
+        } else {
+          setInternalBanners([]);
         }
-
-        // Jika API tidak mengembalikan banner atau hanya 1 banner, lengkapi dengan banner Fesboro lokal
-        // agar fitur Slider (arah panah, indikator, transisi) di beranda bekerja dengan optimal & interaktif.
-        if (fetchedBanners.length === 0) {
-          fetchedBanners = [
-            {
-              id: 'local-fesboro',
-              title: 'Fesboro U-10 Se-Jatim & Jateng',
-              image_path: '/banners/fesboro-banner.png',
-              url: '/tournaments'
-            },
-            {
-              id: 'local-liga-2026',
-              title: 'Kompetisi Liga Bojonegoro 2026',
-              image_path: '/banners/fesboro-banner.png',
-              url: '/tournaments',
-              is_secondary: true
-            }
-          ];
-        } else if (fetchedBanners.length === 1) {
-          // Tambahkan slide kedua dengan informasi kompetisi agar ada efek geser (slider)
-          fetchedBanners = [
-            ...fetchedBanners,
-            {
-              id: 'local-supplement',
-              title: fetchedBanners[0].title || 'Fesboro U-10 Se-Jatim & Jateng',
-              image_path: fetchedBanners[0].image_path || '/banners/fesboro-banner.png',
-              url: fetchedBanners[0].url || '/tournaments',
-              is_supplement: true
-            }
-          ];
-        }
-
-        setBanners(fetchedBanners);
       } catch (error) {
         console.error('Error fetching banners:', error);
-        // Fallback lokal jika API gagal
-        setBanners([
-          {
-            id: 'local-fesboro-fallback',
-            title: 'Fesboro U-10 Se-Jatim & Jateng',
-            image_path: '/banners/fesboro-banner.png',
-            url: '/tournaments'
-          },
-          {
-            id: 'local-fesboro-fallback-2',
-            title: 'Liga Bojonegoro 2026',
-            image_path: '/banners/fesboro-banner.png',
-            url: '/tournaments'
-          }
-        ]);
+        setInternalBanners([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchBanners();
-  }, []);
+  }, [propBanners]);
+
+  const rawBanners = propBanners !== undefined ? propBanners : internalBanners;
+  // Pastikan hanya banner yang memiliki data gambar yang valid
+  const banners = (rawBanners || []).filter(b => b && (b.image_path || b.image || b.banner_path));
 
   useEffect(() => {
     if (banners.length > 1) {
@@ -84,7 +43,7 @@ export default function HeroSlider() {
       }, 5500);
       return () => clearInterval(interval);
     }
-  }, [banners]);
+  }, [banners.length]);
 
   const nextSlide = (e) => {
     if (e) e.preventDefault();
@@ -96,21 +55,14 @@ export default function HeroSlider() {
     setCurrentIndex((prev) => (prev - 1 + banners.length) % banners.length);
   };
 
-  const getBannerImageUrl = (path) => {
-    if (!path) return '/banners/fesboro-banner.png';
+  const getBannerImageUrl = (banner) => {
+    const path = banner?.image_path || banner?.image || banner?.banner_path;
+    if (!path) return '';
     if (path.startsWith('http') || path.startsWith('/')) return path;
-    return getImageUrl(path);
+    return getImageUrl(path) || '';
   };
 
-  if (loading && banners.length === 0) {
-    return (
-      <div 
-        className="w-full rounded-2xl bg-gray-100 dark:bg-gray-800 animate-pulse" 
-        style={{ aspectRatio: '3 / 1' }} 
-      />
-    );
-  }
-
+  // Jika tidak ada data banner, jangan render apapun agar tidak blank
   if (banners.length === 0) {
     return null;
   }
@@ -121,8 +73,8 @@ export default function HeroSlider() {
       style={{ aspectRatio: '3 / 1', width: '100%', background: '#0f172a' }}
     >
       {banners.map((banner, index) => {
-        const imgUrl = getBannerImageUrl(banner.image_path);
-        const targetUrl = banner.url || (banner.game_id ? `/matches/${banner.game_id}` : '/tournaments');
+        const imgUrl = getBannerImageUrl(banner);
+        const targetUrl = banner.url || (banner.game_id ? `/matches/${banner.game_id}` : null);
 
         const slideContent = (
           <div 
@@ -140,9 +92,15 @@ export default function HeroSlider() {
             className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${index === currentIndex ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'}`}
           >
             {targetUrl ? (
-              <Link href={targetUrl} className="block w-full h-full relative cursor-pointer">
-                {slideContent}
-              </Link>
+              targetUrl.startsWith('http') ? (
+                <a href={targetUrl} target="_blank" rel="noopener noreferrer" className="block w-full h-full relative cursor-pointer">
+                  {slideContent}
+                </a>
+              ) : (
+                <Link href={targetUrl} className="block w-full h-full relative cursor-pointer">
+                  {slideContent}
+                </Link>
+              )
             ) : (
               slideContent
             )}
