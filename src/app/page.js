@@ -6,7 +6,7 @@ import { Trophy, Calendar, Star, Zap, CircleDot, Volleyball, Footprints, BadgeCh
 import { motion, AnimatePresence } from 'framer-motion';
 import MatchDetailPanel from '../components/MatchDetailPanel';
 import HeroSlider from '../components/HeroSlider';
-import api, { getImageUrl } from '../api';
+import api, { getImageUrl, fetchAllMatches } from '../api';
 
 // SVG Icons for sports
 const FootballSvg = ({ size = 16, color = "currentColor" }) => (
@@ -266,7 +266,7 @@ function HomeContent() {
     const fetchData = async () => {
       try {
         const [mRes, tRes, sRes, nRes, spRes, bRes] = await Promise.all([
-          api.get('/matches', { params: { per_page: 100 } }),
+          fetchAllMatches(),
           api.get('/tournaments'),
           api.get('/sports'),
           api.get('/news', { params: { limit: 3 } }),
@@ -344,6 +344,39 @@ function HomeContent() {
     if (!activeSport) return tournaments;
     return tournaments.filter(t => t.sport_id === activeSport);
   }, [tournaments, activeSport]);
+
+  // When the user picks a league or sport, jump to that selection's nearest
+  // match date (next upcoming, else most recent) instead of keeping a date
+  // on which the selected league has no matches.
+  const prevSelectionRef = useRef(null);
+  useEffect(() => {
+    if (!initialDateSet) return;
+    const key = `${activeSport ?? ''}|${activeTournament ?? ''}`;
+    if (prevSelectionRef.current === null) { prevSelectionRef.current = key; return; }
+    if (prevSelectionRef.current === key) return;
+    prevSelectionRef.current = key;
+
+    let list = matches.filter(m => m.scheduled_at);
+    if (activeSport) {
+      const ids = filteredTournaments.map(t => t.id);
+      list = list.filter(m => ids.includes(m.tournament_id));
+    }
+    if (activeTournament) list = list.filter(m => m.tournament_id === activeTournament);
+    if (list.length === 0) return;
+
+    const selStr = selectedDate?.toLocaleDateString('en-CA');
+    if (selStr && list.some(m => new Date(m.scheduled_at).toLocaleDateString('en-CA') === selStr)) return;
+
+    const todayStr = new Date().toLocaleDateString('en-CA');
+    const upcoming = list
+      .filter(m => new Date(m.scheduled_at).toLocaleDateString('en-CA') >= todayStr)
+      .sort((a, b) => new Date(a.scheduled_at) - new Date(b.scheduled_at));
+    const target = upcoming.length > 0
+      ? new Date(upcoming[0].scheduled_at)
+      : new Date([...list].sort((a, b) => new Date(b.scheduled_at) - new Date(a.scheduled_at))[0].scheduled_at);
+    setSelectedDate(target);
+    setCalendarMonth(target);
+  }, [activeSport, activeTournament, initialDateSet, matches, filteredTournaments, selectedDate]);
 
   const filteredMatches = useMemo(() => {
     let list = [...matches];
@@ -471,6 +504,40 @@ function HomeContent() {
     return g;
   }, [filteredMatches]);
 
+  // When the selected date shows upcoming fixtures (filter "Semua"), also show
+  // the most recent finished results from an earlier date below them.
+  const { latestResultsGroups, latestResultsDate } = useMemo(() => {
+    const empty = { latestResultsGroups: {}, latestResultsDate: null };
+    if (statusFilter !== 'all' || !selectedDate) return empty;
+    if (!filteredMatches.some(m => m.status === 'scheduled')) return empty;
+
+    const selectedStr = selectedDate.toLocaleDateString('en-CA');
+    let list = matches.filter(m => m.status === 'finished' && m.scheduled_at);
+    if (activeSport) {
+      const ids = filteredTournaments.map(t => t.id);
+      list = list.filter(m => ids.includes(m.tournament_id));
+    }
+    if (activeTournament) list = list.filter(m => m.tournament_id === activeTournament);
+    list = list.filter(m => new Date(m.scheduled_at).toLocaleDateString('en-CA') < selectedStr);
+    if (list.length === 0) return empty;
+
+    const lastStr = list.reduce((max, m) => {
+      const d = new Date(m.scheduled_at).toLocaleDateString('en-CA');
+      return d > max ? d : max;
+    }, '');
+    const g = {};
+    list
+      .filter(m => new Date(m.scheduled_at).toLocaleDateString('en-CA') === lastStr)
+      .sort((a, b) => new Date(a.scheduled_at) - new Date(b.scheduled_at))
+      .forEach(m => {
+        const key = m.tournament?.name || 'Lainnya';
+        if (!g[key]) g[key] = { tournament: m.tournament, matches: [] };
+        g[key].matches.push(m);
+      });
+    const [y, mo, d] = lastStr.split('-').map(Number);
+    return { latestResultsGroups: g, latestResultsDate: new Date(y, mo - 1, d) };
+  }, [matches, filteredMatches, selectedDate, statusFilter, activeSport, activeTournament, filteredTournaments]);
+
   const liveCount = matches.filter(m => ['live', 'first_half', 'half_time', 'second_half', 'extra_time_1', 'extra_time_ht', 'extra_time_2', 'penalty_shootout', 'ongoing'].includes(m.status)).length;
 
   const isToday = d => {
@@ -492,6 +559,185 @@ function HomeContent() {
     return true;
   });
   const featuredLive = liveMatches[0] || null;
+
+  const renderMatchGroup = ([name, group]) => {
+              const compact = isMounted && typeof window !== 'undefined' && window.innerWidth < 640;
+              const nameStyle = compact
+                ? { fontSize: 13, color: '#0f172a', lineHeight: 1.25, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-word' }
+                : { fontSize: 14, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
+              const currentViewMode = viewModes[name] || 'list';
+              return (
+              <div key={name} style={{ 
+                marginBottom: 16, 
+                background: '#ffffff', 
+                borderRadius: 16, 
+                overflow: 'hidden', 
+                border: '1px solid #eef0f3', 
+                boxShadow: '0 1px 3px rgba(0,0,0,0.04)' 
+              }}>
+                <div 
+                  onClick={() => (group.tournament?.uuid || group.tournament?.id) && router.push(`/tournaments/${group.tournament.uuid || group.tournament.id}`)}
+                  style={{ 
+                    cursor: (group.tournament?.uuid || group.tournament?.id) ? 'pointer' : 'default', 
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '12px 16px', 
+                    background: '#f5f6f8',
+                    borderBottom: 'none'
+                  }}
+                >
+                  <img
+                    src={getImageUrl(group.tournament?.logo_path || group.tournament?.logo) || avatar(name, '3b82f6')}
+                    style={{ width: 28, height: 28, borderRadius: 6, objectFit: 'contain', background: (group.tournament?.logo_path || group.tournament?.logo) ? 'transparent' : '#3b82f6' }}
+                    alt=""
+                  />
+                  <span style={{ fontSize: 14, fontWeight: 600, color: '#0f172a' }}>{name}</span>
+                  {group.tournament?.sport && (
+                    <span style={{ fontSize: 10, color: '#6366f1', marginLeft: 'auto', background: '#e0e7ff', padding: '2px 8px', borderRadius: 12, fontWeight: 600 }}>
+                      {SPORT_LABELS[group.tournament.sport?.slug] || ''}
+                    </span>
+                  )}
+                  {/* View Mode Toggle */}
+                  <div style={{ marginLeft: group.tournament?.sport ? 12 : 'auto' }}>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setViewModes(prev => ({ ...prev, [name]: currentViewMode === 'list' ? 'grid' : 'list' }));
+                      }} 
+                      style={{ 
+                        width: 32, height: 32, borderRadius: '50%', background: '#ffffff', 
+                        border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', 
+                        justifyContent: 'center', color: '#475569', cursor: 'pointer',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                      }} 
+                      title="Toggle List/Grid"
+                    >
+                      <Sliders size={14} />
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ 
+                    display: currentViewMode === 'grid' ? 'grid' : 'flex', 
+                    flexDirection: 'column',
+                    gridTemplateColumns: currentViewMode === 'grid' ? 'repeat(auto-fill, minmax(340px, 1fr))' : 'none',
+                    gap: currentViewMode === 'grid' ? 24 : 0,
+                    padding: currentViewMode === 'grid' ? '24px 16px' : 0,
+                  }}>
+                    {group.matches.map(match => {
+                      const isLive = ['live', 'first_half', 'half_time', 'second_half', 'extra_time_1', 'extra_time_ht', 'extra_time_2', 'penalty_shootout', 'ongoing'].includes(match.status);
+                      const isFinished = match.status === 'finished';
+                      const hasScore = isLive || isFinished;
+                      const time = match.scheduled_at
+                        ? new Date(match.scheduled_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                        : '-';
+                      const isSelected = selectedMatchId === (match.uuid || match.id);
+
+                      return (
+                        <div
+                          key={match.id}
+                          onClick={() => handleMatchClick(match.uuid || match.id)}
+                          style={{
+                            display: 'flex', alignItems: 'center',
+                            padding: currentViewMode === 'grid' ? '24px 20px 20px 20px' : (compact ? '12px 12px' : '14px 16px'),
+                            background: currentViewMode === 'grid' ? '#ffffff' : (isSelected ? '#f1f5f9' : 'transparent'),
+                            borderBottom: currentViewMode === 'grid' ? 'none' : '1px solid #f1f5f9',
+                            border: currentViewMode === 'grid' ? '1px solid #f1f5f9' : 'none',
+                            borderRadius: currentViewMode === 'grid' ? 20 : 0,
+                            margin: 0,
+                            boxShadow: currentViewMode === 'grid' ? '0 4px 20px rgba(0,0,0,0.03)' : 'none',
+                            cursor: 'pointer', transition: 'all 0.2s ease',
+                            position: 'relative'
+                          }}
+                        >
+                          {currentViewMode === 'grid' ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', width: '100%', position: 'relative' }}>
+                               {isLive && (
+                                 <div style={{ position: 'absolute', top: -38, left: '50%', transform: 'translateX(-50%)', background: '#ef4444', color: '#fff', padding: '6px 20px', borderRadius: 24, fontSize: 13, fontWeight: 700, zIndex: 1, boxShadow: '0 4px 10px rgba(239, 68, 68, 0.3)' }}>
+                                   LIVE
+                                 </div>
+                               )}
+                               {!isLive && isFinished && (
+                                 <div style={{ position: 'absolute', top: -38, left: '50%', transform: 'translateX(-50%)', background: '#f1f5f9', color: '#64748b', padding: '6px 20px', borderRadius: 24, fontSize: 13, fontWeight: 700, zIndex: 1 }}>
+                                   FT
+                                 </div>
+                               )}
+                               {!isLive && !isFinished && (
+                                 <div style={{ position: 'absolute', top: -38, left: '50%', transform: 'translateX(-50%)', background: '#ffffff', border: '1px solid #e2e8f0', color: '#64748b', padding: '6px 20px', borderRadius: 24, fontSize: 13, fontWeight: 700, zIndex: 1 }}>
+                                   {time}
+                                 </div>
+                               )}
+                               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, justifyContent: 'flex-end', minWidth: 0 }}>
+                                    <span style={{ fontSize: 16, fontWeight: 500, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.home_team?.name}</span>
+                                    <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name)} style={{ width: 48, height: 48, objectFit: 'contain' }} alt="" />
+                                  </div>
+                                  <div style={{ width: 90, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: '0 8px' }}>
+                                    {hasScore ? (
+                                      <span style={{ fontSize: 18, fontWeight: 700, color: '#ef4444', whiteSpace: 'nowrap' }}>{match.home_score} - {match.away_score}</span>
+                                    ) : (
+                                      <span style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap' }}>-</span>
+                                    )}
+                                    {isLive && (
+                                      <span style={{ fontSize: 14, fontWeight: 500, color: '#94a3b8', marginTop: 4 }}>{formatGameMinute(match.minute)}'</span>
+                                    )}
+                                  </div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, justifyContent: 'flex-start', minWidth: 0 }}>
+                                    <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name)} style={{ width: 48, height: 48, objectFit: 'contain' }} alt="" />
+                                    <span style={{ fontSize: 16, fontWeight: 500, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left' }}>{match.away_team?.name}</span>
+                                  </div>
+                               </div>
+                               <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
+                                 <span style={{ fontSize: 14, fontWeight: 400, color: '#0f172a' }}>
+                                   {match.venue?.name || 'Emirates Stadium, London'}
+                                 </span>
+                               </div>
+                            </div>
+                          ) : (
+                            <div style={{ display: 'flex', alignItems: 'center', width: '100%', minWidth: 0, gap: compact ? 6 : 8 }}>
+                              {/* Status (FT / menit live) */}
+                              <div style={{ width: compact ? 26 : 40, flexShrink: 0, display: 'flex', justifyContent: 'flex-start' }}>
+                                {isLive ? (
+                                  <span style={{ color: '#16a34a', fontSize: 12, fontWeight: 600 }}>{formatGameMinute(match.minute)}{(typeof match.minute === 'number' || !isNaN(parseFloat(match.minute))) ? "'" : ""}</span>
+                                ) : isFinished ? (
+                                  <span style={{ fontSize: compact ? 10 : 11, fontWeight: 500, color: '#64748b', background: '#f1f5f9', padding: compact ? '2px 4px' : '2px 6px', borderRadius: 6 }}>FT</span>
+                                ) : null}
+                              </div>
+                              {/* Home */}
+                              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: compact ? 6 : 10, minWidth: 0 }}>
+                                <span style={{ ...nameStyle, textAlign: 'right' }}>
+                                  {match.home_team?.name || 'Home'}
+                                </span>
+                                <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name)} style={{ width: compact ? 20 : 22, height: compact ? 20 : 22, objectFit: 'contain', flexShrink: 0 }} alt="" />
+                              </div>
+                              {/* Skor / jam */}
+                              <div style={{ width: compact ? 50 : 64, flexShrink: 0, display: 'flex', justifyContent: 'center' }}>
+                                {hasScore ? (
+                                  <span style={{ fontSize: 14, fontWeight: 600, color: isLive ? '#16a34a' : '#0f172a', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums', ...(isLive ? { background: '#dcfce7', padding: '2px 8px', borderRadius: 8 } : {}) }}>
+                                    {match.home_score} - {match.away_score}
+                                  </span>
+                                ) : (
+                                  <span style={{ fontSize: 13, color: '#475569', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{time}</span>
+                                )}
+                              </div>
+                              {/* Away */}
+                              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: compact ? 6 : 10, minWidth: 0 }}>
+                                <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name)} style={{ width: compact ? 20 : 22, height: compact ? 20 : 22, objectFit: 'contain', flexShrink: 0 }} alt="" />
+                                <span style={nameStyle}>
+                                  {match.away_team?.name || 'Away'}
+                                </span>
+                              </div>
+                              {!compact && <div style={{ width: 40, flexShrink: 0 }} />}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            );
+  };
 
   return (
     <div style={{ minHeight: 'calc(100vh - 56px)' }}>
@@ -881,188 +1127,18 @@ function HomeContent() {
           </div>
         ) : Object.keys(groupedMatches).length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0, ...(isMounted && typeof window !== 'undefined' && window.innerWidth < 1024 ? { padding: '0 12px' } : {}) }}>
-            {Object.entries(groupedMatches).map(([name, group]) => {
-              const currentViewMode = viewModes[name] || 'list';
-              return (
-              <div key={name} style={{ 
-                marginBottom: 24, 
-                background: '#f8fafc', 
-                borderRadius: 24, 
-                overflow: 'hidden', 
-                border: '1px solid #f1f5f9', 
-                boxShadow: '0 4px 20px rgba(0,0,0,0.03)' 
-              }}>
-                <div 
-                  onClick={() => (group.tournament?.uuid || group.tournament?.id) && router.push(`/tournaments/${group.tournament.uuid || group.tournament.id}`)}
-                  style={{ 
-                    cursor: (group.tournament?.uuid || group.tournament?.id) ? 'pointer' : 'default', 
-                    display: 'flex', alignItems: 'center', gap: 12,
-                    padding: '16px 20px', 
-                    background: 'linear-gradient(90deg, #ffe4e6 0%, #e0e7ff 100%)',
-                    borderBottom: 'none'
-                  }}
-                >
-                  <img
-                    src={getImageUrl(group.tournament?.logo_path || group.tournament?.logo) || avatar(name, '3b82f6')}
-                    style={{ width: 28, height: 28, borderRadius: 6, objectFit: 'contain', background: (group.tournament?.logo_path || group.tournament?.logo) ? 'transparent' : '#3b82f6' }}
-                    alt=""
-                  />
-                  <span style={{ fontSize: 16, fontWeight: 700, color: '#0f172a' }}>{name}</span>
-                  {group.tournament?.sport && (
-                    <span style={{ fontSize: 10, color: '#6366f1', marginLeft: 'auto', background: '#e0e7ff', padding: '2px 8px', borderRadius: 12, fontWeight: 600 }}>
-                      {SPORT_LABELS[group.tournament.sport?.slug] || ''}
-                    </span>
-                  )}
-                  {/* View Mode Toggle */}
-                  <div style={{ marginLeft: group.tournament?.sport ? 12 : 'auto' }}>
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setViewModes(prev => ({ ...prev, [name]: currentViewMode === 'list' ? 'grid' : 'list' }));
-                      }} 
-                      style={{ 
-                        width: 32, height: 32, borderRadius: '50%', background: '#ffffff', 
-                        border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', 
-                        justifyContent: 'center', color: '#475569', cursor: 'pointer',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
-                      }} 
-                      title="Toggle List/Grid"
-                    >
-                      <Sliders size={14} />
-                    </button>
-                  </div>
+            {Object.entries(groupedMatches).map(renderMatchGroup)}
+            {Object.keys(latestResultsGroups).length > 0 && (
+              <>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, margin: '8px 4px 12px' }}>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: '#0f172a' }}>Hasil Terakhir</span>
+                  <span style={{ fontSize: 13, color: '#64748b' }}>
+                    {latestResultsDate?.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short' })}
+                  </span>
                 </div>
-
-                <div>
-                  <div style={{ 
-                    display: currentViewMode === 'grid' ? 'grid' : 'flex', 
-                    flexDirection: 'column',
-                    gridTemplateColumns: currentViewMode === 'grid' ? 'repeat(auto-fill, minmax(340px, 1fr))' : 'none',
-                    gap: currentViewMode === 'grid' ? 24 : 0,
-                    padding: currentViewMode === 'grid' ? '24px 16px' : 0,
-                  }}>
-                    {group.matches.map(match => {
-                      const isLive = ['live', 'first_half', 'half_time', 'second_half', 'extra_time_1', 'extra_time_ht', 'extra_time_2', 'penalty_shootout', 'ongoing'].includes(match.status);
-                      const isFinished = match.status === 'finished';
-                      const hasScore = isLive || isFinished;
-                      const time = match.scheduled_at
-                        ? new Date(match.scheduled_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
-                        : '-';
-                      const isSelected = selectedMatchId === (match.uuid || match.id);
-
-                      return (
-                        <div
-                          key={match.id}
-                          onClick={() => handleMatchClick(match.uuid || match.id)}
-                          style={{
-                            display: 'flex', alignItems: 'center',
-                            padding: currentViewMode === 'grid' ? '24px 20px 20px 20px' : '16px 20px',
-                            background: currentViewMode === 'grid' ? '#ffffff' : (isSelected ? '#f1f5f9' : 'transparent'),
-                            borderBottom: currentViewMode === 'grid' ? 'none' : '1px solid #f1f5f9',
-                            border: currentViewMode === 'grid' ? '1px solid #f1f5f9' : 'none',
-                            borderRadius: currentViewMode === 'grid' ? 20 : 0,
-                            margin: 0,
-                            boxShadow: currentViewMode === 'grid' ? '0 4px 20px rgba(0,0,0,0.03)' : 'none',
-                            cursor: 'pointer', transition: 'all 0.2s ease',
-                            position: 'relative'
-                          }}
-                        >
-                          {currentViewMode === 'grid' ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', width: '100%', position: 'relative' }}>
-                               {isLive && (
-                                 <div style={{ position: 'absolute', top: -38, left: '50%', transform: 'translateX(-50%)', background: '#ef4444', color: '#fff', padding: '6px 20px', borderRadius: 24, fontSize: 13, fontWeight: 700, zIndex: 1, boxShadow: '0 4px 10px rgba(239, 68, 68, 0.3)' }}>
-                                   LIVE
-                                 </div>
-                               )}
-                               {!isLive && isFinished && (
-                                 <div style={{ position: 'absolute', top: -38, left: '50%', transform: 'translateX(-50%)', background: '#f1f5f9', color: '#64748b', padding: '6px 20px', borderRadius: 24, fontSize: 13, fontWeight: 700, zIndex: 1 }}>
-                                   FT
-                                 </div>
-                               )}
-                               {!isLive && !isFinished && (
-                                 <div style={{ position: 'absolute', top: -38, left: '50%', transform: 'translateX(-50%)', background: '#ffffff', border: '1px solid #e2e8f0', color: '#64748b', padding: '6px 20px', borderRadius: 24, fontSize: 13, fontWeight: 700, zIndex: 1 }}>
-                                   {time}
-                                 </div>
-                               )}
-                               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, justifyContent: 'flex-end', minWidth: 0 }}>
-                                    <span style={{ fontSize: 16, fontWeight: 500, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.home_team?.name}</span>
-                                    <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name)} style={{ width: 48, height: 48, objectFit: 'contain' }} alt="" />
-                                  </div>
-                                  <div style={{ width: 90, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: '0 8px' }}>
-                                    {hasScore ? (
-                                      <span style={{ fontSize: 18, fontWeight: 700, color: '#ef4444', whiteSpace: 'nowrap' }}>{match.home_score} - {match.away_score}</span>
-                                    ) : (
-                                      <span style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap' }}>-</span>
-                                    )}
-                                    {isLive && (
-                                      <span style={{ fontSize: 14, fontWeight: 500, color: '#94a3b8', marginTop: 4 }}>{formatGameMinute(match.minute)}'</span>
-                                    )}
-                                  </div>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, justifyContent: 'flex-start', minWidth: 0 }}>
-                                    <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name)} style={{ width: 48, height: 48, objectFit: 'contain' }} alt="" />
-                                    <span style={{ fontSize: 16, fontWeight: 500, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left' }}>{match.away_team?.name}</span>
-                                  </div>
-                               </div>
-                               <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
-                                 <span style={{ fontSize: 14, fontWeight: 400, color: '#0f172a' }}>
-                                   {match.venue?.name || 'Emirates Stadium, London'}
-                                 </span>
-                               </div>
-                            </div>
-                          ) : (
-                            <div style={{ display: 'flex', alignItems: 'center', width: '100%', minWidth: 0, padding: '2px 0' }}>
-                              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, minWidth: 0, paddingRight: 16 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
-                                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #f1f5f9' }}>
-                                      <img src={getImageUrl(match.home_team?.logo_path) || avatar(match.home_team?.name)} style={{ width: 22, height: 22, objectFit: 'contain' }} alt="" />
-                                    </div>
-                                    <span style={{ fontSize: 15, fontWeight: 400, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                      {match.home_team?.name || 'Home'}
-                                    </span>
-                                  </div>
-                                  <span style={{ fontSize: 16, fontWeight: hasScore ? 500 : 400, color: '#0f172a', paddingLeft: 12 }}>
-                                    {hasScore ? match.home_score : '-'}
-                                  </span>
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
-                                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #f1f5f9' }}>
-                                      <img src={getImageUrl(match.away_team?.logo_path) || avatar(match.away_team?.name)} style={{ width: 22, height: 22, objectFit: 'contain' }} alt="" />
-                                    </div>
-                                    <span style={{ fontSize: 15, fontWeight: 400, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                      {match.away_team?.name || 'Away'}
-                                    </span>
-                                  </div>
-                                  <span style={{ fontSize: 16, fontWeight: hasScore ? 500 : 400, color: '#0f172a', paddingLeft: 12 }}>
-                                    {hasScore ? match.away_score : '-'}
-                                  </span>
-                                </div>
-                              </div>
-                              <div style={{ width: 44, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
-                                {isLive ? (
-                                  <span style={{ color: '#ef4444', fontSize: 14, fontWeight: 500 }}>{formatGameMinute(match.minute)}{(typeof match.minute === 'number' || !isNaN(parseFloat(match.minute))) ? "'" : ""}</span>
-                                ) : isFinished ? (
-                                  <span style={{ fontSize: 14, fontWeight: 400, color: '#94a3b8' }}>{(typeof match.minute === 'number' || !isNaN(parseFloat(match.minute))) ? `${match.minute}'` : (match.minute || 'FT')}</span>
-                                ) : (
-                                  <span style={{ fontSize: 13, fontWeight: 400, color: '#94a3b8' }}>{time}</span>
-                                )}
-                              </div>
-                              <div style={{ width: 1, height: 48, background: '#f1f5f9', margin: '0 12px 0 8px', flexShrink: 0 }}></div>
-                              <div style={{ width: 32, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
-                                <Bell size={20} color={isLive ? '#4f46e5' : '#e2e8f0'} strokeWidth={1.5} />
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            );
-            })}
+                {Object.entries(latestResultsGroups).map(renderMatchGroup)}
+              </>
+            )}
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 20px', textAlign: 'center' }}>
@@ -1190,7 +1266,7 @@ function HomeContent() {
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 {latestNews.slice(0, 3).map((item, index) => {
                   const isFirst = index === 0;
-                  const source = item.source || 'FotMob';
+                  const source = item.source || 'Liga Bojonegoro';
                   
                   if (isFirst) {
                     return (

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, ArrowLeft, MapPin, Calendar, Users, Award, Shield, ChevronRight, Star, LayoutGrid, List, BarChart2, GitMerge, ChevronUp, ChevronDown, Bell } from 'lucide-react';
-import api, { getImageUrl } from '../../../api';
+import api, { getImageUrl, fetchAllMatches } from '../../../api';
 import TournamentBracket from '../../../components/TournamentBracket';
 
 const avatar = (name, bg = '3b82f6') => {
@@ -256,7 +256,7 @@ export default function TournamentDetailPage({ params }) {
       window.history.replaceState(null, '', url.toString());
     }
   };
-  const [matchView, setMatchView] = useState('upcoming'); // upcoming, finished
+  const [matchView, setMatchView] = useState(null); // null = otomatis, 'upcoming', 'finished'
   const [viewMode, setViewMode] = useState('list'); // list, grid
   const [playerStats, setPlayerStats] = useState({ top_scorers: [], top_cards: [], top_clean_sheets: [], top_minutes: [] });
   const [teamStats, setTeamStats] = useState(null);
@@ -298,7 +298,7 @@ export default function TournamentDetailPage({ params }) {
         }
 
         // Fetch matches for this tournament
-        const mRes = await api.get('/matches', { params: { per_page: 100 } });
+        const mRes = await fetchAllMatches({ tournament_id: tournamentId });
         if (mRes.data.success) {
           const tMatches = mRes.data.data.filter(m => String(m.tournament_id) === String(tournamentId) || String(m.tournament?.uuid) === String(tournamentId));
           setMatches(tMatches);
@@ -357,9 +357,15 @@ export default function TournamentDetailPage({ params }) {
   }
 
   // Group matches by month if needed, or simply filter
-  const upcomingMatches = matches.filter(m => m.status === 'scheduled');
-  const finishedMatches = matches.filter(m => ['finished', 'live', 'ongoing'].includes(m.status));
-  const filteredMatches = matchView === 'upcoming' ? upcomingMatches : finishedMatches;
+  const upcomingMatches = matches
+    .filter(m => m.status === 'scheduled')
+    .sort((a, b) => new Date(a.scheduled_at) - new Date(b.scheduled_at));
+  const finishedMatches = matches
+    .filter(m => m.status !== 'scheduled')
+    .sort((a, b) => new Date(b.scheduled_at) - new Date(a.scheduled_at));
+  // Default: tampilkan jadwal mendatang; jika tidak ada, langsung tampilkan hasil
+  const effectiveView = matchView ?? (upcomingMatches.length > 0 ? 'upcoming' : 'finished');
+  const filteredMatches = effectiveView === 'upcoming' ? upcomingMatches : finishedMatches;
 
   let totalTeams = tournament.teams?.length || 0;
   if (totalTeams === 0 && standings) {
@@ -388,43 +394,48 @@ export default function TournamentDetailPage({ params }) {
   }
 
   return (
-    <div className="page-container animate-fade-in" style={{ maxWidth: 1000, margin: '16px auto', padding: '0 16px 64px' }}>
+    <div className="page-container animate-fade-in" style={{ maxWidth: 1200, margin: '32px auto', padding: '0 16px 64px' }}>
+      <style>{`
+        .t-row-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        @media (max-width: 640px) {
+          .t-row { gap: 6px !important; }
+          .t-row-date { width: 40px !important; }
+          .t-row-date span:first-child { font-size: 11px !important; }
+          .t-row-spacer { display: none !important; }
+          .t-row-score { width: 50px !important; }
+          .t-row-name { font-size: 13px !important; white-space: normal; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: break-word; }
+          .tournament-header-row h1 { font-size: 18px !important; }
+        }
+      `}</style>
       <div className="animate-slide-up" style={{ width: '100%' }}>
         <div style={{ 
-          background: 'radial-gradient(circle at top left, rgba(232, 245, 233, 0.8) 0%, transparent 40%), radial-gradient(circle at top right, rgba(219, 234, 254, 0.8) 0%, transparent 40%), #ffffff',
+          background: '#ffffff',
+          border: '1px solid #eef0f3',
+          borderRadius: 16,
+          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
           position: 'relative',
           overflow: 'hidden',
-          paddingTop: 16
+          paddingTop: 20
         }}>
           
-          {/* Top Navbar */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', marginBottom: 20 }}>
-            <button onClick={() => router.back()} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fff', border: '1px solid var(--border-light)', borderRadius: 24, padding: '6px 16px', fontSize: 13, fontWeight: 700, color: '#111827', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-              <ArrowLeft size={16} /> Turnamen
-            </button>
-            
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 700, color: '#111827' }}>
-              <Star size={14} color="#f59e0b" />
-              {tournament.sport?.name || 'Turnamen Utama'}
-            </div>
-
-            <button style={{ background: '#111827', color: '#fff', border: 'none', borderRadius: 24, padding: '8px 20px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-              Ikuti Turnamen
-            </button>
-          </div>
-
-          {/* Logo & Title */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '0 24px', marginBottom: 32 }}>
-            <img src={getImageUrl(tournament.logo_path || tournament.logo) || avatar(tournament.name, 'ffffff')} 
-                 onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = avatar(tournament.name, 'ffffff'); }}
-                 style={{ width: 80, height: 80, objectFit: 'contain', borderRadius: 20, background: '#fff', boxShadow: '0 4px 12px rgba(0,0,0,0.08)', padding: 8 }} alt="" />
-            <div style={{ textAlign: 'center' }}>
-              <h1 style={{ fontSize: 28, fontWeight: 800, color: '#111827', marginBottom: 8, letterSpacing: '-0.02em' }}>{tournament.name}</h1>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, fontSize: 13, color: '#6b7280', fontWeight: 500 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><MapPin size={14} /> {tournament.location || 'Bojonegoro'}</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Users size={14} /> {totalTeams} Tim</div>
+          {/* Header: logo + nama (kiri), aksi (kanan) */}
+          <div className="tournament-header-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '0 24px', marginBottom: 24, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, minWidth: 0 }}>
+              <img src={getImageUrl(tournament.logo_path || tournament.logo) || avatar(tournament.name, 'ffffff')}
+                   onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = avatar(tournament.name, 'ffffff'); }}
+                   style={{ width: 48, height: 48, objectFit: 'contain', flexShrink: 0 }} alt="" />
+              <div style={{ minWidth: 0 }}>
+                <h1 style={{ fontSize: 22, fontWeight: 600, color: '#111827', margin: 0, letterSpacing: '-0.01em', lineHeight: 1.2 }}>{tournament.name}</h1>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 13, color: '#6b7280', marginTop: 4, flexWrap: 'wrap' }}>
+                  <span>{tournament.sport?.name || 'Turnamen'}</span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><MapPin size={12} /> {tournament.location || 'Bojonegoro'}</span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Users size={12} /> {totalTeams} Tim</span>
+                </div>
               </div>
             </div>
+            <button style={{ background: '#111827', color: '#fff', border: 'none', borderRadius: 24, padding: '8px 20px', fontSize: 13, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
+              Ikuti
+            </button>
           </div>
 
           {/* Tabs */}
@@ -471,14 +482,15 @@ export default function TournamentDetailPage({ params }) {
           <div>
             {/* Matches view filter (Upcoming vs Results) */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <button
                   onClick={() => setMatchView('upcoming')}
                   style={{
-                    padding: '7px 16px', fontSize: 10, fontWeight: 700, borderRadius: 16, border: 'none',
+                    padding: '8px 18px', fontSize: 13, fontWeight: 600, borderRadius: 20,
+                    border: effectiveView === 'upcoming' ? '1px solid #111827' : '1px solid #e5e7eb',
                     cursor: 'pointer', transition: 'all 0.2s',
-                    background: matchView === 'upcoming' ? 'var(--primary)' : 'transparent',
-                    color: matchView === 'upcoming' ? '#ffffff' : 'var(--text-secondary)'
+                    background: effectiveView === 'upcoming' ? '#111827' : '#ffffff',
+                    color: effectiveView === 'upcoming' ? '#ffffff' : '#111827'
                   }}
                 >
                   Mendatang
@@ -486,10 +498,11 @@ export default function TournamentDetailPage({ params }) {
                 <button
                   onClick={() => setMatchView('finished')}
                   style={{
-                    padding: '7px 16px', fontSize: 10, fontWeight: 700, borderRadius: 16, border: 'none',
+                    padding: '8px 18px', fontSize: 13, fontWeight: 600, borderRadius: 20,
+                    border: effectiveView === 'finished' ? '1px solid #111827' : '1px solid #e5e7eb',
                     cursor: 'pointer', transition: 'all 0.2s',
-                    background: matchView === 'finished' ? 'var(--primary)' : 'transparent',
-                    color: matchView === 'finished' ? '#ffffff' : 'var(--text-secondary)'
+                    background: effectiveView === 'finished' ? '#111827' : '#ffffff',
+                    color: effectiveView === 'finished' ? '#ffffff' : '#111827'
                   }}
                 >
                   Hasil
@@ -523,17 +536,14 @@ export default function TournamentDetailPage({ params }) {
               return Object.entries(monthGroups).map(([monthLabel, monthMatches]) => (
                 <div key={monthLabel}>
                   {/* Month header */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '20px 0', position: 'relative' }}>
-                    <div style={{ height: 1, background: 'var(--border-light)', width: '100%' }} />
-                    <div style={{ position: 'absolute', padding: '0 16px', background: 'var(--bg-card)', color: 'var(--text-secondary)', fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      {monthLabel}
-                    </div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', margin: '20px 4px 10px', textTransform: 'capitalize' }}>
+                    {monthLabel}
                   </div>
 
                   <div style={
                     viewMode === 'grid' 
                     ? { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: 16 }
-                    : { display: 'flex', flexDirection: 'column', gap: 6 }
+                    : { display: 'flex', flexDirection: 'column', background: '#ffffff', border: '1px solid #eef0f3', borderRadius: 16, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }
                   }>
                     {monthMatches.map(m => {
                       const isLive = ['live', 'first_half', 'half_time', 'second_half', 'extra_time_1', 'extra_time_ht', 'extra_time_2', 'penalty_shootout', 'ongoing'].includes(m.status);
@@ -629,8 +639,8 @@ export default function TournamentDetailPage({ params }) {
                           onClick={() => router.push(`/matches/${m.uuid || m.id}`)}
                           style={{
                             background: 'transparent',
-                            borderBottom: '1px solid var(--border-light)',
-                            padding: '16px 20px',
+                            borderBottom: '1px solid #f1f5f9',
+                            padding: '14px 16px',
                             display: 'flex',
                             alignItems: 'center',
                             cursor: 'pointer',
@@ -640,50 +650,37 @@ export default function TournamentDetailPage({ params }) {
                           }}
                           className="hover-bg"
                         >
-                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, minWidth: 0, paddingRight: 16 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
-                                <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid var(--border-light)' }}>
-                                  <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} style={{ width: 22, height: 22, objectFit: 'contain' }} alt="" />
-                                </div>
-                                <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                  {m.home_team?.name || 'Home'}
-                                </span>
-                              </div>
-                              <span style={{ fontSize: 16, fontWeight: hasScore ? 700 : 500, color: 'var(--text-primary)', paddingLeft: 12 }}>
-                                {hasScore ? m.home_score : '-'}
-                              </span>
+                          <div className="t-row" style={{ display: 'flex', alignItems: 'center', width: '100%', minWidth: 0, gap: 8 }}>
+                            {/* Tanggal + status */}
+                            <div className="t-row-date" style={{ width: 56, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                              <span style={{ fontSize: 12, color: '#6b7280' }}>{dateShort}</span>
+                              {isLive ? (
+                                <span style={{ color: '#16a34a', fontSize: 11, fontWeight: 600 }}>{m.minute ? `${m.minute}'` : 'LIVE'}</span>
+                              ) : isFinished ? (
+                                <span style={{ fontSize: 11, color: '#9ca3af' }}>FT</span>
+                              ) : null}
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
-                                <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid var(--border-light)' }}>
-                                  <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name)} style={{ width: 22, height: 22, objectFit: 'contain' }} alt="" />
-                                </div>
-                                <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                  {m.away_team?.name || 'Away'}
-                                </span>
-                              </div>
-                              <span style={{ fontSize: 16, fontWeight: hasScore ? 700 : 500, color: 'var(--text-primary)', paddingLeft: 12 }}>
-                                {hasScore ? m.away_score : '-'}
-                              </span>
+                            {/* Home */}
+                            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, minWidth: 0 }}>
+                              <span className="t-row-name" style={{ fontSize: 14, color: '#111827', textAlign: 'right' }}>{m.home_team?.name || 'Home'}</span>
+                              <img src={getImageUrl(m.home_team?.logo_path) || avatar(m.home_team?.name)} style={{ width: 22, height: 22, objectFit: 'contain', flexShrink: 0 }} alt="" />
                             </div>
-                          </div>
-                          
-                          <div style={{ width: 44, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', flexShrink: 0, gap: 4 }}>
-                            <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)' }}>{dateShort}</span>
-                            {isLive ? (
-                              <span style={{ color: '#ef4444', fontSize: 14, fontWeight: 700 }}>{m.minute ? `${m.minute}'` : 'LIVE'}</span>
-                            ) : isFinished ? (
-                              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)' }}>{m.minute ? `${m.minute}'` : 'FT'}</span>
-                            ) : (
-                              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>{time}</span>
-                            )}
-                          </div>
-                          
-                          <div style={{ width: 1, height: 48, background: 'var(--border-light)', margin: '0 12px 0 8px', flexShrink: 0 }}></div>
-                          
-                          <div style={{ width: 32, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
-                            <Bell size={20} color={isLive ? '#4f46e5' : 'var(--text-muted)'} strokeWidth={1.5} />
+                            {/* Skor / jam */}
+                            <div className="t-row-score" style={{ width: 64, flexShrink: 0, display: 'flex', justifyContent: 'center' }}>
+                              {hasScore ? (
+                                <span style={{ fontSize: 14, fontWeight: 600, color: isLive ? '#16a34a' : '#111827', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums', ...(isLive ? { background: '#dcfce7', padding: '2px 8px', borderRadius: 8 } : {}) }}>
+                                  {m.home_score} - {m.away_score}
+                                </span>
+                              ) : (
+                                <span style={{ fontSize: 13, color: '#475569', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{time}</span>
+                              )}
+                            </div>
+                            {/* Away */}
+                            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 8, minWidth: 0 }}>
+                              <img src={getImageUrl(m.away_team?.logo_path) || avatar(m.away_team?.name)} style={{ width: 22, height: 22, objectFit: 'contain', flexShrink: 0 }} alt="" />
+                              <span className="t-row-name" style={{ fontSize: 14, color: '#111827' }}>{m.away_team?.name || 'Away'}</span>
+                            </div>
+                            <div className="t-row-spacer" style={{ width: 56, flexShrink: 0 }} />
                           </div>
                         </div>
                       );
@@ -1007,20 +1004,22 @@ function StandingsTable({ rows = [], match, sport, scoringInfo, isGrouped, compa
   const isFootball = slug === 'football' || slug === 'futsal' || slug === '';
   const isVolleyball = slug === 'volleyball';
   const isBadminton = slug === 'badminton';
+  // Set-based sports: goals_* = sets won/lost, points_* = total points of every set in the tournament
+  const isNetSport = ['sets', 'tennis'].includes(scoringInfo?.score_type) || isVolleyball || isBadminton;
 
   // Use scoring_info labels from backend if available, fallback to defaults
   const goalsLabel = scoringInfo?.goals_label || {};
-  const labelFor = goalsLabel.for || 'GF';
-  const labelAgainst = goalsLabel.against || 'GA';
-  const labelDiff = goalsLabel.diff || 'GD';
+  const labelFor = isNetSport ? 'SW' : (goalsLabel.for || 'GF');
+  const labelAgainst = isNetSport ? 'SL' : (goalsLabel.against || 'GA');
+  const labelDiff = isNetSport ? 'SD' : (goalsLabel.diff || 'GD');
 
   // Tooltip text based on sport
-  const tipFor = isVolleyball ? 'Set Menang' : isBadminton ? 'Poin Menang' : 'Gol Memasukkan';
-  const tipAgainst = isVolleyball ? 'Set Kalah' : isBadminton ? 'Poin Kalah' : 'Gol Kemasukan';
-  const tipDiff = isVolleyball ? 'Selisih Set' : isBadminton ? 'Selisih Poin' : 'Selisih Gol';
+  const tipFor = isNetSport ? 'Set Menang' : 'Gol Memasukkan';
+  const tipAgainst = isNetSport ? 'Set Kalah' : 'Gol Kemasukan';
+  const tipDiff = isNetSport ? 'Selisih Set' : 'Selisih Gol';
 
   // For non-football sports, hide "drawn" column since draws are rare/impossible
-  const showDrawn = isFootball;
+  const showDrawn = isFootball && !isNetSport;
 
   // Column definitions - dynamic per sport
   const allCols = [
@@ -1030,7 +1029,10 @@ function StandingsTable({ rows = [], match, sport, scoringInfo, isGrouped, compa
     { key: 'lost', label: 'K', tip: 'Kalah' },
     { key: 'plus_minus', label: `${labelFor}/${labelAgainst}`, tip: `${tipFor} - ${tipAgainst}` },
     { key: 'goal_difference', label: labelDiff, tip: tipDiff },
-    ...((isVolleyball || isBadminton) ? [{ key: 'points_akumulasi', label: 'Poin', tip: 'Poin Akumulasi (PF-PA)' }] : []),
+    ...(isNetSport ? [
+      { key: 'points_akumulasi', label: 'PW-PL', tip: 'Total poin dari seluruh set selama turnamen (Menang - Kalah)' },
+      { key: 'points_difference', label: 'PD', tip: 'Selisih total poin' },
+    ] : []),
     { key: 'points', label: 'PTS', tip: 'Poin' },
   ];
 
@@ -1052,7 +1054,7 @@ function StandingsTable({ rows = [], match, sport, scoringInfo, isGrouped, compa
         <div style={{ width: 28, textAlign: 'center' }}>#</div>
         <div style={{ flex: 1, paddingLeft: 8, minWidth: 80 }}>Tim</div>
         {cols.map(c => (
-          <div key={c.key} style={{ width: c.key === 'points' ? 34 : (c.key === 'plus_minus' || c.key === 'points_akumulasi') ? 50 : 28, textAlign: 'center', flexShrink: 0 }}>{c.label}</div>
+          <div key={c.key} title={c.tip} style={{ width: c.key === 'points' ? 34 : c.key === 'points_akumulasi' ? 64 : c.key === 'plus_minus' ? 50 : c.key === 'points_difference' ? 36 : 28, textAlign: 'center', flexShrink: 0 }}>{c.label}</div>
         ))}
         {!compact && <div style={{ width: 90, textAlign: 'center', flexShrink: 0 }}>Form</div>}
       </div>
@@ -1116,16 +1118,18 @@ function StandingsTable({ rows = [], match, sport, scoringInfo, isGrouped, compa
                     val = `${r.goals_for || 0}-${r.goals_against || 0}`;
                   } else if (c.key === 'points_akumulasi') {
                     val = `${r.points_for || 0}-${r.points_against || 0}`;
+                  } else if (c.key === 'points_difference') {
+                    val = r.points_difference ?? ((r.points_for || 0) - (r.points_against || 0));
                   } else {
                     val = r[c.key];
                   }
                   
                   const isPts = c.key === 'points';
-                  const isGD = c.key === 'goal_difference';
+                  const isGD = c.key === 'goal_difference' || c.key === 'points_difference';
                   const gdColor = isGD ? (val > 0 ? '#22c55e' : val < 0 ? '#ef4444' : 'var(--text-secondary)') : null;
                   return (
                     <div key={c.key} style={{
-                      width: isPts ? 34 : (c.key === 'plus_minus' || c.key === 'points_akumulasi') ? 50 : 28, textAlign: 'center', flexShrink: 0,
+                      width: isPts ? 34 : c.key === 'points_akumulasi' ? 64 : c.key === 'plus_minus' ? 50 : c.key === 'points_difference' ? 36 : 28, textAlign: 'center', flexShrink: 0,
                       fontSize: isPts ? 13 : 11,
                       fontWeight: isPts ? 900 : 600,
                       color: isPts ? 'var(--text-primary)' : gdColor || 'var(--text-secondary)',

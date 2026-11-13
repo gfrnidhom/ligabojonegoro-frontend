@@ -1324,7 +1324,7 @@ function KlasemenTab({ standings, match, sport }) {
                     <div style={{ width: 4, height: 18, borderRadius: 2, background: '#3b82f6' }} />
                     <span style={{ fontSize: 11, fontWeight: 700, color: '#e8eaed', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{g.group?.name}</span>
                   </div>
-                  <StandingsTable rows={g.standings} match={match} sport={sport} />
+                  <StandingsTable rows={g.standings} match={match} sport={sport} scoringInfo={standings.scoring_info} />
                 </div>
               ))}
             </div>
@@ -1338,18 +1338,18 @@ function KlasemenTab({ standings, match, sport }) {
                 <div style={{ width: 4, height: 18, borderRadius: 2, background: '#3b82f6' }} />
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#e8eaed', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{g.group?.name}</span>
               </div>
-              <StandingsTable rows={g.standings} match={match} sport={sport} />
+              <StandingsTable rows={g.standings} match={match} sport={sport} scoringInfo={standings.scoring_info} />
             </div>
           ))}
         </div>
       ) : (
-        <StandingsTable rows={standings.standings} match={match} sport={sport} />
+        <StandingsTable rows={standings.standings} match={match} sport={sport} scoringInfo={standings.scoring_info} />
       )}
     </div>
   );
 }
 
-function StandingsTable({ rows = [], match, sport }) {
+function StandingsTable({ rows = [], match, sport, scoringInfo }) {
   if (!Array.isArray(rows) || rows.length === 0) {
     return <div style={{ padding: '16px 0', textAlign: 'center', fontSize: 10, color: '#9ca3af' }}>Belum ada data klasemen.</div>;
   }
@@ -1367,33 +1367,26 @@ function StandingsTable({ rows = [], match, sport }) {
     return { bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.08)', color: '#8b92a5' };
   };
 
-  const isVolleyball = sport?.slug === 'volleyball';
-  const isBadminton = sport?.slug === 'badminton';
+  const slug = String(sport?.slug || '').toLowerCase();
+  // Set-based sports: goals_* = sets won/lost, points_* = total points of every set in the tournament
+  const isNetSport = ['sets', 'tennis'].includes(scoringInfo?.score_type) || ['volleyball', 'badminton'].includes(slug);
 
   // Column definitions
   const cols = [
     { key: 'played', label: 'M', tip: 'Main' },
     { key: 'won', label: 'M', tip: 'Menang' },
-    { key: 'drawn', label: 'S', tip: 'Seri' },
+    ...(isNetSport ? [] : [{ key: 'drawn', label: 'S', tip: 'Seri' }]),
     { key: 'lost', label: 'K', tip: 'Kalah' },
-    { 
-      key: 'goals_for', 
-      label: isVolleyball ? 'SM' : isBadminton ? 'MM' : 'GM', 
-      tip: isVolleyball ? 'Set Menang' : isBadminton ? 'Match Menang' : 'Gol Masuk' 
-    },
-    { 
-      key: 'goals_against', 
-      label: isVolleyball ? 'SK' : isBadminton ? 'MK' : 'GK', 
-      tip: isVolleyball ? 'Set Kalah' : isBadminton ? 'Match Kalah' : 'Gol Kemasukan' 
-    },
-    { 
-      key: 'goal_difference', 
-      label: isVolleyball ? 'SS' : isBadminton ? 'MS' : 'SG', 
-      tip: isVolleyball ? 'Selisih Set' : isBadminton ? 'Selisih Match' : 'Selisih Gol' 
-    },
-    ...((isVolleyball || isBadminton) ? [{ key: 'points_akumulasi', label: 'Poin', tip: 'Poin Akumulasi (PF-PA)' }] : []),
+    { key: 'goals_for', label: isNetSport ? 'SW' : 'GM', tip: isNetSport ? 'Set Menang' : 'Gol Masuk' },
+    { key: 'goals_against', label: isNetSport ? 'SL' : 'GK', tip: isNetSport ? 'Set Kalah' : 'Gol Kemasukan' },
+    { key: 'goal_difference', label: isNetSport ? 'SD' : 'SG', tip: isNetSport ? 'Selisih Set' : 'Selisih Gol' },
+    ...(isNetSport ? [
+      { key: 'points_akumulasi', label: 'PW-PL', tip: 'Total poin dari seluruh set selama turnamen (Menang - Kalah)' },
+      { key: 'points_difference', label: 'PD', tip: 'Selisih total poin' },
+    ] : []),
     { key: 'points', label: 'PTS', tip: 'Poin' },
   ];
+  const colWidth = (key) => (key === 'points' ? 34 : key === 'points_akumulasi' ? 64 : key === 'points_difference' ? 36 : 28);
 
   return (
     <div style={{
@@ -1410,7 +1403,7 @@ function StandingsTable({ rows = [], match, sport }) {
         <div style={{ width: 44, textAlign: 'left', paddingLeft: 4 }}>#</div>
         <div style={{ flex: 1, paddingLeft: 8, minWidth: 80 }}>Tim</div>
         {cols.map(c => (
-          <div key={c.key} style={{ width: c.key === 'points' ? 34 : c.key === 'points_akumulasi' ? 50 : 28, textAlign: 'center', flexShrink: 0 }}>{c.label}</div>
+          <div key={c.key} title={c.tip} style={{ width: colWidth(c.key), textAlign: 'center', flexShrink: 0 }}>{c.label}</div>
         ))}
         <div style={{ width: 90, textAlign: 'center', flexShrink: 0 }}>Form</div>
       </div>
@@ -1486,15 +1479,17 @@ function StandingsTable({ rows = [], match, sport }) {
                   let val;
                   if (c.key === 'points_akumulasi') {
                     val = `${r.points_for || 0}-${r.points_against || 0}`;
+                  } else if (c.key === 'points_difference') {
+                    val = r.points_difference ?? ((r.points_for || 0) - (r.points_against || 0));
                   } else {
                     val = r[c.key];
                   }
                   const isPts = c.key === 'points';
-                  const isGD = c.key === 'goal_difference';
+                  const isGD = c.key === 'goal_difference' || c.key === 'points_difference';
                   const gdColor = isGD ? (val > 0 ? '#22c55e' : val < 0 ? '#ef4444' : '#8b92a5') : null;
                   return (
                     <div key={c.key} style={{
-                      width: isPts ? 34 : c.key === 'points_akumulasi' ? 50 : 28, textAlign: 'center', flexShrink: 0,
+                      width: colWidth(c.key), textAlign: 'center', flexShrink: 0,
                       fontSize: isPts ? 13 : 11,
                       fontWeight: isPts ? 900 : 600,
                       color: isPts ? '#f1f5f9' : gdColor || '#8b92a5',

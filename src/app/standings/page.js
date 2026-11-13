@@ -65,7 +65,12 @@ export default function StandingsPage() {
 
   // Determine if Draw column should be shown based on sport
   const sportSlug = String(selectedTournament?.sport?.slug || '').toLowerCase();
-  const showDrawn = sportSlug === 'football' || sportSlug === 'futsal' || sportSlug === '';
+  // Set-based sports (volleyball, badminton): goals_* = sets, points_* = total points of every set
+  const isNetSport = ['sets', 'tennis'].includes(scoringInfo.score_type)
+    || ['volleyball', 'voli', 'bola-voli', 'badminton', 'bulutangkis'].includes(sportSlug);
+  const showDrawn = !isNetSport && (sportSlug === 'football' || sportSlug === 'futsal' || sportSlug === '');
+  const diffColor = (v) => (v > 0 ? '#10b981' : v < 0 ? '#ef4444' : '#94a3b8');
+  const signed = (v) => (v > 0 ? `+${v}` : `${v}`);
 
   // Map labels to Indonesian for legend
   const goalsLabelMap = {
@@ -86,23 +91,37 @@ export default function StandingsPage() {
         </h3>
       )}
       <div style={{
-        background: 'rgba(255,255,255,0.01)',
-        border: '1px solid rgba(255,255,255,0.04)',
+        background: '#fff',
+        border: '1px solid var(--border-light)',
         borderRadius: 16, overflow: 'hidden',
       }}>
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 640 }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: isNetSport ? 820 : 640 }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <tr style={{ borderBottom: '1px solid var(--border-light)' }}>
                 <th style={thStyle}>#</th>
                 <th style={{ ...thStyle, textAlign: 'left' }}>Tim</th>
                 <th style={thStyle}>M</th>
                 <th style={thStyle}>M</th>
                 {showDrawn && <th style={thStyle}>S</th>}
                 <th style={thStyle}>K</th>
-                <th style={thStyle}>{goalsLabel.for}</th>
-                <th style={thStyle}>{goalsLabel.against}</th>
-                <th style={thStyle}>{goalsLabel.diff}</th>
+                {isNetSport ? (
+                  <>
+                    <th style={thStyle} title="Set Menang">SW</th>
+                    <th style={thStyle} title="Set Kalah">SL</th>
+                    <th style={thStyle} title="Selisih Set">SD</th>
+                    <th style={{ ...thStyle, color: '#cca26b' }} title="Total poin dari seluruh set (menang)">PW</th>
+                    <th style={{ ...thStyle, color: '#cca26b' }} title="Total poin dari seluruh set (kalah)">PL</th>
+                    <th style={{ ...thStyle, color: '#cca26b' }} title="Selisih poin">PD</th>
+                    <th style={{ ...thStyle, color: '#cca26b' }} title="Rasio poin (PW ÷ PL)">Rasio</th>
+                  </>
+                ) : (
+                  <>
+                    <th style={thStyle}>{goalsLabel.for}</th>
+                    <th style={thStyle}>{goalsLabel.against}</th>
+                    <th style={thStyle}>{goalsLabel.diff}</th>
+                  </>
+                )}
                 <th style={{ ...thStyle, color: '#3b82f6' }}>Poin</th>
               </tr>
             </thead>
@@ -115,7 +134,7 @@ export default function StandingsPage() {
                   <tr
                     key={row.team?.id || idx}
                     style={{
-                      borderBottom: '1px solid rgba(255,255,255,0.03)',
+                      borderBottom: '1px solid var(--border-light)',
                       transition: 'background 0.15s',
                     }}
                     onMouseEnter={e => { e.currentTarget.style.background = 'rgba(59,130,246,0.03)'; }}
@@ -123,13 +142,13 @@ export default function StandingsPage() {
                   >
                     <td style={{
                       ...tdStyle, fontWeight: 800,
-                      color: isTop ? '#10b981' : '#f1f5f9',
+                      color: isTop ? '#10b981' : 'var(--text-primary)',
                     }}>
                       <div style={{
                         width: 28, height: 28, borderRadius: 8,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: isTop ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.03)',
-                        border: `1px solid ${isTop ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.04)'}`,
+                        background: isTop ? 'rgba(16,185,129,0.1)' : 'rgba(0,0,0,0.03)',
+                        border: `1px solid ${isTop ? 'rgba(16,185,129,0.2)' : 'rgba(0,0,0,0.06)'}`,
                         fontSize: 10,
                       }}>
                         {pos}
@@ -144,7 +163,7 @@ export default function StandingsPage() {
                           style={{ width: 26, height: 26, borderRadius: '50%' }}
                           alt={row.team?.name || ''}
                         />
-                        <span style={{ fontWeight: 700, color: '#f1f5f9', fontSize: 11 }}>{row.team?.name}</span>
+                        <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: 11 }}>{row.team?.name}</span>
                       </Link>
                     </td>
                     <td style={tdStyle}>{row.played || 0}</td>
@@ -153,12 +172,23 @@ export default function StandingsPage() {
                     <td style={{ ...tdStyle, color: '#ef4444' }}>{row.lost || 0}</td>
                     <td style={tdStyle}>{row.goals_for || 0}</td>
                     <td style={tdStyle}>{row.goals_against || 0}</td>
-                    <td style={{
-                      ...tdStyle, fontWeight: 700,
-                      color: gd > 0 ? '#10b981' : gd < 0 ? '#ef4444' : '#94a3b8',
-                    }}>
-                      {gd > 0 ? '+' : ''}{gd}
+                    <td style={{ ...tdStyle, fontWeight: 700, color: diffColor(gd) }}>
+                      {signed(gd)}
                     </td>
+                    {isNetSport && (() => {
+                      const pf = Number(row.points_for || 0);
+                      const pa = Number(row.points_against || 0);
+                      const pd = pf - pa;
+                      const netCell = { ...tdStyle, background: 'rgba(204,162,107,0.04)' };
+                      return (
+                        <>
+                          <td style={netCell}>{pf}</td>
+                          <td style={netCell}>{pa}</td>
+                          <td style={{ ...netCell, fontWeight: 700, color: diffColor(pd) }}>{signed(pd)}</td>
+                          <td style={netCell}>{pa > 0 ? (pf / pa).toFixed(3) : (pf > 0 ? '∞' : '-')}</td>
+                        </>
+                      );
+                    })()}
                     <td style={{ ...tdStyle, fontWeight: 800, color: '#3b82f6', fontSize: 13 }}>{row.points || 0}</td>
                   </tr>
                 );
@@ -290,11 +320,21 @@ export default function StandingsPage() {
         }}>
           <span>M = Main</span>
           <span style={{ color: '#10b981' }}>M = Menang</span>
-          <span>S = Seri</span>
+          {showDrawn && <span>S = Seri</span>}
           <span style={{ color: '#ef4444' }}>K = Kalah</span>
-          <span>{goalsLabel.for} = {goalsLabelMap[goalsLabel.for] || goalsLabel.for}</span>
-          <span>{goalsLabel.against} = {goalsLabelMap[goalsLabel.against] || goalsLabel.against}</span>
-          <span>{goalsLabel.diff} = {goalsLabelMap[goalsLabel.diff] || goalsLabel.diff}</span>
+          {isNetSport ? (
+            <>
+              <span>SW/SL/SD = Set Menang / Set Kalah / Selisih Set</span>
+              <span style={{ color: '#cca26b' }}>PW/PL/PD = Total poin dari seluruh set selama turnamen (Menang / Kalah / Selisih)</span>
+              <span style={{ color: '#cca26b' }}>Rasio = PW ÷ PL</span>
+            </>
+          ) : (
+            <>
+              <span>{goalsLabel.for} = {goalsLabelMap[goalsLabel.for] || goalsLabel.for}</span>
+              <span>{goalsLabel.against} = {goalsLabelMap[goalsLabel.against] || goalsLabel.against}</span>
+              <span>{goalsLabel.diff} = {goalsLabelMap[goalsLabel.diff] || goalsLabel.diff}</span>
+            </>
+          )}
           {scoringInfo.point_system === 'scaled' && scoringInfo.point_rules && (
             <span style={{ color: '#cca26b', fontWeight: 600 }}>
               Sistem poin: {scoringInfo.point_rules.filter(r => r.condition === 'win').map(r => {
@@ -333,7 +373,7 @@ const thStyle = {
 const tdStyle = {
   padding: '12px 10px',
   fontSize: 11,
-  color: '#94a3b8',
+  color: '#475569',
   textAlign: 'center',
   fontWeight: 500,
 };

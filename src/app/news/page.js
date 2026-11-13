@@ -3,32 +3,54 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Flame, TrendingUp } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ArrowLeft, Newspaper } from 'lucide-react';
 import api, { getImageUrl } from '../../api';
 
-const formatTimeAgo = (dateString) => {
+// "3 jam lalu" untuk berita baru, tanggal lengkap untuk berita lama
+const formatNewsDate = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
-  const now = new Date();
-  const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
-  
-  if (diffInHours < 1) {
-    const diffInMins = Math.floor((now - date) / (1000 * 60));
-    return `${diffInMins} min ago`;
-  }
-  if (diffInHours < 24) {
-    return `${diffInHours} hr ago`;
-  }
-  return `${Math.floor(diffInHours / 24)} d ago`;
+  if (isNaN(date)) return '';
+  const diffMs = Date.now() - date.getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return 'Baru saja';
+  if (mins < 60) return `${mins} menit lalu`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} jam lalu`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days} hari lalu`;
+  return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 };
 
-const CATEGORIES = ['Semua', 'Liga', 'Turnamen', 'Transfer', 'Lokal'];
+// Ringkasan teks polos dari konten (bisa berisi HTML)
+const makeExcerpt = (content, max = 160) => {
+  if (!content) return '';
+  const text = String(content)
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return text.length > max ? `${text.slice(0, max).trim()}…` : text;
+};
+
+function NewsImage({ item, style }) {
+  const [failed, setFailed] = useState(false);
+  const src = getImageUrl(item.image_path);
+  if (!src || failed) {
+    return (
+      <div style={{ ...style, background: '#eef0f3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Newspaper size={28} color="#94a3b8" />
+      </div>
+    );
+  }
+  return <img src={src} alt={item.title} onError={() => setFailed(true)} style={{ ...style, objectFit: 'cover' }} />;
+}
 
 export default function NewsPage() {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState('Semua');
+  const [error, setError] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -36,157 +58,132 @@ export default function NewsPage() {
       try {
         const response = await api.get('/news');
         if (response.data.success) {
-          setNews(response.data.data);
+          const items = [...(response.data.data || [])].sort(
+            (a, b) => new Date(b.published_at || b.created_at) - new Date(a.published_at || a.created_at)
+          );
+          setNews(items);
         }
-      } catch (error) {
-        console.error('Error fetching news:', error);
+      } catch (err) {
+        console.error('Error fetching news:', err);
+        setError(true);
       } finally {
         setLoading(false);
       }
     };
-
     fetchNews();
   }, []);
 
-  return (
-    <div style={{ maxWidth: 768, margin: '0 auto', minHeight: 'calc(100vh - 72px)', paddingBottom: 120 }}>
-      {/* Header */}
-      <div 
-        className="sticky top-0 lg:top-[72px] z-40"
-        style={{ 
-        padding: '20px 20px 16px', 
-        background: 'rgba(242, 242, 242, 0.85)', 
-        backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid rgba(0,0,0,0.05)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
-          <button 
-            onClick={() => router.push('/')}
-            style={{ 
-              width: 36, height: 36, borderRadius: '50%', background: '#f8fafc', 
-              border: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', transition: 'all 0.2s'
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = '#f1f5f9'}
-            onMouseLeave={e => e.currentTarget.style.background = '#f8fafc'}
-          >
-            <ArrowLeft size={18} color="#0f172a" />
-          </button>
-          <h1 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', margin: 0, letterSpacing: '-0.02em' }}>Berita</h1>
-        </div>
+  const [featured, ...rest] = news;
 
-        {/* Categories */}
-        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }} className="hide-scrollbar">
-          {CATEGORIES.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              style={{
-                padding: '6px 16px',
-                borderRadius: 20,
-                fontSize: 12,
-                fontWeight: 600,
-                whiteSpace: 'nowrap',
-                border: activeCategory === cat ? 'none' : '1px solid #e2e8f0',
-                background: activeCategory === cat ? '#0f172a' : '#fff',
-                color: activeCategory === cat ? '#fff' : '#64748b',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+  return (
+    <div className="news-page" style={{ maxWidth: 1200, margin: '32px auto', padding: '0 16px 96px', minHeight: 'calc(100vh - 72px)' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+        <button
+          onClick={() => router.push('/')}
+          aria-label="Kembali ke beranda"
+          style={{
+            width: 36, height: 36, borderRadius: '50%', background: '#ffffff',
+            border: '1px solid #eef0f3', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', flexShrink: 0
+          }}
+        >
+          <ArrowLeft size={18} color="#0f172a" />
+        </button>
+        <h1 style={{ fontSize: 22, fontWeight: 600, color: '#0f172a', margin: 0, letterSpacing: '-0.01em' }}>Berita</h1>
       </div>
 
       {loading ? (
-        <div style={{ padding: 40, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ padding: 60, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div className="loader"></div>
-          <p style={{ marginTop: 12, color: '#64748b', fontSize: 12, fontWeight: 500 }}>Memuat berita terbaru...</p>
+          <p style={{ marginTop: 12, color: '#64748b', fontSize: 13 }}>Memuat berita terbaru...</p>
         </div>
-      ) : news.length > 0 ? (
-        <motion.div 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
-          style={{ display: 'flex', flexDirection: 'column' }}
-        >
-          {news.map((item, index) => {
-            const isFirst = index === 0;
-            const source = item.source || 'Liga Bojonegoro';
-            
-            if (isFirst) {
-              return (
-                <Link href={`/news/${item.slug}`} key={item.id} style={{ textDecoration: 'none', color: 'inherit', display: 'block', padding: '20px 20px 32px', borderBottom: '8px solid rgba(0,0,0,0.03)' }}>
-                  <div style={{ position: 'relative', width: '100%', paddingBottom: '62.5%', borderRadius: 20, overflow: 'hidden', marginBottom: 16 }}>
-                    <img 
-                      src={getImageUrl(item.image_path)} 
-                      alt={item.title} 
-                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
-                      onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
-                      onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-                    />
-                    <div style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(239, 68, 68, 0.9)', color: '#fff', padding: '4px 10px', borderRadius: 12, fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 4, backdropFilter: 'blur(4px)' }}>
-                      <Flame size={12} fill="currentColor" /> TRENDING
+      ) : news.length === 0 ? (
+        <div style={{ padding: 60, textAlign: 'center', color: '#64748b', display: 'flex', flexDirection: 'column', alignItems: 'center', background: '#fff', border: '1px solid #eef0f3', borderRadius: 16 }}>
+          <div style={{ width: 64, height: 64, background: '#f1f5f9', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+            <Newspaper size={28} color="#94a3b8" />
+          </div>
+          <p style={{ fontSize: 15, fontWeight: 600, color: '#0f172a', margin: '0 0 6px 0' }}>
+            {error ? 'Gagal memuat berita' : 'Belum ada berita'}
+          </p>
+          <p style={{ fontSize: 13, margin: 0 }}>
+            {error ? 'Periksa koneksi Anda lalu muat ulang halaman.' : 'Kembali lagi nanti untuk informasi terbaru.'}
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Berita utama */}
+          <Link href={`/news/${featured.slug}`} className="news-featured news-card" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <div className="news-featured-img">
+              <NewsImage item={featured} style={{ width: '100%', height: '100%', display: 'block' }} />
+            </div>
+            <div className="news-featured-body">
+              <h2 style={{ fontSize: 24, fontWeight: 600, color: '#0f172a', lineHeight: 1.3, margin: '0 0 12px 0', letterSpacing: '-0.01em' }}>
+                {featured.title}
+              </h2>
+              {makeExcerpt(featured.content) && (
+                <p style={{ fontSize: 14, color: '#475569', lineHeight: 1.6, margin: '0 0 16px 0' }}>
+                  {makeExcerpt(featured.content, 220)}
+                </p>
+              )}
+              <div style={{ fontSize: 12, color: '#64748b' }}>
+                {featured.source || 'Liga Bojonegoro'} · {formatNewsDate(featured.published_at || featured.created_at)}
+              </div>
+            </div>
+          </Link>
+
+          {/* Berita lainnya */}
+          {rest.length > 0 && (
+            <div className="news-grid">
+              {rest.map(item => (
+                <Link key={item.id} href={`/news/${item.slug}`} className="news-card news-grid-item" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <div className="news-grid-img">
+                    <NewsImage item={item} style={{ width: '100%', height: '100%', display: 'block' }} />
+                  </div>
+                  <div style={{ padding: '14px 16px 16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                    <h3 style={{ fontSize: 15, fontWeight: 600, color: '#0f172a', lineHeight: 1.4, margin: '0 0 8px 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {item.title}
+                    </h3>
+                    <div style={{ fontSize: 12, color: '#64748b', marginTop: 'auto' }}>
+                      {item.source || 'Liga Bojonegoro'} · {formatNewsDate(item.published_at || item.created_at)}
                     </div>
                   </div>
-                  
-                  <h2 style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', lineHeight: 1.35, margin: '0 0 12px 0', letterSpacing: '-0.02em' }}>
-                    {item.title}
-                  </h2>
-                  <div style={{ display: 'flex', alignItems: 'center', fontSize: 11, color: '#64748b', fontWeight: 600 }}>
-                    <span style={{ color: '#3b82f6' }}>{source}</span>
-                    <span style={{ margin: '0 6px' }}>•</span>
-                    <span>{formatTimeAgo(item.published_at || item.created_at)}</span>
-                  </div>
                 </Link>
-              );
-            }
-
-            return (
-              <Link href={`/news/${item.slug}`} key={item.id} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', gap: 16, padding: '20px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-                <div style={{ position: 'relative', width: 104, height: 104, borderRadius: 16, overflow: 'hidden', flexShrink: 0 }}>
-                  <img 
-                    src={getImageUrl(item.image_path)} 
-                    alt={item.title} 
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
-                    onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
-                    onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-                  />
-                </div>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: '#3b82f6', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    {item.category || 'Berita'}
-                  </div>
-                  <h3 style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', lineHeight: 1.4, margin: '0 0 8px 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', letterSpacing: '-0.01em' }}>
-                    {item.title}
-                  </h3>
-                  <div style={{ display: 'flex', alignItems: 'center', fontSize: 10, color: '#94a3b8', fontWeight: 500 }}>
-                    <TrendingUp size={12} style={{ marginRight: 4 }} />
-                    {formatTimeAgo(item.published_at || item.created_at)}
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
-        </motion.div>
-      ) : (
-        <div style={{ padding: 60, textAlign: 'center', color: '#64748b', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{ width: 64, height: 64, background: '#f1f5f9', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-             <TrendingUp size={28} color="#94a3b8" />
-          </div>
-          <p style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', margin: '0 0 8px 0' }}>Belum ada berita</p>
-          <p style={{ fontSize: 12, margin: 0 }}>Kembali lagi nanti untuk informasi terbaru.</p>
-        </div>
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       <style dangerouslySetInnerHTML={{__html: `
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
+        .news-card {
+          background: #ffffff;
+          border: 1px solid #eef0f3;
+          border-radius: 16px;
+          overflow: hidden;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+          transition: box-shadow 0.2s ease, transform 0.2s ease;
         }
-        .hide-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
+        .news-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.08); transform: translateY(-2px); }
+        .news-featured { display: grid; grid-template-columns: 3fr 2fr; margin-bottom: 16px; }
+        .news-featured-img { aspect-ratio: 16 / 9; min-height: 100%; }
+        .news-featured-body { padding: 28px; display: flex; flex-direction: column; justify-content: center; }
+        .news-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+        .news-grid-item { display: flex; flex-direction: column; }
+        .news-grid-img { aspect-ratio: 16 / 9; background: #eef0f3; }
+        @media (max-width: 1024px) {
+          .news-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 768px) {
+          .news-page { margin: 16px auto !important; padding: 0 12px 96px !important; }
+          .news-featured { grid-template-columns: 1fr; }
+          .news-featured-img { min-height: 0; }
+          .news-featured-body { padding: 16px; }
+          .news-featured-body h2 { font-size: 19px !important; }
+          .news-grid { grid-template-columns: 1fr; gap: 12px; }
+          .news-grid-item { flex-direction: row; }
+          .news-grid-img { width: 112px; flex-shrink: 0; aspect-ratio: auto; min-height: 96px; }
+          .news-grid-item h3 { font-size: 14px !important; }
         }
       `}} />
     </div>

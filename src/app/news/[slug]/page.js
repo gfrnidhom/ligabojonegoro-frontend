@@ -3,186 +3,229 @@
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Calendar, User, Clock, Share2 } from 'lucide-react';
+import { ArrowLeft, Share2, Check, Newspaper } from 'lucide-react';
 import api, { getImageUrl } from '../../../api';
 
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const d = new Date(dateString);
+  if (isNaN(d)) return '';
+  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+};
+
+const formatShortDate = (dateString) => {
+  if (!dateString) return '';
+  const d = new Date(dateString);
+  if (isNaN(d)) return '';
+  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+};
+
+const looksLikeHtml = (text) => /<\/?(p|br|div|h[1-6]|ul|ol|li|strong|em|a|img|blockquote)\b/i.test(text || '');
+
+// Isi berita dari admin bisa berupa HTML atau teks biasa dengan baris baru.
+function ArticleBody({ content }) {
+  if (!content) return null;
+  if (looksLikeHtml(content)) {
+    return <div className="article-body" dangerouslySetInnerHTML={{ __html: content }} />;
+  }
+  const paragraphs = String(content)
+    .replace(/\r\n/g, '\n')
+    .split(/\n+/)
+    .map(p => p.trim())
+    .filter(Boolean);
+  return (
+    <div className="article-body">
+      {paragraphs.map((p, i) => <p key={i}>{p}</p>)}
+    </div>
+  );
+}
+
+function NewsImage({ item, style }) {
+  const [failed, setFailed] = useState(false);
+  const src = getImageUrl(item?.image_path);
+  if (!src || failed) {
+    return (
+      <div style={{ ...style, background: '#eef0f3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Newspaper size={28} color="#94a3b8" />
+      </div>
+    );
+  }
+  return <img src={src} alt={item.title} onError={() => setFailed(true)} style={{ ...style, objectFit: 'cover' }} />;
+}
+
 export default function NewsDetailPage({ params }) {
-  const unwrappedParams = use(params);
-  const slug = unwrappedParams.slug;
+  const { slug } = use(params);
   const router = useRouter();
 
   const [news, setNews] = useState(null);
+  const [others, setOthers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    const fetchNewsDetail = async () => {
+    if (!slug) return;
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      setError(false);
       try {
-        setLoading(true);
-        // First try to fetch all news and find by slug, 
-        // since we might not have a dedicated /news/{slug} endpoint
-        const response = await api.get('/news');
-        if (response.data.success) {
-          const found = response.data.data.find(n => n.slug === slug);
-          if (found) {
-            // We can also fetch the exact detail if the endpoint exists: api.get(`/news/${found.id}`)
-            setNews(found);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching news detail:', error);
+        const [detailRes, listRes] = await Promise.allSettled([
+          api.get(`/news/${slug}`),
+          api.get('/news'),
+        ]);
+        const list = listRes.status === 'fulfilled' && listRes.value.data?.success ? (listRes.value.data.data || []) : [];
+        let item = detailRes.status === 'fulfilled' && detailRes.value.data?.success ? detailRes.value.data.data : null;
+        if (!item) item = list.find(n => n.slug === slug) || null;
+        if (cancelled) return;
+        if (!item && detailRes.status === 'rejected' && listRes.status === 'rejected') setError(true);
+        setNews(item);
+        setOthers(
+          list
+            .filter(n => n.slug !== slug)
+            .sort((a, b) => new Date(b.published_at || b.created_at) - new Date(a.published_at || a.created_at))
+            .slice(0, 5)
+        );
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
-
-    if (slug) {
-      fetchNewsDetail();
-    }
+    load();
+    return () => { cancelled = true; };
   }, [slug]);
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
-  };
-
-  const handleShare = () => {
+  const handleShare = async () => {
+    const url = window.location.href;
     if (navigator.share) {
-      navigator.share({
-        title: news?.title,
-        text: news?.excerpt || 'Berita Liga Bojonegoro',
-        url: window.location.href,
-      }).catch(console.error);
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert('Link berhasil disalin!');
+      try { await navigator.share({ title: news?.title, url }); } catch { /* dibatalkan */ }
+      return;
     }
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* clipboard tidak tersedia */ }
   };
 
   if (loading) {
     return (
-      <div style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ minHeight: '70vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <div className="loader"></div>
-        <p style={{ marginTop: 14, color: '#9ca3af', fontSize: 11, fontWeight: 500 }}>Memuat berita...</p>
+        <p style={{ marginTop: 14, color: '#64748b', fontSize: 13 }}>Memuat berita...</p>
       </div>
     );
   }
 
   if (!news) {
     return (
-      <div style={{ maxWidth: 800, margin: '80px auto', textAlign: 'center', padding: '0 16px' }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#111827', marginBottom: 12 }}>Berita Tidak Ditemukan</h2>
-        <p style={{ color: '#6b7280', marginBottom: 24 }}>Berita yang Anda cari mungkin telah dihapus atau URL tidak valid.</p>
-        <button onClick={() => router.push('/news')} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          <ArrowLeft size={16} /> Kembali ke Daftar Berita
+      <div style={{ maxWidth: 560, margin: '80px auto', textAlign: 'center', padding: '0 16px' }}>
+        <h2 style={{ fontSize: 20, fontWeight: 600, color: '#0f172a', marginBottom: 8 }}>
+          {error ? 'Gagal memuat berita' : 'Berita tidak ditemukan'}
+        </h2>
+        <p style={{ color: '#64748b', fontSize: 14, marginBottom: 24 }}>
+          {error ? 'Periksa koneksi Anda lalu muat ulang halaman.' : 'Berita yang Anda cari mungkin telah dihapus atau tautannya tidak valid.'}
+        </p>
+        <button onClick={() => router.push('/news')} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#0f172a', color: '#fff', border: 'none', borderRadius: 20, padding: '10px 20px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+          <ArrowLeft size={16} /> Kembali ke Berita
         </button>
       </div>
     );
   }
 
-  const coverImage = getImageUrl(news.image_path) || 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80';
+  const isDraft = news.is_published === 0 || news.is_published === false || news.is_published === 'False';
 
   return (
-    <article className="animate-fade-in" style={{ maxWidth: 800, margin: '0 auto', padding: '24px 16px 120px' }}>
-      
-      {/* Navigation */}
-      <div style={{ marginBottom: 24 }}>
-        <button 
-          onClick={() => router.push('/news')}
-          style={{ 
-            display: 'inline-flex', alignItems: 'center', gap: 6, 
-            color: '#6b7280', fontSize: 12, fontWeight: 600, 
-            background: 'none', border: 'none', cursor: 'pointer',
-            padding: '8px 0', transition: 'color 0.2s'
-          }}
-          onMouseEnter={e => e.currentTarget.style.color = '#111827'}
-          onMouseLeave={e => e.currentTarget.style.color = '#6b7280'}
-        >
-          <ArrowLeft size={16} /> Kembali ke Berita
-        </button>
-      </div>
-
-      {/* Header */}
-      <header style={{ marginBottom: 32 }}>
-        {news.is_published === 0 && (
-          <span style={{ 
-            display: 'inline-block', padding: '4px 12px', background: 'rgba(245,158,11,0.15)', 
-            color: '#f59e0b', borderRadius: 20, fontSize: 10, fontWeight: 700, marginBottom: 16 
-          }}>
-            DRAFT
-          </span>
-        )}
-        
-        <h1 style={{ 
-          fontSize: 'clamp(28px, 5vw, 42px)', fontWeight: 800, color: '#111827', 
-          lineHeight: 1.2, marginBottom: 20, letterSpacing: '-0.02em' 
-        }}>
-          {news.title}
-        </h1>
-        
-        <div style={{ 
-          display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 20, 
-          color: '#6b7280', fontSize: 11, fontWeight: 500,
-          borderBottom: '1px solid #e5e7eb', paddingBottom: 24
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Calendar size={16} />
-            <span>{formatDate(news.published_at || news.created_at)}</span>
+    <div className="news-detail-page" style={{ maxWidth: 1200, margin: '32px auto', padding: '0 16px 96px' }}>
+      <div className="news-detail-grid">
+        {/* Artikel */}
+        <article className="news-detail-card">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '20px 28px 0' }} className="article-pad">
+            <button
+              onClick={() => router.push('/news')}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fff', border: '1px solid #eef0f3', borderRadius: 20, padding: '6px 14px', fontSize: 13, fontWeight: 600, color: '#0f172a', cursor: 'pointer' }}
+            >
+              <ArrowLeft size={16} /> Berita
+            </button>
+            <button
+              onClick={handleShare}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fff', border: '1px solid #eef0f3', borderRadius: 20, padding: '6px 14px', fontSize: 13, fontWeight: 600, color: copied ? '#16a34a' : '#0f172a', cursor: 'pointer' }}
+            >
+              {copied ? <><Check size={15} /> Link disalin</> : <><Share2 size={15} /> Bagikan</>}
+            </button>
           </div>
-          {news.author && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <User size={16} />
-              <span>{news.author}</span>
+
+          <header className="article-pad" style={{ padding: '24px 28px 20px' }}>
+            {isDraft && (
+              <span style={{ display: 'inline-block', padding: '3px 10px', background: '#fef3c7', color: '#b45309', borderRadius: 12, fontSize: 11, fontWeight: 600, marginBottom: 12 }}>
+                DRAFT
+              </span>
+            )}
+            <h1 className="article-title" style={{ fontSize: 32, fontWeight: 600, color: '#0f172a', lineHeight: 1.25, margin: '0 0 12px', letterSpacing: '-0.015em' }}>
+              {news.title}
+            </h1>
+            <div style={{ fontSize: 13, color: '#64748b' }}>
+              {news.author || news.source || 'Liga Bojonegoro'} · {formatDate(news.published_at || news.created_at)}
             </div>
-          )}
-          <button 
-            onClick={handleShare}
-            style={{ 
-              marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6,
-              background: 'rgba(59,130,246,0.1)', color: '#60a5fa',
-              border: '1px solid rgba(59,130,246,0.2)', borderRadius: 20,
-              padding: '6px 14px', fontSize: 10, fontWeight: 700, cursor: 'pointer'
-            }}
-          >
-            <Share2 size={14} /> Bagikan
-          </button>
-        </div>
-      </header>
+          </header>
 
-      {/* Cover Image */}
-      <div style={{ 
-        width: '100%', aspectRatio: '16/9', borderRadius: 24, overflow: 'hidden',
-        marginBottom: 40, background: '#f1f5f9', border: '1px solid #e5e7eb'
-      }}>
-        <img 
-          src={coverImage} 
-          alt={news.title} 
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-        />
+          <div className="article-cover">
+            <NewsImage item={news} style={{ width: '100%', height: '100%', display: 'block' }} />
+          </div>
+
+          <div className="article-pad" style={{ padding: '28px 28px 36px' }}>
+            <ArticleBody content={news.content} />
+          </div>
+        </article>
+
+        {/* Berita lainnya */}
+        {others.length > 0 && (
+          <aside className="news-detail-card news-detail-aside">
+            <h2 style={{ fontSize: 15, fontWeight: 600, color: '#0f172a', margin: 0, padding: '18px 18px 8px' }}>Berita Lainnya</h2>
+            {others.map(item => (
+              <Link key={item.id} href={`/news/${item.slug}`} className="other-news-item" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <div style={{ width: 88, height: 64, borderRadius: 10, overflow: 'hidden', flexShrink: 0 }}>
+                  <NewsImage item={item} style={{ width: '100%', height: '100%', display: 'block' }} />
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#0f172a', lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    {item.title}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>{formatShortDate(item.published_at || item.created_at)}</div>
+                </div>
+              </Link>
+            ))}
+          </aside>
+        )}
       </div>
-
-      {/* Content */}
-      <div 
-        className="prose prose-lg max-w-none"
-        style={{ color: '#374151', lineHeight: 1.8 }}
-        dangerouslySetInnerHTML={{ __html: news.content }} 
-      />
 
       <style dangerouslySetInnerHTML={{__html: `
-        .prose p { margin-bottom: 1.5em; }
-        .prose h2 { color: #111827; font-weight: 700; margin-top: 2em; margin-bottom: 0.8em; font-size: 1.5em; letter-spacing: -0.01em; }
-        .prose h3 { color: #1f2937; font-weight: 600; margin-top: 1.5em; margin-bottom: 0.6em; font-size: 1.25em; letter-spacing: -0.01em; }
-        .prose a { color: #2563eb; text-decoration: none; font-weight: 500; }
-        .prose a:hover { text-decoration: underline; color: #1d4ed8; }
-        .prose ul, .prose ol { padding-left: 1.5em; margin-bottom: 1.5em; }
-        .prose li { margin-bottom: 0.5em; }
-        .prose blockquote { border-left: 4px solid #3b82f6; padding-left: 1em; color: #6b7280; font-style: italic; background: #f8fafc; padding: 1em; border-radius: 0 8px 8px 0; }
-        .prose img { border-radius: 12px; margin: 2em 0; max-width: 100%; height: auto; border: 1px solid #e5e7eb; }
+        .news-detail-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+        .news-detail-card { background: #fff; border: 1px solid #eef0f3; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .news-detail-aside { position: sticky; top: 88px; padding-bottom: 8px; }
+        .article-cover { aspect-ratio: 16 / 9; background: #eef0f3; }
+        .other-news-item { display: flex; gap: 12px; padding: 12px 18px; border-top: 1px solid #f1f5f9; transition: background 0.15s; }
+        .other-news-item:hover { background: #f8fafc; }
+        .article-body { color: #1e293b; font-size: 16px; line-height: 1.8; }
+        .article-body p { margin: 0 0 1.2em; }
+        .article-body p:last-child { margin-bottom: 0; }
+        .article-body h2 { color: #0f172a; font-weight: 600; margin: 1.8em 0 0.6em; font-size: 1.35em; }
+        .article-body h3 { color: #0f172a; font-weight: 600; margin: 1.5em 0 0.5em; font-size: 1.15em; }
+        .article-body a { color: #2563eb; text-decoration: underline; }
+        .article-body ul, .article-body ol { padding-left: 1.5em; margin: 0 0 1.2em; }
+        .article-body li { margin-bottom: 0.4em; }
+        .article-body blockquote { border-left: 3px solid #cbd5e1; margin: 1.5em 0; padding: 0.2em 0 0.2em 1em; color: #475569; }
+        .article-body img { border-radius: 12px; margin: 1.5em 0; max-width: 100%; height: auto; }
+        @media (max-width: 960px) {
+          .news-detail-grid { grid-template-columns: 1fr; }
+          .news-detail-aside { position: static; }
+        }
+        @media (max-width: 640px) {
+          .news-detail-page { margin: 12px auto !important; padding: 0 12px 96px !important; }
+          .article-pad { padding-left: 16px !important; padding-right: 16px !important; }
+          .article-title { font-size: 23px !important; }
+          .article-body { font-size: 15px; line-height: 1.75; }
+        }
       `}} />
-
-    </article>
+    </div>
   );
 }

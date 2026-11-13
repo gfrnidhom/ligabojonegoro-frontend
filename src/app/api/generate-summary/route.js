@@ -1,83 +1,153 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextResponse } from 'next/server';
 
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { matchData } = body;
+    const { matchData, forceRefresh } = body;
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    
-    // Fallback if API key is not configured
-    if (!apiKey) {
-      return NextResponse.json({ 
-        summary: `Ini adalah ringkasan simulasi karena GEMINI_API_KEY belum dikonfigurasi di server. Pertandingan antara ${matchData?.home_team?.name || 'Tuan Rumah'} dan ${matchData?.away_team?.name || 'Tim Tamu'} berakhir dengan skor ${matchData?.home_score} - ${matchData?.away_score}. Pertandingan berlangsung sengit dengan penguasaan bola ${matchData?.stats?.possession_home || 50}% berbanding ${matchData?.stats?.possession_away || 50}%. Silakan tambahkan GEMINI_API_KEY di file .env.local untuk mengaktifkan ringkasan AI yang sesungguhnya.`
+    const routerBaseUrl = process.env.NINE_ROUTER_BASE_URL || 'https://generativelanguage.googleapis.com/v1beta/openai';
+    const routerApiKey = process.env.NINE_ROUTER_API_KEY || '';
+    const routerModel = process.env.NINE_ROUTER_MODEL || 'gemini-2.5-flash';
+
+    // 1. If matchData already has persisted summary in statistics and not force refresh
+    if (!forceRefresh && matchData?.statistics?.ai_summary) {
+      return NextResponse.json({
+        summary: matchData.statistics.ai_summary,
+        model: matchData.statistics.ai_summary_model || routerModel,
+        updatedAt: matchData.statistics.ai_summary_updated_at,
+        cached: true,
       });
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemma-4-31b-it' });
-
-    // Construct a comprehensive prompt based on match data
-    const prompt = `
-      Anda adalah seorang komentator dan analis sepak bola profesional yang sedang menulis ringkasan pertandingan untuk sebuah portal berita olahraga.
-      Buatkan satu paragraf ringkasan pertandingan yang sangat menarik, dramatis, namun tetap analitis dan faktual berdasarkan data statistik berikut:
-      
-      Pertandingan: ${matchData?.home_team?.name} vs ${matchData?.away_team?.name}
-      Skor Akhir: ${matchData?.home_score} - ${matchData?.away_score}
-      Status: ${matchData?.status === 'finished' ? 'Selesai' : matchData?.status}
-      
-      Statistik Kunci:
-      - Penguasaan Bola: ${matchData?.stats?.possession_home || 50}% (Home) vs ${matchData?.stats?.possession_away || 50}% (Away)
-      - Total Tembakan: ${matchData?.stats?.shots_home || 0} vs ${matchData?.stats?.shots_away || 0}
-      - Tembakan Tepat Sasaran: ${matchData?.stats?.shots_on_target_home || 0} vs ${matchData?.stats?.shots_on_target_away || 0}
-      - Tendangan Sudut: ${matchData?.stats?.corners_home || 0} vs ${matchData?.stats?.corners_away || 0}
-      - Pelanggaran: ${matchData?.stats?.fouls_home || 0} vs ${matchData?.stats?.fouls_away || 0}
-      - Kartu Kuning: ${matchData?.stats?.yellow_cards_home || 0} vs ${matchData?.stats?.yellow_cards_away || 0}
-      - Kartu Merah: ${matchData?.stats?.red_cards_home || 0} vs ${matchData?.stats?.red_cards_away || 0}
-      
-      Instruksi tambahan:
-      - Format hasil dalam 1-2 paragraf saja, langsung intinya.
-      - Gunakan bahasa Indonesia yang bergaya jurnalistik olahraga (contoh: "mendominasi jalannya laga", "tampil efektif", "hujan kartu", dsb).
-      - Jangan menyertakan sapaan pembuka atau penutup (misal: "Halo", "Berikut adalah ringkasannya"). Langsung tuliskan narasi pertandingannya.
-    `;
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-
-    return NextResponse.json({ summary: text });
-  } catch (error) {
-    console.error('Error generating summary:', error);
-    
-    // Fallback Generator if Rate Limited / Quota Exceeded
-    const { matchData } = body || {};
+    // 2. Format detailed match events & statistics for prompt
     const home = matchData?.home_team?.name || 'Tuan Rumah';
     const away = matchData?.away_team?.name || 'Tim Tamu';
-    const hScore = parseInt(matchData?.home_score) || 0;
-    const aScore = parseInt(matchData?.away_score) || 0;
-    const hPoss = parseInt(matchData?.stats?.possession_home) || 50;
-    const aPoss = parseInt(matchData?.stats?.possession_away) || 50;
-    const hShots = parseInt(matchData?.stats?.shots_home) || 0;
-    const aShots = parseInt(matchData?.stats?.shots_away) || 0;
+    const hScore = matchData?.home_score ?? 0;
+    const aScore = matchData?.away_score ?? 0;
+    const stats = matchData?.statistics || matchData?.stats || {};
+    const events = matchData?.events || [];
+
+    const eventDetails = events.map(e => {
+      const min = e.minute ? `Menit ${e.minute}'` : 'Menit -';
+      const team = e.team_id === matchData?.home_team?.id ? home : away;
+      const player = e.player?.name || 'Pemain';
+
+      if (e.event_type === 'goal') return `- ${min}: Gol untuk ${team} oleh ${player}`;
+      if (e.event_type === 'penalty') return `- ${min}: Gol penalti untuk ${team} oleh ${player}`;
+      if (e.event_type === 'own_goal') return `- ${min}: Gol bunuh diri oleh ${player} (${team})`;
+      if (e.event_type === 'disallowed_goal') {
+        return `- ${min}: GOL DIANULIR (-1) untuk ${team} oleh ${player}. Alasan: ${e.event_data?.reason || 'Pelanggaran'}`;
+      }
+      if (e.event_type === 'yellow_card') return `- ${min}: Kartu kuning untuk ${player} (${team})`;
+      if (e.event_type === 'red_card') return `- ${min}: Kartu merah untuk ${player} (${team})`;
+      return null;
+    }).filter(Boolean);
+
+    const prompt = `
+Anda adalah seorang analis dan jurnalis olahraga profesional untuk kompetisi Liga Bojonegoro.
+Buat ringkasan dan analisis pertandingan yang padat, menarik, dramatis, namun tetap analitis dan faktual berdasarkan data berikut:
+
+Pertandingan: ${home} vs ${away}
+Skor Akhir: ${hScore} - ${aScore}
+Status: ${matchData?.status === 'finished' ? 'Selesai (Full Time)' : (matchData?.status || 'Selesai')}
+
+Rentetan Kejadian:
+${eventDetails.length > 0 ? eventDetails.join('\n') : '- Pertandingan berlangsung normal tanpa kartu merah atau gol penalti.'}
+
+Statistik Pertandingan:
+- Penguasaan Bola: ${stats.possession_home || 50}% (${home}) vs ${stats.possession_away || 50}% (${away})
+- Total Tembakan: ${stats.shots_home ?? 0} vs ${stats.shots_away ?? 0}
+- Tepat Sasaran: ${stats.shots_on_target_home ?? 0} vs ${stats.shots_on_target_away ?? 0}
+- Tendangan Sudut: ${stats.corners_home ?? 0} vs ${stats.corners_away ?? 0}
+- Pelanggaran: ${stats.fouls_home ?? 0} vs ${stats.fouls_away ?? 0}
+
+Instruksi:
+- Tulis dalam 1-2 paragraf mengalir padat dalam Bahasa Indonesia jurnalistik olahraga yang seru dan objektif.
+- Jangan gunakan format markdown judul (#), bullet points, sapaan pembuka (seperti "Halo"), atau kata penutup klise.
+- Langsung masuk ke narasi jalannya pertandingan.
+    `.trim();
+
+    // 3. Call 9Router OpenAI-compatible API
+    try {
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      if (routerApiKey) {
+        headers['Authorization'] = `Bearer ${routerApiKey}`;
+      }
+
+      const res = await fetch(`${routerBaseUrl.replace(/\/$/, '')}/chat/completions`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          model: routerModel,
+          messages: [
+            {
+              role: 'system',
+              content: 'Anda adalah seorang jurnalis dan analis olahraga profesional. Tulis ulasan pertandingan sepak bola dalam 1-2 paragraf narasi tanpa judul atau sapaan pembuka/penutup.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          temperature: 0.7,
+          max_tokens: 2048,
+          // 9router streams (SSE) unless told otherwise; we need a single JSON body
+          stream: false,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const text = data?.choices?.[0]?.message?.content?.trim();
+        if (text) {
+          // Clean up any stray markdown fences
+          const cleaned = text.replace(/^```(?:markdown)?\s*/i, '').replace(/\s*```$/, '').trim();
+          return NextResponse.json({
+            summary: cleaned,
+            model: `9Router (${routerModel})`,
+            isFallback: false,
+          });
+        }
+      }
+      console.warn('9Router returned non-OK status:', res.status);
+    } catch (routerErr) {
+      console.warn('9Router connection failed, falling back:', routerErr.message);
+    }
+
+    // 4. Fallback Generator if 9Router is offline
+    const hPoss = parseInt(stats.possession_home) || 50;
+    const aPoss = parseInt(stats.possession_away) || 50;
+    const hShots = parseInt(stats.shots_home) || 0;
+    const aShots = parseInt(stats.shots_away) || 0;
 
     let resultText = '';
-    if (hScore > aScore) resultText = `${home} sukses menundukkan ${away} dengan kemenangan ${hScore}-${aScore}.`;
-    else if (aScore > hScore) resultText = `${away} berhasil mencuri poin penuh dari kandang ${home} lewat kemenangan ${hScore}-${aScore}.`;
-    else resultText = `Duel sengit antara ${home} dan ${away} harus berakhir sama kuat dengan skor imbang ${hScore}-${aScore}.`;
-    
-    let possText = '';
-    if (hPoss > 55) possText = `Tuan rumah tampil mendikte permainan dengan dominasi penguasaan bola mencapai ${hPoss}%.`;
-    else if (aPoss > 55) possText = `Tim tamu bermain sangat agresif dan menguasai lini tengah dengan ${aPoss}% penguasaan bola.`;
-    else possText = `Pertarungan di lini tengah berlangsung alot dengan penguasaan bola yang relatif berimbang antara kedua kesebelasan.`;
-    
-    let attackText = `Sepanjang laga, ${home} tercatat melepaskan ${hShots} tembakan, berbalas ${aShots} tembakan dari kubu ${away}.`;
-    
-    const fallbackSummary = `${resultText} ${possText} ${attackText}`;
+    if (hScore > aScore) resultText = `${home} sukses mengamankan kemenangan berharga atas tamunya ${away} dengan keunggulan ${hScore}-${aScore}.`;
+    else if (aScore > hScore) resultText = `${away} berhasil mencuri poin penuh dari markas ${home} usai menyudahi laga dengan skor ${hScore}-${aScore}.`;
+    else resultText = `Pertarungan ketat antara ${home} dan ${away} harus berakhir tanpa pemenang setelah kedua tim bermain imbang ${hScore}-${aScore}.`;
 
-    return NextResponse.json({ 
+    let possText = '';
+    if (hPoss > 55) possText = `Tuan rumah ${home} mendikte jalannya permainan dengan dominasi penguasaan bola mencapai ${hPoss}%.`;
+    else if (aPoss > 55) possText = `Tim tamu ${away} bermain agresif dan berhasil memegang kendali lini tengah dengan ${aPoss}% penguasaan bola.`;
+    else possText = `Pertarungan di lini tengah berjalan sengit dengan persentase penguasaan bola yang berimbang.`;
+
+    let attackText = (hShots > 0 || aShots > 0)
+      ? ` Laga berlangsung terbuka di mana ${home} mencatatkan ${hShots} tembakan berbanding ${aShots} tembakan dari kubu ${away}.`
+      : '';
+
+    const fallbackSummary = `${resultText} ${possText}${attackText}`;
+
+    return NextResponse.json({
       summary: fallbackSummary,
-      isFallback: true 
+      model: 'Rule-based Engine (Fallback)',
+      isFallback: true
     });
+  } catch (error) {
+    console.error('Error generating summary:', error);
+    return NextResponse.json(
+      { error: 'Gagal memproses ringkasan pertandingan.' },
+      { status: 500 }
+    );
   }
 }
