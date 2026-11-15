@@ -39,7 +39,7 @@ export async function POST(req) {
         return `- ${min}: GOL DIANULIR (-1) untuk ${team} oleh ${player}. Alasan: ${e.event_data?.reason || 'Pelanggaran'}`;
       }
       if (e.event_type === 'yellow_card') return `- ${min}: Kartu kuning untuk ${player} (${team})`;
-      if (e.event_type === 'red_card') return `- ${min}: Kartu merah untuk ${player} (${team})`;
+      if (e.event_type === 'red_card') return `- ${min}: Kartu merah${e.event_data?.second_yellow ? ' (kartu kuning kedua)' : ''} untuk ${player} (${team})`;
       return null;
     }).filter(Boolean);
 

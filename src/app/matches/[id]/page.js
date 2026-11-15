@@ -985,6 +985,8 @@ function RincianTab({ match }) {
                             <div style={{ color: '#ef4444', marginTop: 2, fontSize: 11, textAlign: isHome ? 'right' : 'left' }}>Own goal</div>
                           ) : ev.event_type === 'penalty' ? (
                             <div style={{ color: '#f59e0b', marginTop: 2, fontSize: 11, textAlign: isHome ? 'right' : 'left' }}>Penalty</div>
+                          ) : ev.event_type === 'red_card' && ev.event_data?.second_yellow ? (
+                            <div style={{ color: '#ef4444', marginTop: 2, fontSize: 11, textAlign: isHome ? 'right' : 'left' }}>Kartu kuning kedua</div>
                           ) : null}
 
                           {/* Full Commentary */}
